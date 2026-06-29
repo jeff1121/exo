@@ -1,7 +1,7 @@
 # type: ignore
-"""Two-node integration tests (ring + jaccl parallelism).
+"""雙節點整合測試（ring + jaccl 平行化）。
 
-Run with:
+執行方式：
     uv run pytest tests/test_2node.py -v
 """
 

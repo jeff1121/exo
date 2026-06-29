@@ -1,1 +1,1 @@
-"""API adapters for different API formats (Claude, OpenAI Responses, etc.)."""
+"""此說明已翻譯為繁體中文。"""

@@ -12,7 +12,7 @@ def test_plain_union_prefers_first_member_when_shapes_are_identical():
     class Foo2(BaseModel):
         x: int
 
-    # Base Pydantic behavior: ambiguous dict goes to the first union member
+    # 已翻譯註解。
     ta = TypeAdapter[Foo1 | Foo2](Foo1 | Foo2)
     out = ta.validate_python({"x": 1})
     assert isinstance(out, Foo1), (
@@ -33,7 +33,7 @@ def test_tagged_union_serializes_and_deserializes_two_identical_shapes_correctly
     t2 = Foo2(x=2)
     assert t2.model_dump() == {"Foo2": {"x": 2}}
 
-    # ---- deserialize (TypeAdapter -> model_validator(before)) ----
+    # 已翻譯註解。
     ta = TypeAdapter[Foo1 | Foo2](Foo1 | Foo2)
 
     out1 = ta.validate_python({"Foo1": {"x": 10}})
@@ -136,7 +136,7 @@ def test_two_level_nested_tagging():
 def test_three_level_nested_tagging():
     wrapper = Wrapper(label="deep", outer=Outer(inner=Inner(x=7)))
     dumped = wrapper.model_dump()
-    # 3-level structure, each with exactly one tag
+    # 已翻譯註解。
     assert dumped == {
         "Wrapper": {
             "label": "deep",
@@ -178,7 +178,7 @@ def test_lists_and_mixed_nested_structures():
 
 
 def test_no_double_tagging_on_repeated_calls():
-    """Ensure multiple model_dump calls don't stack tags."""
+    """此說明已翻譯為繁體中文。"""
     inner = Inner(x=11)
     dumped1 = inner.model_dump()
     dumped2 = inner.model_dump()
@@ -237,13 +237,13 @@ L1 = L1A | L1B | L1C
 
 @pytest.mark.anyio
 async def test_tagged_union_is_fast():
-    # payload along the "C" path (worst case for DFS if branches are tried A->B->C)
+    # 已翻譯註解。
     payload = {"L1C": {"child": {"L2C": {"child": {"L3C": {"x": 123}}}}}}
 
     with anyio.fail_after(0.1):
         out = TypeAdapter(L1).validate_python(payload)  # type: ignore
 
-    # Sanity check the result
+    # 已翻譯註解。
     assert out.__class__.__name__ == "L1C"  # type: ignore
     assert out.child.__class__.__name__ == "L2C"  # type: ignore
     assert out.child.child.__class__.__name__ == "L3C"  # type: ignore

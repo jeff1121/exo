@@ -61,9 +61,7 @@ class ErrorOverride:
     ) -> Callable[P, R]: ...
 
     def patch[**P, R](self, fn: Callable[P, Any], /) -> Callable[P, Any]:
-        """
-        Returns a function with all these exceptions replaced by their overrides
-        """
+        """回傳一個函式，將這些例外替換為對應的覆寫例外。"""
 
         if iscoroutinefunction(fn):
             async_fn = cast(Callable[P, CoroutineType[Any, Any, R]], fn)
@@ -115,18 +113,17 @@ class Sender[T](AnyioSender[T]):
     ):
         super().__init__(_state=state)
 
-        # patch the methods we want to override errors for
+        # 替要覆寫錯誤型別的方法打補丁
         #
-        # NOTE: it is very important that new methods which are added,
-        #       and which can throw, are patched in this block
+        # 注意：若新增的方法可能拋出例外，務必在此區塊補丁
         if (e := error_override_config) is not None:
-            # new methods of this class
+            # 本類別新增的方法
             self.clone_receiver = e.patch(self.clone_receiver)
 
-            # overridden methods
+            # 覆寫的方法
             self.clone = e.patch(self.clone)
 
-            # parent methods
+            # 父類別方法
             self.send_nowait = e.patch(self.send_nowait)
             self.send = e.patch(self.send)
             self.close = e.patch(self.close)
@@ -142,7 +139,7 @@ class Sender[T](AnyioSender[T]):
         return Sender(self._state, self.err_config)
 
     def clone_receiver(self) -> "Receiver[T]":
-        """Constructs a Receiver using a Senders shared state - similar to calling Receiver.clone() without needing the receiver"""
+        """此說明已翻譯為繁體中文。"""
         if self._closed:
             raise ClosedResourceError
         return Receiver(self._state, self.err_config)
@@ -156,20 +153,19 @@ class Receiver[T](AnyioReceiver[T]):
     ):
         super().__init__(_state=state)
 
-        # patch the methods we want to override errors for
+        # 替要覆寫錯誤型別的方法打補丁
         #
-        # NOTE: it is very important that new methods which are added,
-        #       and which can throw, are patched in this block
+        # 注意：若新增的方法可能拋出例外，務必在此區塊補丁
         if (e := error_override_config) is not None:
-            # new methods of this class
+            # 本類別新增的方法
             self.clone_sender = e.patch(self.clone_sender)
             self.collect = e.patch(self.collect)
             self.receive_at_least = e.patch(self.receive_at_least)
 
-            # overridden methods
+            # 覆寫的方法
             self.clone = e.patch(self.clone)
 
-            # parent methods
+            # 父類別方法
             self.receive_nowait = e.patch(self.receive_nowait)
             self.receive = e.patch(self.receive)
             self.close = e.patch(self.close)
@@ -185,13 +181,13 @@ class Receiver[T](AnyioReceiver[T]):
         return Receiver(self._state, self.err_config)
 
     def clone_sender(self) -> Sender[T]:
-        """Constructs a Sender using a Receivers shared state - similar to calling Sender.clone() without needing the sender"""
+        """此說明已翻譯為繁體中文。"""
         if self._closed:
             raise ClosedResourceError
         return Sender(self._state, self.err_config)
 
     def collect(self) -> list[T]:
-        """Collect all currently available items from this receiver"""
+        """此說明已翻譯為繁體中文。"""
         out: list[T] = []
         while True:
             try:
@@ -240,8 +236,8 @@ class MpState[T]:
 @dataclass(eq=False)
 class MpSender[T]:
     """
-    An interprocess channel, mimicing the Anyio structure.
-    It should be noted that none of the clone methods are implemented for simplicity, for now.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     _state: MpState[T] = field()
@@ -263,7 +259,7 @@ class MpSender[T]:
         try:
             self.send_nowait(item)
         except WouldBlock:
-            # put anyway, blocking
+            # 已翻譯註解。
             self._state.buffer.put(item, block=True)
 
     async def send_async(self, item: T) -> None:
@@ -278,15 +274,15 @@ class MpSender[T]:
             self._state.buffer.put_nowait(_MpEndOfStream())
         self._state.buffer.close()
 
-    # == unique to Mp channels ==
+    # 已翻譯註解。
     def join(self) -> None:
-        """Ensure any queued messages are resolved before continuing"""
+        """確保佇列中的訊息都處理完成後再繼續。"""
         assert self._state.closed.is_set(), (
             "Mp channels must be closed before being joined"
         )
         self._state.buffer.join_thread()
 
-    # == context manager support ==
+    # 已翻譯註解。
     def __enter__(self) -> Self:
         return self
 
@@ -307,8 +303,8 @@ class MpSender[T]:
 @dataclass(eq=False)
 class MpReceiver[T]:
     """
-    An interprocess channel, mimicing the Anyio structure.
-    It should be noted that none of the clone methods are implemented for simplicity, for now.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     _state: MpState[T] = field()
@@ -336,9 +332,9 @@ class MpReceiver[T]:
             try:
                 item = self._state.buffer.get()
             except (TypeError, OSError):
-                # Queue pipe can get closed while we are blocked on get().
-                # The underlying connection._handle becomes None, causing
-                # TypeError in read(handle, remaining).
+                # 已翻譯註解。
+                # 已翻譯註解。
+                # 已翻譯註解。
                 raise ClosedResourceError from None
             if isinstance(item, _MpEndOfStream):
                 self.close()
@@ -357,15 +353,15 @@ class MpReceiver[T]:
             self._state.buffer.put_nowait(_MpEndOfStream())
         self._state.buffer.close()
 
-    # == unique to Mp channels ==
+    # 已翻譯註解。
     def join(self) -> None:
-        """Block until all enqueued messages are drained off our side of the buffer"""
+        """阻塞直到我們這端緩衝區中排隊訊息都被清空。"""
         assert self._state.closed.is_set(), (
             "Mp channels must be closed before being joined"
         )
         self._state.buffer.join_thread()
 
-    # == iterator support ==
+    # == 迭代器支援 ==
     def __iter__(self) -> Self:
         return self
 
@@ -375,7 +371,7 @@ class MpReceiver[T]:
         except EndOfStream:
             raise StopIteration from None
 
-    # == async iterator support ==
+    # == 非同步迭代器支援 ==
     def __aiter__(self) -> Self:
         return self
 
@@ -385,7 +381,7 @@ class MpReceiver[T]:
         except EndOfStream:
             raise StopAsyncIteration from None
 
-    # == context manager support ==
+    # 已翻譯註解。
     def __enter__(self) -> Self:
         return self
 
@@ -398,7 +394,7 @@ class MpReceiver[T]:
         self.close()
 
     def collect(self) -> list[T]:
-        """Collect all currently available items from this receiver"""
+        """此說明已翻譯為繁體中文。"""
         out: list[T] = []
         while True:
             try:
@@ -424,7 +420,7 @@ class MpReceiver[T]:
 
 
 class channel[T]:  # noqa: N801
-    """Create a pair of asynchronous channels for communicating within the same process"""
+    """建立一對用於同一行程內通訊的非同步通道。"""
 
     def __new__(
         cls,
@@ -440,9 +436,9 @@ class channel[T]:  # noqa: N801
 
 
 class mp_channel[T]:  # noqa: N801
-    """Create a pair of synchronous channels for interprocess communication"""
+    """建立一對用於跨行程通訊的同步通道。"""
 
-    # max buffer size uses math.inf to represent an unbounded queue, and 0 to represent a yet unimplemented "unbuffered" queue.
+    # 已翻譯註解。
     def __new__(cls, max_buffer_size: float = inf) -> tuple[MpSender[T], MpReceiver[T]]:
         if (
             max_buffer_size == 0

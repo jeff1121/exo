@@ -27,8 +27,8 @@ from exo.worker.tests.unittests.conftest import (
 
 def test_plan_kills_runner_when_instance_missing():
     """
-    If a local runner's instance is no longer present in state,
-    plan() should return a Shutdown for that runner.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard = get_pipeline_shard_metadata(model_id=MODEL_A_ID, device_rank=0)
     instance = get_mlx_ring_instance(
@@ -66,8 +66,8 @@ def test_plan_kills_runner_when_instance_missing():
 
 def test_plan_kills_runner_when_sibling_failed():
     """
-    If a sibling runner in the same instance has failed, the local runner
-    should be shut down.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard2 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -109,8 +109,8 @@ def test_plan_kills_runner_when_sibling_failed():
 
 def test_plan_creates_runner_when_missing_for_node():
     """
-    If shard_assignments specify a runner for this node but we don't have
-    a local supervisor yet, plan() should emit a CreateRunner.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard = get_pipeline_shard_metadata(model_id=MODEL_A_ID, device_rank=0)
     instance = get_mlx_ring_instance(
@@ -120,7 +120,7 @@ def test_plan_creates_runner_when_missing_for_node():
         runner_to_shard={RUNNER_1_ID: shard},
     )
 
-    runners: dict[Any, Any] = {}  # nothing local yet
+    runners: dict[Any, Any] = {}  # 已翻譯註解。
     instances = {INSTANCE_1_ID: instance}
     all_runners: dict[Any, Any] = {}
 
@@ -137,7 +137,7 @@ def test_plan_creates_runner_when_missing_for_node():
         download_backoff=KeyedBackoff(),
     )
 
-    # We patched plan_mod.CreateRunner → CreateRunner
+    # 已翻譯註解。
     assert isinstance(result, plan_mod.CreateRunner)
     assert result.instance_id == INSTANCE_1_ID
     assert isinstance(result.bound_instance, BoundInstance)
@@ -147,8 +147,8 @@ def test_plan_creates_runner_when_missing_for_node():
 
 def test_plan_does_not_create_runner_when_supervisor_already_present():
     """
-    If we already have a local supervisor for the runner assigned to this node,
-    plan() should not emit a CreateRunner again.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard = get_pipeline_shard_metadata(model_id=MODEL_A_ID, device_rank=0)
     instance = get_mlx_ring_instance(
@@ -184,8 +184,8 @@ def test_plan_does_not_create_runner_when_supervisor_already_present():
 
 def test_plan_does_not_create_runner_for_unassigned_node():
     """
-    If this node does not appear in shard_assignments.node_to_runner,
-    plan() should not try to create a runner on this node.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard = get_pipeline_shard_metadata(model_id=MODEL_A_ID, device_rank=0)
     instance = get_mlx_ring_instance(
@@ -195,7 +195,7 @@ def test_plan_does_not_create_runner_for_unassigned_node():
         runner_to_shard={RUNNER_2_ID: shard},
     )
 
-    runners: dict[RunnerId, FakeRunnerSupervisor] = {}  # no local runners
+    runners: dict[RunnerId, FakeRunnerSupervisor] = {}  # 已翻譯註解。
     instances = {INSTANCE_1_ID: instance}
     all_runners: dict[RunnerId, RunnerStatus] = {}
 

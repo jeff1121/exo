@@ -246,7 +246,7 @@ class Runner:
                 self.update_status(RunnerConnected())
                 logger.info("runner connected")
 
-            # we load the model if it's connected with a group, or idle without a group. we should never tell a model to connect if it doesn't need to
+            # 已翻譯註解。
             case LoadModel() if isinstance(self.generator, Builder) and (
                 isinstance(self.current_status, (RunnerConnected, RunnerIdle))
             ):

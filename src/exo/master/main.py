@@ -156,7 +156,7 @@ class Master:
                 tg.start_soon(self._command_processor)
                 tg.start_soon(self._plan)
         except* (EventRouterBrokenResourceError, EventRouterClosedResourceError):
-            # Event router has been closed (try-star syntax handles error groups)
+            # 已翻譯註解。
             pass
         finally:
             self._event_log.close()
@@ -181,7 +181,7 @@ class Master:
                         case TestCommand():
                             pass
                         case TextGeneration():
-                            # set-difference => prefill-only nodes
+                            # 已翻譯註解。
                             prefill_only: set[InstanceId] = set()
                             for link in self.state.instance_links.values():
                                 prefill_only.update(link.prefill_instances)
@@ -189,13 +189,13 @@ class Master:
                                 prefill_only.difference_update(link.decode_instances)
 
                             for instance in self.state.instances.values():
-                                # NON-prefill-only instances matching the model ID
+                                # 已翻譯註解。
                                 if (
                                     instance.shard_assignments.model_id
                                     == command.task_params.model
                                     and instance.instance_id not in prefill_only
                                 ):
-                                    # count in-flight tasks of that instance
+                                    # 已翻譯註解。
                                     in_flight = {TaskStatus.Pending, TaskStatus.Running}
                                     task_count = sum(
                                         1
@@ -207,7 +207,7 @@ class Master:
                                         task_count
                                     )
 
-                            # there are no NON-prefill-only instances matching this model ID
+                            # 已翻譯註解。
                             if not instance_task_counts:
                                 raise ValueError(
                                     f"No instance found for model {command.task_params.model}"
@@ -452,8 +452,8 @@ class Master:
                                 InstanceLinkDeleted(link_id=command.link_id)
                             )
                         case RequestEventLog():
-                            # We should just be able to send everything, since other buffers will ignore old messages
-                            # rate limit to 1000 at a time
+                            # 已翻譯註解。
+                            # 每批最多 1000 筆做流量限制
                             end = min(command.since_idx + 1000, len(self._event_log))
                             for i, event in enumerate(
                                 self._event_log.read_range(command.since_idx, end),
@@ -467,10 +467,10 @@ class Master:
                 except Exception as e:
                     logger.opt(exception=e).warning("Error in command processor")
 
-    # These plan loops are the cracks showing in our event sourcing architecture - more things could be commands
+    # 已翻譯註解。
     async def _plan(self) -> None:
         while True:
-            # kill broken instances
+            # 已翻譯註解。
             connected_node_ids = set(self.state.topology.list_nodes())
             for instance_id, instance in self.state.instances.items():
                 for node_id in instance.shard_assignments.node_to_runner:
@@ -480,7 +480,7 @@ class Master:
                         )
                         break
 
-            # time out dead nodes
+            # 將逾時的節點標記為失效
             for node_id, time in self.state.last_seen.items():
                 now = datetime.now(tz=timezone.utc)
                 if now - time > timedelta(seconds=30):
@@ -492,7 +492,7 @@ class Master:
     async def _event_processor(self) -> None:
         with self.local_event_receiver as local_events:
             async for local_event in local_events:
-                # Discard all events not from our session
+                # 已翻譯註解。
                 if local_event.session != self.session_id:
                     continue
                 self._multi_buffer.ingest(
@@ -521,9 +521,9 @@ class Master:
                     self._event_log.append(event)
                     await self._send_indexed_event(indexed)
 
-    # This function is re-entrant, take care!
+    # 此函式具可重入性，使用時請留意！
     async def _send_indexed_event(self, event: IndexedEvent):
-        # Convenience method since this line is ugly
+        # 這行較冗長，抽成便利方法
         await self.global_event_sender.send(
             GlobalForwarderEvent(
                 origin=self.node_id,

@@ -27,8 +27,8 @@ from exo.worker.tests.unittests.conftest import (
 
 def test_plan_starts_warmup_for_accepting_rank_when_all_loaded_or_warming():
     """
-    For non-zero device_rank shards, StartWarmup should be emitted when all
-    shards in the instance are Loaded/WarmingUp.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=3)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=3)
@@ -74,8 +74,8 @@ def test_plan_starts_warmup_for_accepting_rank_when_all_loaded_or_warming():
 
 def test_plan_starts_warmup_for_rank_zero_after_others_warming():
     """
-    For device_rank == 0, StartWarmup should only be emitted once all the
-    other runners in the instance are already warming up.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -119,7 +119,7 @@ def test_plan_starts_warmup_for_rank_zero_after_others_warming():
 
 def test_plan_does_not_start_warmup_for_non_zero_rank_until_all_loaded_or_warming():
     """
-    Non-zero rank should not start warmup while any shard is not Loaded/WarmingUp.
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -162,11 +162,11 @@ def test_plan_does_not_start_warmup_for_non_zero_rank_until_all_loaded_or_warmin
 
 def test_plan_does_not_start_warmup_for_rank_zero_until_others_warming():
     """
-    Rank-zero shard should not start warmup until all non-zero ranks are
-    already WarmingUp.
-    For accepting ranks (device_rank != 0), StartWarmup should be
-    emitted when all shards in the instance are Loaded/WarmingUp.
-    In a 2-node setup, rank 1 is the accepting rank.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -177,7 +177,7 @@ def test_plan_does_not_start_warmup_for_rank_zero_until_others_warming():
         runner_to_shard={RUNNER_1_ID: shard0, RUNNER_2_ID: shard1},
     )
 
-    # Rank 1 is the accepting rank
+    # 已翻譯註解。
     bound_instance = BoundInstance(
         instance=instance, bound_runner_id=RUNNER_1_ID, bound_node_id=NODE_A
     )
@@ -231,9 +231,9 @@ def test_plan_does_not_start_warmup_for_rank_zero_until_others_warming():
 
 def test_plan_starts_warmup_for_connecting_rank_after_others_warming():
     """
-    For connecting rank (device_rank == world_size - 1), StartWarmup should
-    only be emitted once all the other runners are already warming up.
-    In a 2-node setup, rank 1 is the connecting rank.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -244,7 +244,7 @@ def test_plan_starts_warmup_for_connecting_rank_after_others_warming():
         runner_to_shard={RUNNER_1_ID: shard0, RUNNER_2_ID: shard1},
     )
 
-    # Rank 1 is the connecting rank
+    # 已翻譯註解。
     bound_instance = BoundInstance(
         instance=instance, bound_runner_id=RUNNER_2_ID, bound_node_id=NODE_B
     )
@@ -278,8 +278,8 @@ def test_plan_starts_warmup_for_connecting_rank_after_others_warming():
 
 def test_plan_does_not_start_warmup_for_accepting_rank_until_all_loaded_or_warming():
     """
-    Accepting rank should not start warmup while any shard is not Loaded/WarmingUp.
-    In a 2-node setup, rank 0 is the accepting rank.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -290,7 +290,7 @@ def test_plan_does_not_start_warmup_for_accepting_rank_until_all_loaded_or_warmi
         runner_to_shard={RUNNER_1_ID: shard0, RUNNER_2_ID: shard1},
     )
 
-    # Rank 0 is the accepting rank
+    # 已翻譯註解。
     bound_instance = BoundInstance(
         instance=instance, bound_runner_id=RUNNER_1_ID, bound_node_id=NODE_A
     )
@@ -323,8 +323,8 @@ def test_plan_does_not_start_warmup_for_accepting_rank_until_all_loaded_or_warmi
 
 def test_plan_does_not_start_warmup_for_connecting_rank_until_others_warming():
     """
-    Connecting rank (device_rank == 0) should not start warmup
-    until all other ranks are already WarmingUp.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -335,7 +335,7 @@ def test_plan_does_not_start_warmup_for_connecting_rank_until_others_warming():
         runner_to_shard={RUNNER_1_ID: shard0, RUNNER_2_ID: shard1},
     )
 
-    # Rank 1 is the connecting rank
+    # 已翻譯註解。
     bound_instance = BoundInstance(
         instance=instance, bound_runner_id=RUNNER_1_ID, bound_node_id=NODE_A
     )

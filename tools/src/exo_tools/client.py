@@ -1,5 +1,5 @@
 # type: ignore
-"""HTTP client for the exo API."""
+"""exo API 的 HTTP 客戶端。"""
 
 from __future__ import annotations
 
@@ -64,7 +64,7 @@ class ExoClient:
         return self.request_json("POST", "/bench/chat/completions", body=payload)
 
     def stream_bench_chat_completions(self, payload: dict[str, Any]) -> Iterator[str]:
-        """POST /bench/chat/completions with stream=True, yielding raw SSE lines."""
+        """以 stream=True 呼叫 POST /bench/chat/completions，逐行產出原始 SSE。"""
         payload = {**payload, "stream": True}
         data = json.dumps(payload).encode("utf-8")
         conn = http.client.HTTPConnection(self.host, self.port, timeout=self.timeout_s)

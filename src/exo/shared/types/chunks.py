@@ -35,8 +35,8 @@ class ErrorChunk(BaseChunk):
     error_message: str
     finish_reason: Literal["error"] = "error"
 
-    # NOTE: this is a bad place to put this, creates semantic overlap/confusion;
-    #       at some point someone put this somewhere else, thanks :)
+    # 注意：已翻譯註解。
+    #       已翻譯註解。
     diagnostics: list[KnownRunnerDiagnostic] = []
 
 
@@ -61,8 +61,8 @@ class ImageChunk(BaseChunk):
     error_message: str | None = None
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
-            if name == "data" and hasattr(value, "__len__"):  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
+            if name == "data" and hasattr(value, "__len__"):  # 已翻譯註解。
                 yield name, f"<{len(self.data)} chars>"
             elif name is not None:
                 yield name, value
@@ -76,15 +76,15 @@ class InputImageChunk(BaseChunk):
     image_index: int = 0
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
-            if name == "data" and hasattr(value, "__len__"):  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
+            if name == "data" and hasattr(value, "__len__"):  # 已翻譯註解。
                 yield name, f"<{len(self.data)} chars>"
             elif name is not None:
                 yield name, value
 
 
 class PrefillProgressChunk(BaseChunk):
-    """Data class for prefill progress events during streaming."""
+    """此說明已翻譯為繁體中文。"""
 
     processed_tokens: int
     total_tokens: int

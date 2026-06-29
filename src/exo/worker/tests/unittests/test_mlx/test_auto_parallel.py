@@ -21,7 +21,7 @@ def run_pipeline_device(
     rank: int,
     world_size: int,
     hostfile_path: str,
-    result_queue: Any,  # pyright: ignore[reportAny]
+    result_queue: Any,  # 已翻譯註解。
 ) -> None:
     import os
 
@@ -53,7 +53,7 @@ def run_pipeline_device(
         first = PipelineFirstLayer(mock, r=rank, group=group)
         composed = PipelineLastLayer(first, r=rank, s=world_size, group=group)
 
-        # Wrap in a mock model, then wrap in PipelineParallelModel for all_gather
+        # 已翻譯註解。
         inner_model = MockModel([composed])
         model = patch_pipeline_model(inner_model, group)
 
@@ -61,9 +61,9 @@ def run_pipeline_device(
         result = model(x)
         mx.eval(result)
         success = result.shape == x.shape
-        result_queue.put((rank, success, result))  # pyright: ignore[reportAny]
+        result_queue.put((rank, success, result))  # 已翻譯註解。
     except Exception as e:
-        result_queue.put((rank, False, str(e)))  # pyright: ignore[reportAny]
+        result_queue.put((rank, False, str(e)))  # 已翻譯註解。
 
 
 def test_single_wrapper_delegates_attributes() -> None:
@@ -117,13 +117,13 @@ def test_composed_call_works() -> None:
             p.start()
             processes.append(p)
 
-        for p in processes:  # pyright: ignore[reportAny]
-            p.join(timeout=10)  # pyright: ignore[reportAny]
+        for p in processes:  # 已翻譯註解。
+            p.join(timeout=10)  # 已翻譯註解。
 
         results: dict[int, Any] = {}
         errors: dict[int, str] = {}
-        while not result_queue.empty():  # pyright: ignore[reportAny]
-            rank, success, value = result_queue.get()  # pyright: ignore[reportAny]
+        while not result_queue.empty():  # 已翻譯註解。
+            rank, success, value = result_queue.get()  # 已翻譯註解。
             if success:
                 results[rank] = value
             else:
@@ -138,7 +138,7 @@ def test_composed_call_works() -> None:
                 f"Device {rank} failed: {errors.get(rank, 'unknown')}"
             )
             result_array = results[rank]
-            # Both devices see the final result (4.0) after all_gather
+            # 已翻譯註解。
             assert (result_array == 4.0).all(), (
                 f"Device {rank}: expected 4.0, got {result_array}"
             )

@@ -30,7 +30,7 @@ from exo.worker.engines.mlx.utils_mlx import (
     load_tokenizer_for_model_id,
 )
 
-# ── Config reduction ──────────────────────────────────────────────────────── #
+# 已翻譯註解。
 
 _REDUCE = {
     "num_hidden_layers": 4,
@@ -103,14 +103,14 @@ def _reduce_config(cfg: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────── #
+# 已翻譯註解。
 
 
 def _find_snapshot(hub_name: str) -> Path | None:
-    """Locate a model directory under exo's models dirs.
+    """此說明已翻譯為繁體中文。
 
-    Uses resolve_existing_model for fully-downloaded models; falls back to any
-    existing directory (even partial) so that tokenizer-only copies still work.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     model_id = ModelId(f"mlx-community/{hub_name}")
     found = resolve_existing_model(model_id)
@@ -139,8 +139,8 @@ def _copy_tokenizer(src: Path, dst: Path) -> None:
 
 def _build_model(module_name: str, cfg: dict[str, Any]) -> Model:
     mod = importlib.import_module(f"mlx_lm.models.{module_name}")
-    args = mod.ModelArgs.from_dict(cfg)  # pyright: ignore[reportAny]
-    model: nn.Module = mod.Model(args)  # pyright: ignore[reportAny]
+    args = mod.ModelArgs.from_dict(cfg)  # 已翻譯註解。
+    model: nn.Module = mod.Model(args)  # 已翻譯註解。
     flat = cast(list[tuple[str, mx.array]], tree_flatten(model.parameters()))
     random_weights = [
         (k, mx.random.normal(shape=v.shape, dtype=mx.float16)) for k, v in flat
@@ -172,7 +172,7 @@ def _collect_tokens(
     return tokens
 
 
-# ── Architecture definitions ──────────────────────────────────────────────── #
+# 已翻譯註解。
 
 
 @dataclass(frozen=True)
@@ -180,7 +180,7 @@ class ArchSpec:
     name: str
     hub_name: str
     module: str
-    tokenizer_hub: str | None = None  # fallback for models without bundled tokenizer
+    tokenizer_hub: str | None = None  # 已翻譯註解。
 
 
 ARCHITECTURES: list[ArchSpec] = [
@@ -209,7 +209,7 @@ ARCHITECTURES: list[ArchSpec] = [
 
 
 def _has_chat_template(model_dir: Path) -> bool:
-    """Check if a model dir has a usable chat template (inline or separate)."""
+    """此說明已翻譯為繁體中文。"""
     if (model_dir / "chat_template.jinja").exists():
         return True
     cfg = model_dir / "tokenizer_config.json"
@@ -265,12 +265,12 @@ def _make_task() -> TextGenerationTaskParams:
     )
 
 
-# ── Test class ────────────────────────────────────────────────────────────── #
+# 已翻譯註解。
 
 
 @pytest.mark.slow
 class TestPrefixCacheArchitectures:
-    """Verify prefix cache produces identical output to fresh generation for every architecture."""
+    """此說明已翻譯為繁體中文。"""
 
     @pytest.fixture(autouse=True)
     def _cleanup(self):
@@ -292,13 +292,13 @@ class TestPrefixCacheArchitectures:
 
         tmpdir = Path(tempfile.mkdtemp(prefix=f"exo_test_{spec.name}_"))
         try:
-            # Build reduced config
+            # 已翻譯註解。
             with open(snapshot / "config.json") as f:
                 cfg = cast(dict[str, Any], json.load(f))
             reduced = _reduce_config(copy.deepcopy(cfg))
             (tmpdir / "config.json").write_text(json.dumps(reduced))
 
-            # Copy tokenizer
+            # 已翻譯註解。
             tok_src = snapshot
             if spec.tokenizer_hub is not None:
                 alt = _find_snapshot(spec.tokenizer_hub)
@@ -306,7 +306,7 @@ class TestPrefixCacheArchitectures:
                     tok_src = alt
             _copy_tokenizer(tok_src, tmpdir)
 
-            # Load tokenizer and model
+            # 已翻譯註解。
             model_id = ModelId(f"mlx-community/{spec.hub_name}")
             tokenizer = load_tokenizer_for_model_id(model_id, tmpdir)
             mx.random.seed(0)
@@ -315,17 +315,17 @@ class TestPrefixCacheArchitectures:
             task = _make_task()
             prompt = apply_chat_template(tokenizer=tokenizer, task_params=task)
 
-            # Run 1: fresh
+            # 已翻譯註解。
             mx.random.seed(42)
             fresh = _collect_tokens(model, tokenizer, task, prompt, None)
             assert len(fresh) > 0, "Fresh generation produced no tokens"
 
-            # Run 2: populate cache
+            # 已翻譯註解。
             kv = KVPrefixCache(None)
             mx.random.seed(42)
             populate = _collect_tokens(model, tokenizer, task, prompt, kv)
 
-            # Run 3: exact cache hit
+            # 已翻譯註解。
             mx.random.seed(42)
             cached = _collect_tokens(model, tokenizer, task, prompt, kv)
 

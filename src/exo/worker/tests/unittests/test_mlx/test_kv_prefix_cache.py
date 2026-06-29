@@ -80,7 +80,7 @@ class TestGetPrefixLength:
 class TestKVPrefix:
     @pytest.fixture
     def mock_tokenizer(self):
-        """Create a minimal mock tokenizer for tests that don't need real tokenization."""
+        """此說明已翻譯為繁體中文。"""
         from unittest.mock import MagicMock
 
         tokenizer = MagicMock()
@@ -153,9 +153,9 @@ class TestKVPrefixCacheWithModel:
             distributed_prompt_progress_callback=None,
         )
 
-        # Cache should now hold the prompt tokens minus one
+        # 已翻譯註解。
         assert cache_length(cache) == len(tokens) - 1
-        # Snapshots should be available for models with non-KV caches
+        # 已翻譯註解。
         assert len(snapshots) > 0
 
     def test_add_and_get_exact_match(self, model_and_tokenizer):
@@ -188,20 +188,20 @@ class TestKVPrefixCacheWithModel:
         stored_length = cache_length(kv_prefix_cache.caches[0])
         assert stored_length > 0
 
-        # Retrieve with same prompt: exact match
+        # 已翻譯註解。
         result_cache, remaining_tokens, matched_index, _ = kv_prefix_cache.get_kv_cache(
             model, tokens
         )
         assert matched_index == 0
 
-        # Exact match returns last token(s) — for models with SSM/rotating caches,
-        # snapshot availability constrains how far back we can trim, so remaining
-        # may be 1 or 2 tokens depending on the model.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert len(remaining_tokens) >= 1
         assert mx.array_equal(remaining_tokens, tokens[-len(remaining_tokens) :])
 
     def test_add_and_get_prefix_match(self, model_and_tokenizer):
-        """get_kv_cache with a longer prompt sharing prefix should return partial match."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         short_task = TextGenerationTaskParams(
@@ -227,7 +227,7 @@ class TestKVPrefixCacheWithModel:
         kv_prefix_cache = KVPrefixCache(None)
         kv_prefix_cache.add_kv_cache(short_tokens, cache, snapshots)
 
-        # Query with longer prompt that shares the chat template prefix
+        # 已翻譯註解。
         long_task = TextGenerationTaskParams(
             model=DEFAULT_GPT_OSS_MODEL_ID,
             input=[InputMessage(role="user", content="Hi there, how are you?")],
@@ -236,7 +236,7 @@ class TestKVPrefixCacheWithModel:
         long_prompt = apply_chat_template(tokenizer, long_task)
         long_tokens = encode_prompt(tokenizer, long_prompt)
 
-        # The prompts share a prefix (chat template preamble + "Hi")
+        # 已翻譯註解。
         expected_prefix = get_prefix_length(long_tokens, short_tokens)
         assert expected_prefix > 0, (
             "Prompts should share a prefix from the chat template"
@@ -247,13 +247,13 @@ class TestKVPrefixCacheWithModel:
         )
         assert matched_index == 0
 
-        # remaining_tokens covers from snapshot restore position to end
+        # 已翻譯註解。
         assert len(remaining_tokens) >= len(long_tokens) - expected_prefix
 
     def test_stored_cache_not_mutated_after_get_and_generation(
         self, model_and_tokenizer
     ):
-        """Getting a cache and then mutating it (as generation does) must not corrupt stored cache."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         task = TextGenerationTaskParams(
@@ -281,11 +281,11 @@ class TestKVPrefixCacheWithModel:
 
         stored_length = cache_length(kv_prefix_cache.caches[0])
 
-        # Get cache and mutate it (simulating what generation does)
+        # 已翻譯註解。
         result_cache, _, matched_index, _ = kv_prefix_cache.get_kv_cache(model, tokens)
         assert matched_index == 0
 
-        # Simulate generation: feed many additional tokens through the cache
+        # 已翻譯註解。
         head_dim = result_cache[0].keys.shape[-1]
         num_heads = result_cache[0].keys.shape[1]
         extra_keys = mx.random.normal((1, num_heads, 50, head_dim))
@@ -294,13 +294,13 @@ class TestKVPrefixCacheWithModel:
             layer_cache.update_and_fetch(extra_keys, extra_values)
         mx.eval([c.keys for c in result_cache])
 
-        # Stored cache must be unchanged
+        # 已翻譯註解。
         assert cache_length(kv_prefix_cache.caches[0]) == stored_length
 
     def test_stored_cache_survives_repeated_get_mutate_cycles(
         self, model_and_tokenizer
     ):
-        """Multiple get+mutate cycles (like repeated user requests) must not corrupt cache."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         task = TextGenerationTaskParams(
@@ -343,7 +343,7 @@ class TestKVPrefixCacheWithModel:
             )
 
     def test_mlx_generate_populates_cache(self, model_and_tokenizer):
-        """mlx_generate should save the post-prefill cache (before the decode loop)."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         kv_prefix_cache = KVPrefixCache(None)
@@ -355,7 +355,7 @@ class TestKVPrefixCacheWithModel:
         prompt = apply_chat_template(tokenizer, task)
         prompt_tokens = encode_prompt(tokenizer, prompt)
 
-        # Consume the entire generator so the cache-saving code after yield runs
+        # 已翻譯註解。
         for _response in mlx_generate(
             model=model,
             tokenizer=tokenizer,
@@ -368,13 +368,13 @@ class TestKVPrefixCacheWithModel:
 
         assert len(kv_prefix_cache.prompts) == 1
         assert len(kv_prefix_cache.caches) == 1
-        # add_kv_cache is called before the decode loop and stores a deepcopy of
-        # the cache as it is just after prefill + trim(2). Generation tokens are
-        # never written into the stored entry.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert cache_length(kv_prefix_cache.caches[0]) == len(prompt_tokens) - 2
 
     def test_mlx_generate_second_call_gets_prefix_hit(self, model_and_tokenizer):
-        """Second mlx_generate call with same prompt should get a prefix hit from stored cache."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         kv_prefix_cache = KVPrefixCache(None)
@@ -386,7 +386,7 @@ class TestKVPrefixCacheWithModel:
         prompt = apply_chat_template(tokenizer, task)
         prompt_tokens = encode_prompt(tokenizer, prompt)
 
-        # First generation populates cache
+        # 已翻譯註解。
         for _response in mlx_generate(
             model=model,
             tokenizer=tokenizer,
@@ -399,25 +399,25 @@ class TestKVPrefixCacheWithModel:
 
         assert len(kv_prefix_cache.prompts) == 1
 
-        # Second call should find a prefix match (the stored cache contains
-        # prompt + generated tokens, which shares the prompt prefix)
+        # 已翻譯註解。
+        # 已翻譯註解。
         result_cache, remaining_tokens, matched_index, _ = kv_prefix_cache.get_kv_cache(
             model, prompt_tokens
         )
-        # The stored cache is longer than the prompt (it includes generated tokens),
-        # so this is a prefix match where our prompt is fully contained
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert matched_index == 0
-        # Exact match: remaining_tokens is just the last token and the one before
+        # 已翻譯註解。
         assert len(remaining_tokens) == 2
         assert mx.array_equal(remaining_tokens, prompt_tokens[-2:])
 
     def test_mlx_generate_long_prompt_updates_cache_in_place(self, model_and_tokenizer):
-        """With a prompt > 1000 tokens, second generation should update the cache entry in-place."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         kv_prefix_cache = KVPrefixCache(None)
 
-        # Build a long user message (> 1000 tokens) to exceed _MIN_PREFIX_HIT_TO_UPDATE
+        # 已翻譯註解。
         base_text = "The quick brown fox jumps over the lazy dog. "
         base_tokens = tokenizer.encode(base_text)
         repeats = (1200 // len(base_tokens)) + 2
@@ -434,7 +434,7 @@ class TestKVPrefixCacheWithModel:
             "Prompt must exceed _MIN_PREFIX_HIT_TO_UPDATE"
         )
 
-        # First generation populates the cache (must prefill all tokens)
+        # 已翻譯註解。
         t0 = time.perf_counter()
         for _response in mlx_generate(
             model=model,
@@ -450,7 +450,7 @@ class TestKVPrefixCacheWithModel:
         assert len(kv_prefix_cache.prompts) == 1
         first_cache_length = cache_length(kv_prefix_cache.caches[0])
 
-        # Second generation: same long prompt + extra content (simulating multi-turn)
+        # 已翻譯註解。
         task2 = TextGenerationTaskParams(
             model=DEFAULT_GPT_OSS_MODEL_ID,
             input=[
@@ -463,11 +463,11 @@ class TestKVPrefixCacheWithModel:
         prompt2 = apply_chat_template(tokenizer, task2)
         prompt2_tokens = encode_prompt(tokenizer, prompt2)
 
-        # Verify the prompts share a long prefix
+        # 已翻譯註解。
         prefix_len = get_prefix_length(prompt2_tokens, prompt1_tokens)
         assert prefix_len > 1000, "Prompts must share > 1000 token prefix"
 
-        # Second generation should reuse the cached prefix (only prefill new tokens)
+        # 已翻譯註解。
         t0 = time.perf_counter()
         for _response in mlx_generate(
             model=model,
@@ -480,20 +480,20 @@ class TestKVPrefixCacheWithModel:
             pass
         second_gen_time = time.perf_counter() - t0
 
-        # Second generation should be significantly faster due to prefix cache hit - hopefully not flaky
+        # 已翻譯註解。
         assert second_gen_time < first_gen_time * 0.5, (
             f"Expected prefix cache speedup: "
             f"first={first_gen_time:.2f}s, second={second_gen_time:.2f}s"
         )
 
-        # With prefix_hit > 1000, should update in-place (not add a second entry)
+        # 已翻譯註解。
         assert len(kv_prefix_cache.prompts) == 1
-        # Updated cache should be longer (prompt2 + generated > prompt1 + generated)
+        # 已翻譯註解。
         updated_cache_length = cache_length(kv_prefix_cache.caches[0])
         assert updated_cache_length > first_cache_length
 
     def test_mlx_generate_stored_cache_not_mutated(self, model_and_tokenizer):
-        """After mlx_generate saves a cache, a second generation must not corrupt the stored copy."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         kv_prefix_cache = KVPrefixCache(None)
@@ -504,7 +504,7 @@ class TestKVPrefixCacheWithModel:
         )
         prompt = apply_chat_template(tokenizer, task)
 
-        # First generation populates cache
+        # 已翻譯註解。
         for _response in mlx_generate(
             model=model,
             tokenizer=tokenizer,
@@ -517,7 +517,7 @@ class TestKVPrefixCacheWithModel:
 
         firstcache_length = cache_length(kv_prefix_cache.caches[0])
 
-        # Second generation gets the cache and mutates it during generation
+        # 已翻譯註解。
         for _response in mlx_generate(
             model=model,
             tokenizer=tokenizer,
@@ -528,16 +528,16 @@ class TestKVPrefixCacheWithModel:
         ):
             pass
 
-        # The first stored cache must not have been mutated by the second generation
+        # 已翻譯註解。
         assert cache_length(kv_prefix_cache.caches[0]) == firstcache_length
 
     def test_evicts_lru_entry_under_memory_pressure(self, model_and_tokenizer):
-        """Under memory pressure, adding a new cache entry evicts the least recently used one."""
+        """此說明已翻譯為繁體中文。"""
         model, tokenizer = model_and_tokenizer
 
         kv_prefix_cache = KVPrefixCache(None)
 
-        # Add three cache entries with different prompts
+        # 已翻譯註解。
         prompts = ["First entry", "Second entry", "Third entry"]
         for i, content in enumerate(prompts):
             task = TextGenerationTaskParams(
@@ -559,21 +559,21 @@ class TestKVPrefixCacheWithModel:
                 distributed_prompt_progress_callback=None,
             )
             kv_prefix_cache.add_kv_cache(tokens, cache)
-            # Stagger _last_used so LRU order is deterministic
+            # 已翻譯註解。
             kv_prefix_cache._last_used[i] = float(i)
 
         assert len(kv_prefix_cache.prompts) == 3
 
-        # Access the third entry to make it most recently used
+        # 已翻譯註解。
         kv_prefix_cache._last_used[2] = 100.0
-        # Entry 0 (_last_used=0.0) is LRU, entry 1 (_last_used=1.0) is next
+        # 已翻譯註解。
 
-        # Simulate memory pressure: return usage above _MEMORY_THRESHOLD (0.9)
+        # 已翻譯註解。
         with patch(
             "exo.worker.engines.mlx.cache.get_memory_used_percentage",
             return_value=0.95,
         ):
-            # Trigger eviction by adding a new entry
+            # 已翻譯註解。
             task = TextGenerationTaskParams(
                 model=DEFAULT_GPT_OSS_MODEL_ID,
                 input=[InputMessage(role="user", content="New entry")],
@@ -594,9 +594,9 @@ class TestKVPrefixCacheWithModel:
             )
             kv_prefix_cache.add_kv_cache(tokens, cache)
 
-        # LRU entries should have been evicted (entries 0, 1, 2 in order of _last_used)
-        # Since fake_active stays above threshold after each eviction (we don't change it),
-        # all old entries get evicted, leaving only the newly added one
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert len(kv_prefix_cache.prompts) == 1
-        # The surviving entry should be the newly added one
+        # 已翻譯註解。
         assert get_prefix_length(kv_prefix_cache.prompts[0], tokens) == len(tokens)

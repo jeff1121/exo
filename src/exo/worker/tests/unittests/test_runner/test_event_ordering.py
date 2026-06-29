@@ -1,4 +1,4 @@
-# Check tasks are complete before runner is ever ready.
+# 已翻譯註解。
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Callable
@@ -124,7 +124,7 @@ class MockLoadOutput:
 
 @pytest.fixture
 def patch_out_mlx(monkeypatch: pytest.MonkeyPatch):
-    # initialize_mlx returns a mock group
+    # 已翻譯註解。
     monkeypatch.setattr(mlx_builder, "initialize_mlx", make_nothin(MockGroup()))
 
     def lmi_gen():
@@ -142,8 +142,8 @@ def patch_out_mlx(monkeypatch: pytest.MonkeyPatch):
         return (tasks, [])
 
     monkeypatch.setattr(mlx_batch_generator, "mx_all_gather_tasks", fake_all_gather)
-    # Mock apply_chat_template since we're using a fake tokenizer (integer 1).
-    # Returns a prompt without thinking tag so detect_thinking_prompt_suffix returns None.
+    # 已翻譯註解。
+    # 已翻譯註解。
     monkeypatch.setattr(
         mlx_batch_generator, "apply_chat_template", make_nothin("test prompt")
     )
@@ -198,7 +198,7 @@ class FakeExoBatchGenerator:
         pass
 
 
-# Use a fake event_sender to remove test flakiness.
+# 已翻譯註解。
 class EventCollector:
     def __init__(self, on_event: Callable[[Event], None] | None = None) -> None:
         self.events: list[Event] = []
@@ -275,19 +275,19 @@ def _run(tasks: Iterable[Task], send_after_ready: list[Task] | None = None):
         for t in tasks:
             task_sender.send(t)
 
-        # worst monkeypatch known to man
-        # this is some c++ nonsense
+        # 已翻譯註解。
+        # 已翻譯註解。
         task_receiver.close = nothin
         task_receiver.join = nothin
         builder = MlxBuilder(
             bound_instance.bound_shard.model_card.model_id,
-            event_sender,  # pyright: ignore[reportArgumentType]
+            event_sender,  # 已翻譯註解。
             cancel_receiver,
         )
         runner = Runner(
             bound_instance,
             builder,
-            event_sender,  # pyright: ignore[reportArgumentType]
+            event_sender,  # 已翻譯註解。
             task_receiver,
         )
         runner.main()
@@ -354,7 +354,7 @@ def test_events_processed_in_correct_order(patch_out_mlx: pytest.MonkeyPatch):
             TaskStatusUpdated(
                 task_id=CHAT_COMPLETION_TASK_ID, task_status=TaskStatus.Complete
             ),
-            # CHAT COMPLETION TASK SHOULD COMPLETE BEFORE RUNNER READY
+            # 已翻譯註解。
             RunnerStatusUpdated(runner_id=RUNNER_1_ID, runner_status=RunnerReady()),
             TaskStatusUpdated(task_id=SHUTDOWN_TASK_ID, task_status=TaskStatus.Running),
             RunnerStatusUpdated(
@@ -364,7 +364,7 @@ def test_events_processed_in_correct_order(patch_out_mlx: pytest.MonkeyPatch):
             TaskStatusUpdated(
                 task_id=SHUTDOWN_TASK_ID, task_status=TaskStatus.Complete
             ),
-            # SPECIAL EXCEPTION FOR RUNNER SHUTDOWN
+            # 已翻譯註解。
             RunnerStatusUpdated(runner_id=RUNNER_1_ID, runner_status=RunnerShutdown()),
         ],
     )

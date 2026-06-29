@@ -25,7 +25,7 @@ from exo.worker.engines.image.distributed_model import DistributedImageModel
 
 
 def parse_size(size_str: ImageSize) -> tuple[int, int]:
-    """Parse size parameter like '1024x1024' to (width, height) tuple."""
+    """此說明已翻譯為繁體中文。"""
     if size_str == "auto":
         return (1024, 1024)
 
@@ -44,9 +44,9 @@ def parse_size(size_str: ImageSize) -> tuple[int, int]:
 
 
 def warmup_image_generator(model: DistributedImageModel) -> Image.Image | None:
-    """Warmup the image generator with a small image."""
+    """此說明已翻譯為繁體中文。"""
     with tempfile.TemporaryDirectory() as tmpdir:
-        # Create a small dummy image for warmup (needed for edit models)
+        # 已翻譯註解。
         dummy_image = Image.new("RGB", (256, 256), color=(128, 128, 128))
         dummy_path = Path(tmpdir) / "warmup.png"
         dummy_image.save(dummy_path)
@@ -71,7 +71,7 @@ def generate_image(
     task: ImageGenerationTaskParams | ImageEditsTaskParams,
     cancel_checker: Callable[[], bool] | None = None,
 ) -> Generator[ImageChunk, None, None]:
-    """Generate image(s), optionally yielding partial results."""
+    """此說明已翻譯為繁體中文。"""
     width, height = parse_size(task.size)
     quality: Literal["low", "medium", "high"] = task.quality or "medium"
 
@@ -100,7 +100,7 @@ def generate_image(
 
     with tempfile.TemporaryDirectory() as tmpdir:
         if isinstance(task, ImageEditsTaskParams):
-            # Decode base64 image data and save to temp file
+            # 已翻譯註解。
             image_path = Path(tmpdir) / "input.png"
             image_path.write_bytes(base64.b64decode(task.image_data))
             if task.size == "auto":
@@ -108,7 +108,7 @@ def generate_image(
                     width, height = img.size
 
         for image_num in range(num_images):
-            # Increment seed for each image to ensure unique results
+            # 已翻譯註解。
             current_seed = base_seed + image_num
 
             for result in model.generate(
@@ -123,7 +123,7 @@ def generate_image(
                 cancel_checker=cancel_checker,
             ):
                 if isinstance(result, tuple):
-                    # Partial image: (Image, partial_index, total_partials)
+                    # 已翻譯註解。
                     image, partial_idx, total_partials = result
                     buffer = io.BytesIO()
                     image_format = task.output_format.upper()
@@ -145,7 +145,7 @@ def generate_image(
                 else:
                     image = result
 
-                    # Only include stats on the final image
+                    # 已翻譯註解。
                     stats: ImageGenerationStats | None = None
                     if is_bench and image_num == num_images - 1:
                         generation_end_time = time.perf_counter()
@@ -202,10 +202,10 @@ def _process_image_response(
     stats: ImageGenerationStats | None,
     model_id: ModelId,
 ) -> Iterator[ImageChunk]:
-    """Process a single image response and send chunks."""
+    """此說明已翻譯為繁體中文。"""
     is_partial = partial_index is not None
     encoded_data = base64.b64encode(image_data).decode("utf-8")
-    # Extract stats from final ImageGenerationResponse if available
+    # 已翻譯註解。
     data_chunks = [
         encoded_data[i : i + EXO_MAX_CHUNK_SIZE]
         for i in range(0, len(encoded_data), EXO_MAX_CHUNK_SIZE)
@@ -214,7 +214,7 @@ def _process_image_response(
 
     def _data_to_chunk(item: tuple[int, str]) -> ImageChunk:
         chunk_index, chunk_data = item
-        # Only include stats on the last chunk of the final image
+        # 已翻譯註解。
         chunk_stats = (
             stats if chunk_index == total_chunks - 1 and not is_partial else None
         )

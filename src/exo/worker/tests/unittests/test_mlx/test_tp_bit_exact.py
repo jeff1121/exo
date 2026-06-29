@@ -1,5 +1,5 @@
 # type: ignore
-"""uv run pytest -v -m "" src/exo/worker/tests/unittests/test_mlx/test_tp_bit_exact.py"""
+"""此說明已翻譯為繁體中文。"""
 
 import importlib
 import json

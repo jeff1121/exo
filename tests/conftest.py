@@ -1,7 +1,7 @@
 # type: ignore
-"""Pytest configuration for marker-driven exo integration tests.
+"""使用 marker 驅動的 exo 整合測試 Pytest 設定。
 
-Test authors declare requirements via markers:
+測試作者可透過 marker 宣告需求：
 
     @pytest.mark.cluster(count=2, thunderbolt='a2a')
     @pytest.mark.instance('mlx-community/Llama-3.2-1B-Instruct-4bit',
@@ -10,11 +10,11 @@ Test authors declare requirements via markers:
         resp = session.chat('What is 2+2?')
         assert '4' in resp
 
-Clusters are cached by `ClusterSpec`; tests with the same cluster_spec
-share a deployment. Each test places its own instance (matching its
-`@pytest.mark.instance`), and instances are cleaned up after the test.
+叢集會以 `ClusterSpec` 快取；相同 cluster_spec 的測試會共用部署。
+每個測試會建立自己的 instance（對應 `@pytest.mark.instance`），
+並在測試後清理。
 
-Run with:
+執行方式：
     uv run pytest tests/ -v
     uv run pytest tests/ -v --hosts s2,s4,s9,s10
 """
@@ -35,11 +35,11 @@ from .framework import (
     parse_instance_marker,
 )
 
-# Single eco session for the entire test process.
+# 整個測試程序共用單一 eco session。
 eco = EcoSession(user_prefix="test")
 
-# Cluster cache keyed by ClusterSpec — tests with the same spec share a deployment.
-# Cleared at session teardown.
+# 以 ClusterSpec 為鍵的叢集快取——相同規格的測試共用同一個部署。
+# 於 session teardown 時清空。
 _cluster_cache: dict[ClusterSpec, ClusterInfo] = {}
 
 
@@ -53,7 +53,7 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    """Register custom markers."""
+    """註冊自訂 markers。"""
     config.addinivalue_line(
         "markers",
         "cluster(count=N, thunderbolt=Thunderbolt|None, min_memory=GB, chip=PATTERN): "
@@ -67,7 +67,7 @@ def pytest_configure(config):
 
 
 def pytest_report_header(config):
-    """Show the eco user and hosts for this test session."""
+    """顯示本次測試 session 使用的 eco 使用者與主機。"""
     hosts = config.getoption("--hosts")
     lines = [f"eco user: {eco.user}"]
     if hosts:
@@ -85,7 +85,7 @@ def _host_pool(request) -> list[str] | None:
 
 @pytest.fixture
 def session(request, _host_pool) -> Session:
-    """Per-test fixture providing a Session matching the test's markers.
+    """每個測試的 fixture，提供符合該測試 markers 的 Session。
 
     Reads @pytest.mark.cluster and @pytest.mark.instance from the test, deploys
     a matching cluster (cached across tests with the same spec), places the
@@ -99,7 +99,7 @@ def session(request, _host_pool) -> Session:
     cluster_spec = parse_cluster_marker(cluster_marker)
     instance_spec = parse_instance_marker(instance_marker)
 
-    # Deploy or reuse a cluster matching the spec
+    # 部署或重用符合規格的叢集
     cluster = _cluster_cache.get(cluster_spec)
     if cluster is None:
         if _host_pool:
@@ -116,7 +116,7 @@ def session(request, _host_pool) -> Session:
             )
         _cluster_cache[cluster_spec] = cluster
 
-    # Place an instance for this test if the test specified one
+    # 若測試有指定 instance，則為此測試建立一個 instance
     instance_id = None
     if instance_spec is not None:
         client = cluster.make_client()
@@ -137,23 +137,23 @@ def session(request, _host_pool) -> Session:
 
     yield sess
 
-    # ---- Teardown ----
+    # ---- 收尾階段 ----
 
-    # If the test left nodes disconnected, invalidate the cluster cache and
-    # stop the cluster so the next test deploys fresh.
+    # 若測試結束後仍有節點中斷，則使叢集快取失效並
+    # 停止叢集，讓下一個測試重新部署。
     if sess._stopped_hosts:
         _cluster_cache.pop(cluster_spec, None)
         with contextlib.suppress(Exception):
             eco.stop(sess.cluster.hosts)
         return
 
-    # Otherwise, clean up any instances created during the test
+    # 否則，清理測試期間建立的所有 instances
     with contextlib.suppress(Exception):
         cleanup_all_instances(sess.client)
 
 
 # ---------------------------------------------------------------------------
-# Session-level teardown — stop all cached clusters
+# Session 層級收尾——停止所有快取的叢集
 # ---------------------------------------------------------------------------
 
 
@@ -167,7 +167,7 @@ def _teardown_clusters():
 
 
 def pytest_runtest_makereport(item, call):
-    """Attach cluster logs to the test report when a test fails."""
+    """測試失敗時，將叢集日誌附加到測試報告。"""
     if call.when != "call" or call.excinfo is None:
         return
 

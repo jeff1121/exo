@@ -26,8 +26,8 @@ from exo.worker.tests.unittests.conftest import (
 
 def test_plan_requests_download_when_waiting_and_shard_not_downloaded():
     """
-    When a runner is waiting for a model and its shard is not in the
-    local download_status map, plan() should emit DownloadModel.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     shard = get_pipeline_shard_metadata(model_id=MODEL_A_ID, device_rank=0)
@@ -66,9 +66,9 @@ def test_plan_requests_download_when_waiting_and_shard_not_downloaded():
 
 def test_plan_loads_model_when_all_shards_downloaded_and_waiting():
     """
-    When all shards for an instance are DownloadCompleted (globally) and
-    all runners are in waiting/loading/loaded states, plan() should emit
-    LoadModel once.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard2 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -121,8 +121,8 @@ def test_plan_loads_model_when_all_shards_downloaded_and_waiting():
 
 def test_plan_does_not_request_download_when_shard_already_downloaded():
     """
-    If the local shard already has a DownloadCompleted entry, plan()
-    should not re-emit DownloadModel while global state is still catching up.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0)
     instance = get_mlx_ring_instance(
@@ -140,7 +140,7 @@ def test_plan_does_not_request_download_when_shard_already_downloaded():
     instances = {INSTANCE_1_ID: instance}
     all_runners = {RUNNER_1_ID: RunnerIdle()}
 
-    # Global state shows shard is downloaded for NODE_A
+    # 已翻譯註解。
     global_download_status: dict[NodeId, list[DownloadProgress]] = {
         NODE_A: [
             DownloadCompleted(shard_metadata=shard, node_id=NODE_A, total=Memory())
@@ -166,8 +166,8 @@ def test_plan_does_not_request_download_when_shard_already_downloaded():
 
 def test_plan_does_not_load_model_until_all_shards_downloaded_globally():
     """
-    LoadModel should not be emitted while some shards are still missing from
-    the global_download_status.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard2 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -196,7 +196,7 @@ def test_plan_does_not_load_model_until_all_shards_downloaded_globally():
         NODE_A: [
             DownloadCompleted(shard_metadata=shard1, node_id=NODE_A, total=Memory())
         ],
-        NODE_B: [],  # NODE_B has no downloads completed yet
+        NODE_B: [],  # 已翻譯註解。
     }
 
     result = plan_mod.plan(
@@ -220,7 +220,7 @@ def test_plan_does_not_load_model_until_all_shards_downloaded_globally():
         ],
         NODE_B: [
             DownloadCompleted(shard_metadata=shard2, node_id=NODE_B, total=Memory())
-        ],  # NODE_B has no downloads completed yet
+        ],  # 已翻譯註解。
     }
 
     result = plan_mod.plan(

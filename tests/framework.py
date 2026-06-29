@@ -1,6 +1,6 @@
-"""Marker-driven test framework for exo integration tests.
+"""使用 marker 驅動的 exo 整合測試框架。
 
-Test authors declare requirements via markers:
+測試作者可透過 marker 宣告需求：
 
     @pytest.mark.cluster(count=2, thunderbolt='a2a')
     @pytest.mark.instance('mlx-community/Llama-3.2-1B-Instruct-4bit',
@@ -9,9 +9,9 @@ Test authors declare requirements via markers:
         resp = session.chat('What is 2+2?')
         assert '4' in resp
 
-The `session` fixture reads the markers, deploys the cluster, places the
-instance, and provides a `Session` object. All cluster/instance orchestration
-lives in `exo_tools.harness`; this module is purely the pytest-facing layer.
+`session` fixture 會讀取 markers、部署叢集、建立 instance，並提供
+`Session` 物件。所有叢集/instance 的協調邏輯都在 `exo_tools.harness`；
+本模組只負責 pytest 介面層。
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ DEFAULT_MODEL = "mlx-community/Llama-3.2-1B-Instruct-4bit"
 
 
 def _extract_content(resp: ChatCompletionResponse) -> str:
-    """Extract plain-text content from a non-streaming chat completion."""
+    """從非串流 chat completion 擷取純文字內容。"""
     choice = resp.choices[0]
     if not isinstance(choice, ChatCompletionChoice):
         raise RuntimeError(
@@ -117,7 +117,7 @@ class Session:
     def instances(self) -> dict[str, Any]:
         return self.state.get("instances", {})
 
-    # ---- Inference ----
+    # ---- 推論 ----
 
     def chat(self, prompt: str, max_tokens: int = 100) -> str:
         resp = self.chat_raw(prompt, max_tokens=max_tokens)
@@ -162,13 +162,13 @@ class Session:
         return ChatCompletionResponse.model_validate(raw)
 
     def disconnect_node(self, index: int) -> None:
-        """Stop exo on a node and wait for the cluster to observe the disconnect."""
+        """停止某節點上的 exo，並等待叢集觀察到斷線。"""
         host = self.cluster.hosts[index]
         self.eco.stop([host], keep=True)
         self._stopped_hosts.add(host)
 
     def reconnect_node(self, index: int) -> None:
-        """Restart a previously disconnected node into the existing namespace."""
+        """將先前斷線的節點重新加入既有 namespace。"""
         host = self.cluster.hosts[index]
         self.eco.start_hosts([host], namespace=self.cluster.namespace)
         self._stopped_hosts.discard(host)
@@ -176,7 +176,7 @@ class Session:
     def wait_ready(
         self, expected_nodes: int | None = None, timeout: float = 60
     ) -> None:
-        """Wait until the cluster has exactly `expected_nodes` visible and reporting memory.
+        """等待叢集中可見且有回報記憶體的節點數恰為 `expected_nodes`。
 
         Defaults to the count of non-stopped hosts. Use this after
         `disconnect_node` / `reconnect_node` to wait for the cluster to settle.

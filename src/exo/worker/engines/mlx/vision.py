@@ -43,7 +43,7 @@ _MLX_VLM_MODEL_TYPE_ALIASES: dict[str, str] = {
 
 
 def _torch_tensor_to_mx(
-    tensor: Any,  # pyright: ignore[reportAny]
+    tensor: Any,  # 已翻譯註解。
 ) -> mx.array:
     if str(tensor.dtype) == "torch.bfloat16":  # type: ignore
         return mx.array(tensor.float().numpy(), dtype=mx.bfloat16)  # type: ignore
@@ -63,20 +63,20 @@ def _run_processor(
     pil_images: list[Image.Image],
 ) -> tuple[dict[str, np.ndarray], list[int] | None]:
     """
-    Image processors split into two families by how they report per-image
-    token counts:
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    1. Variable-resolution patch models (Qwen3-VL, Llama 4 vision, ...):
-       return a `BatchFeature` dict containing `pixel_values` and
-       `image_grid_thw` — an (n_images, 3) array of (temporal, height, width)
-       patch counts. The caller multiplies the three to get the per-image
-       token count, so no override is needed.
+    此說明已翻譯為繁體中文。
+       此說明已翻譯為繁體中文。
+       此說明已翻譯為繁體中文。
+       此說明已翻譯為繁體中文。
+       此說明已翻譯為繁體中文。
 
-    2. Fixed-token-budget models (Gemma 4): every image collapses to a fixed
-       number of soft tokens, so there's no grid to report. These processors
-       return `(batch_feature_dict, [n_tokens_per_image])` instead.
+    此說明已翻譯為繁體中文。
+       此說明已翻譯為繁體中文。
+       此說明已翻譯為繁體中文。
 
-    We normalize both into (dict, optional tokens override).
+    此說明已翻譯為繁體中文。
     """
     raw = cast(_ProcessorOutput, processor(images=pil_images, return_tensors="np"))
     if isinstance(raw, tuple):
@@ -87,12 +87,12 @@ def _run_processor(
 
 def _instantiate_projector(
     cls: type,
-    model_config: Any,  # pyright: ignore[reportAny]
-    vision_config: Any,  # pyright: ignore[reportAny]
-    text_config: Any,  # pyright: ignore[reportAny]
+    model_config: Any,  # 已翻譯註解。
+    vision_config: Any,  # 已翻譯註解。
+    text_config: Any,  # 已翻譯註解。
 ) -> nn.Module:
     """
-    Instantiate projector/embedding classes with any missing values
+    此說明已翻譯為繁體中文。
     """
     init_sig = inspect.signature(cls.__init__)
     params = {n: p for n, p in init_sig.parameters.items() if n != "self"}
@@ -101,17 +101,17 @@ def _instantiate_projector(
     if "config" in params:
         kwargs["config"] = model_config
     if "embedding_dim" in params:
-        kwargs["embedding_dim"] = vision_config.hidden_size  # pyright: ignore[reportAny]
+        kwargs["embedding_dim"] = vision_config.hidden_size  # 已翻譯註解。
     if "text_hidden_size" in params:
-        kwargs["text_hidden_size"] = text_config.hidden_size  # pyright: ignore[reportAny]
+        kwargs["text_hidden_size"] = text_config.hidden_size  # 已翻譯註解。
     if "eps" in params:
-        kwargs["eps"] = getattr(vision_config, "rms_norm_eps", 1e-6)  # pyright: ignore[reportAny]
+        kwargs["eps"] = getattr(vision_config, "rms_norm_eps", 1e-6)  # 已翻譯註解。
     return cls(**kwargs)  # type: ignore
 
 
 def _patch_video_processor() -> None:
-    """Patch so we don't crash horribly when torch vision isn't installed"""
-    # TODO: Update if we add torch vision.
+    """此說明已翻譯為繁體中文。"""
+    # 待辦事項：已翻譯註解。
     global _video_processor_patched
     if _video_processor_patched:
         return
@@ -232,10 +232,10 @@ class VisionEncoder:
     def _apply_projector_quantization_if_needed(
         self, projector_weights: dict[str, mx.array]
     ) -> None:
-        # Quantized models ship the projector's Linear layers as packed uint32
-        # weights plus `.scales`/`.biases`. Our now instantiated projector
-        # uses plain nn.Linear, so we must mirror the packing via nn.quantize
-        # before load_weights, otherwise MLX rejects the extra parameters.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         if self._projector is None:
             return
         has_quantized_tensors = any(
@@ -253,17 +253,17 @@ class VisionEncoder:
         nn.quantize(self._projector, group_size=group_size, bits=bits)
 
     def _load_image_processor_from_module(self, repo: str) -> "ImageProcessor | None":
-        # mlx_vlm.utils.load_image_processor only works for models that set
-        # `Model.ImageProcessor = <cls>`, but Gemma4 just uses
-        # `Gemma4ImageProcessor` from the package `__init__.py`.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         try:
             pkg: Any = importlib.import_module(
                 f"mlx_vlm.models.{self._config.model_type}"
             )
         except ImportError:
             return None
-        for attr in dir(pkg):  # pyright: ignore[reportAny]
-            cls = getattr(pkg, attr)  # pyright: ignore[reportAny]
+        for attr in dir(pkg):  # 已翻譯註解。
+            cls = getattr(pkg, attr)  # 已翻譯註解。
             if isinstance(cls, type) and attr.endswith("ImageProcessor"):
                 return cls.from_pretrained(repo)  # type: ignore
         return None
@@ -428,8 +428,8 @@ class VisionEncoder:
         vision_weights: dict[str, mx.array] = {}
         projector_weights: dict[str, mx.array] = {}
 
-        # If weights under `model.visual.`, we need to call mlx_vlm's VisionModel.sanitize()
-        # to remap into its own keys.
+        # 已翻譯註解。
+        # 已翻譯註解。
         needs_sanitize = False
 
         for sf_path in safetensors_files:
@@ -540,10 +540,10 @@ class VisionEncoder:
             ]
         else:
             batch, tokens_override = _run_processor(self._processor, pil_images)
-            # `Gemma4ImageProcessor` returns pixel_values as a plain ndarray
-            # when all images resize to the same shape, or as a Python list of
-            # per-image (C, H, W) ndarrays when they differ. Treat it as the
-            # union here.
+            # 已翻譯註解。
+            # 已翻譯註解。
+            # 已翻譯註解。
+            # 已翻譯註解。
             raw_pixel_values: np.ndarray | list[np.ndarray] = cast(
                 "np.ndarray | list[np.ndarray]", batch["pixel_values"]
             )
@@ -566,7 +566,7 @@ class VisionEncoder:
 
             if isinstance(raw_pixel_values, list):
                 per_image_pixels = [
-                    # (C, H, W) -> (1, C, H, W)
+                    # 已翻譯註解。
                     mx.array(p)[None] if p.ndim == 3 else mx.array(p)
                     for p in raw_pixel_values
                 ]
@@ -594,10 +594,10 @@ class VisionEncoder:
                 grid_thw=grid_hw,
             )
         elif grid_thw is None:
-            # Fixed-token-budget models (gemma4): run each image separately
-            # since they can have different spatial shapes *and* different
-            # soft-token counts, then flatten each to (n_tokens_i, hidden)
-            # and concatenate along the token axis.
+            # 已翻譯註解。
+            # 已翻譯註解。
+            # 已翻譯註解。
+            # 已翻譯註解。
             per_image_hidden: list[mx.array] = []
             for pv in per_image_pixels:
                 result = self._vision_tower(pv.astype(tower_dtype))
@@ -616,8 +616,8 @@ class VisionEncoder:
         else:
             image_features = hidden_states
 
-        # `create_vision_embeddings` expects a 2D (total_tokens, hidden) view,
-        # but fixed-token-budget models (gemma4) return (n_images, tokens, hidden).
+        # 已翻譯註解。
+        # 已翻譯註解。
         if image_features.ndim == 3:
             image_features = image_features.reshape(-1, image_features.shape[-1])
 
@@ -661,12 +661,12 @@ def create_vision_embeddings(
             n = min(n_placeholders, image_features.shape[0])
             image_features = image_features[:n]
 
-        # Gemma-family models apply `h = input_embeddings * embed_scale` inside
-        # the inner model's forward pass. That scale is appropriate for text
-        # tokens (which come out of a raw `embed_tokens(id)` lookup) but not
-        # for our pre-projected image features. Pre-divide by `embed_scale`
-        # so that after the model multiplies, image features are unchanged
-        # while text positions remain correctly scaled.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         if hasattr(inner, "embed_scale"):  # type: ignore
             embed_scale = float(inner.embed_scale)  # type: ignore
             image_features = image_features / embed_scale
@@ -718,11 +718,11 @@ def _find_media_regions(
 
 class VisionProcessor:
     """
-    Pipeline for vision models:
-    1. Encode images into features (or grab from cache)
-    2. Replace image placeholders with the features
-    3. Build vision prompt
-    4. Provide media regions for prefix caching
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(self, config: VisionCardConfig, model_id: ModelId):

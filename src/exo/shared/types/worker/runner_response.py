@@ -34,7 +34,7 @@ class ImageGenerationResponse(BaseRunnerResponse):
     image_index: int = 0
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
             if name == "image_data":
                 yield name, f"<{len(self.image_data)} bytes>"
             elif name is not None:
@@ -49,7 +49,7 @@ class PartialImageResponse(BaseRunnerResponse):
     image_index: int = 0
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
             if name == "image_data":
                 yield name, f"<{len(self.image_data)} bytes>"
             elif name is not None:

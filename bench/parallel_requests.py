@@ -30,7 +30,7 @@ def write(s: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Model picker (same style as exo_eval)
+# 模型選擇器（風格與 exo_eval 相同）
 # ---------------------------------------------------------------------------
 
 
@@ -92,7 +92,7 @@ def pick_model() -> str | None:
             render()
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
-        write(f"\033[{total_lines}A\033[J")  # clear picker UI
+        write(f"\033[{total_lines}A\033[J")  # 清除選擇器介面
         write("\033[?25h\033[0m")
         sys.stdout.flush()
 
@@ -100,7 +100,7 @@ def pick_model() -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# Parallel requests
+# 平行請求
 # ---------------------------------------------------------------------------
 
 statuses: list[str] = []
@@ -127,13 +127,13 @@ def render_progress(first: bool = False) -> None:
         q = QUESTIONS[i % len(QUESTIONS)]
         status = statuses[i]
         if status == "pending":
-            color = "\033[33m"  # yellow
+            color = "\033[33m"  # 黃色
         elif status == "running":
-            color = "\033[36m"  # cyan
+            color = "\033[36m"  # 青色
         elif status == "done":
-            color = "\033[32m"  # green
+            color = "\033[32m"  # 綠色
         else:
-            color = "\033[31m"  # red
+            color = "\033[31m"  # 紅色
         write(
             f"  {i:>2}  {color}{status:<8}\033[0m  {times[i]:>6}  {tokens[i]:>5}tok  {q[:40]:<40}  {previews[i][:50]}\r\n"
         )
@@ -192,7 +192,7 @@ async def run_requests(print_stdout: bool = False) -> None:
     full_responses = [None] * NUM_REQUESTS
     total_lines = NUM_REQUESTS + 4
 
-    write("\033[?25l")  # hide cursor
+    write("\033[?25l")  # 隱藏游標
     start_time = time.monotonic()
     render_progress(first=True)
     lock = asyncio.Lock()
@@ -226,7 +226,7 @@ async def run_requests(print_stdout: bool = False) -> None:
                     )
                 write("\r\n")
     finally:
-        write("\033[?25h")  # show cursor
+        write("\033[?25h")  # 顯示游標
         sys.stdout.flush()
 
 

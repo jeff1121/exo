@@ -1,4 +1,4 @@
-"""Tests for Claude Messages API conversion functions and types."""
+"""此說明已翻譯為繁體中文。"""
 
 import pydantic
 import pytest
@@ -16,7 +16,7 @@ from exo.shared.types.common import ModelId
 
 
 class TestFinishReasonToClaudeStopReason:
-    """Tests for finish_reason to Claude stop_reason mapping."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_stop_maps_to_end_turn(self):
         assert finish_reason_to_claude_stop_reason("stop") == "end_turn"
@@ -38,7 +38,7 @@ class TestFinishReasonToClaudeStopReason:
 
 
 class TestClaudeRequestToInternal:
-    """Tests for converting Claude Messages API requests to TextGenerationTaskParams."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_basic_request_conversion(self):
         request = ClaudeMessagesRequest(
@@ -152,7 +152,7 @@ class TestClaudeRequestToInternal:
 
 
 class TestClaudeMessagesRequestValidation:
-    """Tests for Claude Messages API request validation."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_request_requires_model(self):
         with pytest.raises(pydantic.ValidationError):

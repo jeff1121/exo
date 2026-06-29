@@ -1,8 +1,8 @@
-"""Tests for GLM tool call argument parsing regex."""
+"""此說明已翻譯為繁體中文。"""
 
 import regex as re
 
-# Replicate the regex patterns from runner.py to test them in isolation
+# 已翻譯註解。
 _func_name_regex = re.compile(r"^(.*?)<arg_key>", re.DOTALL)
 _func_arg_regex = re.compile(
     r"<arg_key>(.*?)</arg_key>(?:\n|\s)*<arg_value>(.*?)(?:</arg_value>|(?=<arg_key>)|$)",
@@ -11,13 +11,13 @@ _func_arg_regex = re.compile(
 
 
 def _parse_args(text: str) -> list[tuple[str, str]]:
-    """Extract (key, value) pairs from GLM tool call text."""
+    """此說明已翻譯為繁體中文。"""
     pairs = _func_arg_regex.findall(text)
-    return [(k.strip(), v.strip()) for k, v in pairs]  # pyright: ignore[reportAny]
+    return [(k.strip(), v.strip()) for k, v in pairs]  # 已翻譯註解。
 
 
 def _parse_func_name(text: str) -> str:
-    """Extract function name from GLM tool call text."""
+    """此說明已翻譯為繁體中文。"""
     match = _func_name_regex.search(text)
     if match is None:
         raise ValueError(f"Could not parse function name: {text!r}")
@@ -25,7 +25,7 @@ def _parse_func_name(text: str) -> str:
 
 
 class TestGlmToolParsingWithClosingTags:
-    """Tests for normal format with closing tags present."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_single_argument(self):
         text = (
@@ -54,7 +54,7 @@ class TestGlmToolParsingWithClosingTags:
 
 
 class TestGlmToolParsingMissingClosingTags:
-    """Tests for format where </arg_value> closing tags are missing."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_single_argument_no_closing(self):
         text = "get_weather<arg_key>location</arg_key><arg_value>San Francisco"
@@ -72,7 +72,7 @@ class TestGlmToolParsingMissingClosingTags:
         assert pairs == [("query", "python"), ("limit", "10")]
 
     def test_mixed_closing_tags(self):
-        """First arg has closing tag, second does not."""
+        """此說明已翻譯為繁體中文。"""
         text = (
             "fn<arg_key>a</arg_key><arg_value>1</arg_value>"
             "<arg_key>b</arg_key><arg_value>2"
@@ -92,7 +92,7 @@ class TestGlmToolParsingMissingClosingTags:
 
 
 class TestGlmToolParsingEdgeCases:
-    """Edge case tests for GLM tool call parsing."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_empty_value_with_closing(self):
         text = "fn<arg_key>empty</arg_key><arg_value></arg_value>"

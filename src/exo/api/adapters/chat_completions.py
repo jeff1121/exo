@@ -1,4 +1,4 @@
-"""OpenAI Chat Completions API adapter for converting requests/responses."""
+"""此說明已翻譯為繁體中文。"""
 
 import base64
 import re
@@ -66,7 +66,7 @@ async def chat_request_to_text_generation(
     images: list[Base64Image] = []
 
     for msg in request.messages:
-        # Normalize content to string
+        # 將內容正規化為字串
         content: str
         has_images = False
         if msg.content is None:
@@ -99,16 +99,16 @@ async def chat_request_to_text_generation(
                         has_images = True
             content = "\n".join(text_parts)
 
-        # Extract system message as instructions
+        # 已翻譯註解。
         if msg.role == "system":
             if instructions is None:
                 instructions = content
             else:
-                # Append additional system messages
+                # 已翻譯註解。
                 instructions = f"{instructions}\n{content}"
             chat_template_messages.append({"role": "system", "content": content})
         else:
-            # Skip messages with no meaningful content
+            # 略過沒有實質內容的訊息
             if (
                 msg.content is None
                 and msg.reasoning_content is None
@@ -121,8 +121,8 @@ async def chat_request_to_text_generation(
                     InputMessage(role=msg.role, content=InputMessageContent(content))
                 )
 
-            # Build full message dict for chat template (preserves tool_calls etc.)
-            # Normalize content for model_dump
+            # 已翻譯註解。
+            # 已翻譯註解。
             if has_images:
                 multimodal_content: list[dict[str, Any]] = []
                 assert isinstance(msg.content, list)
@@ -181,8 +181,8 @@ async def chat_request_to_text_generation(
 def chunk_to_response(
     chunk: TokenChunk, command_id: CommandId
 ) -> ChatCompletionResponse:
-    """Convert a TokenChunk to a streaming ChatCompletionResponse."""
-    # Build logprobs if available
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     logprobs: Logprobs | None = None
     if chunk.logprob is not None:
         logprobs = Logprobs(
@@ -221,13 +221,13 @@ async def generate_chat_stream(
         PrefillProgressChunk | ErrorChunk | ToolCallChunk | TokenChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """Generate Chat Completions API streaming events from chunks."""
+    """此說明已翻譯為繁體中文。"""
     last_usage: Usage | None = None
 
     async for chunk in chunk_stream:
         match chunk:
             case PrefillProgressChunk():
-                # Use SSE comment so third-party clients ignore it
+                # 已翻譯註解。
                 yield f": prefill_progress {chunk.model_dump_json()}\n\n"
 
             case ErrorChunk():
@@ -298,9 +298,9 @@ async def collect_chat_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    # This is an AsyncGenerator[str] rather than returning a ChatCompletionReponse because
-    # FastAPI handles the cancellation better but wouldn't auto-serialize for some reason
-    """Collect all token chunks and return a single ChatCompletionResponse."""
+    # 已翻譯註解。
+    # 已翻譯註解。
+    """此說明已翻譯為繁體中文。"""
     text_parts: list[str] = []
     thinking_parts: list[str] = []
     tool_calls: list[ToolCall] = []

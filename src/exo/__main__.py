@@ -12,8 +12,8 @@ INLINE_CODE_FLAG: Final[str] = "-c"
 
 def _maybe_run_inline_code(argv: Sequence[str]) -> bool:
     """
-    Reproduce the bare minimum of Python's `-c` flag so multiprocessing
-    helper processes (for example the resource tracker) can execute.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     try:

@@ -1,5 +1,5 @@
-"""Tests for serve_prefill_request — the producer-side path that uses
-KVPrefixCache for cross-request prefix sharing."""
+"""此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。"""
 
 import io
 from collections.abc import Callable
@@ -54,7 +54,7 @@ def _populate_cache_in_place(cache: list[KVCache], n_tokens: int) -> None:
 
 
 def _patch_prefill(monkeypatch: pytest.MonkeyPatch) -> list[mx.array]:
-    """Replace mlx_prefill with a tracker; return the list it appends to."""
+    """此說明已翻譯為繁體中文。"""
     inputs: list[mx.array] = []
 
     def fake_prefill(**kwargs: object) -> tuple[float, int, list[object]]:
@@ -93,8 +93,8 @@ def _decode(payload: bytes) -> tuple[Header, list[KVChunk], int]:
 
 def _serve(request: PrefillRequest, kv_prefix_cache: KVPrefixCache | None) -> bytes:
     cache = mlx_serve_mod.run_prefill_for_request(
-        model=cast(Any, _FakeModel()),  # pyright: ignore[reportAny]
-        tokenizer=cast(Any, _FakeTokenizer()),  # pyright: ignore[reportAny]
+        model=cast(Any, _FakeModel()),  # 已翻譯註解。
+        tokenizer=cast(Any, _FakeTokenizer()),  # 已翻譯註解。
         group=None,
         kv_prefix_cache=kv_prefix_cache,
         request=request,

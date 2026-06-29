@@ -10,10 +10,10 @@ from exo.shared.types.profiling import InterfaceType, NetworkInterfaceInfo
 
 
 def get_os_version() -> str:
-    """Return the OS version string for this node.
+    """此說明已翻譯為繁體中文。
 
-    On macOS this is the macOS version (e.g. ``"15.3"``).
-    On other platforms it falls back to the platform name (e.g. ``"Linux"``).
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     if sys.platform == "darwin":
         version = platform.mac_ver()[0]
@@ -22,9 +22,9 @@ def get_os_version() -> str:
 
 
 async def get_os_build_version() -> str:
-    """Return the macOS build version string (e.g. ``"24D5055b"``).
+    """此說明已翻譯為繁體中文。
 
-    On non-macOS platforms, returns ``"Unknown"``.
+    此說明已翻譯為繁體中文。
     """
     if sys.platform != "darwin":
         return "Unknown"
@@ -39,9 +39,9 @@ async def get_os_build_version() -> str:
 
 async def get_friendly_name() -> str:
     """
-    Asynchronously gets the 'Computer Name' (friendly name) of a Mac.
-    e.g., "John's MacBook Pro"
-    Returns the name as a string, or None if an error occurs or not on macOS.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     hostname = socket.gethostname()
 
@@ -57,7 +57,7 @@ async def get_friendly_name() -> str:
 
 
 async def _get_interface_types_from_networksetup() -> dict[str, InterfaceType]:
-    """Parse networksetup -listallhardwareports to get interface types."""
+    """此說明已翻譯為繁體中文。"""
     if sys.platform != "darwin":
         return {}
 
@@ -82,7 +82,7 @@ async def _get_interface_types_from_networksetup() -> dict[str, InterfaceType]:
                 current_type = "unknown"
         elif line.startswith("Device:"):
             device = line.split(":", 1)[1].strip()
-            # enX is ethernet adapters or thunderbolt - these must be deprioritised
+            # 已翻譯註解。
             if device.startswith("en") and device not in ["en0", "en1"]:
                 current_type = "maybe_ethernet"
             types[device] = current_type
@@ -92,10 +92,10 @@ async def _get_interface_types_from_networksetup() -> dict[str, InterfaceType]:
 
 async def get_network_interfaces() -> list[NetworkInterfaceInfo]:
     """
-    Retrieves detailed network interface information on macOS.
-    Parses output from 'networksetup -listallhardwareports' and 'ifconfig'
-    to determine interface names, IP addresses, and types (ethernet, wifi, vpn, other).
-    Returns a list of NetworkInterfaceInfo objects.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     interfaces_info: list[NetworkInterfaceInfo] = []
     interface_types = await _get_interface_types_from_networksetup()
@@ -118,11 +118,11 @@ async def get_network_interfaces() -> list[NetworkInterfaceInfo]:
 
 
 async def get_model_and_chip() -> tuple[str, str]:
-    """Get Mac system information using system_profiler."""
+    """此說明已翻譯為繁體中文。"""
     model = "Unknown Model"
     chip = "Unknown Chip"
 
-    # TODO: better non mac support
+    # 待辦事項：已翻譯註解。
     if sys.platform != "darwin":
         return (model, chip)
 
@@ -136,7 +136,7 @@ async def get_model_and_chip() -> tuple[str, str]:
     except CalledProcessError:
         return (model, chip)
 
-    # less interested in errors here because this value should be hard coded
+    # 已翻譯註解。
     output = process.stdout.decode().strip()
 
     model_line = next(

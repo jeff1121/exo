@@ -245,7 +245,7 @@ class ResumableShardDownloader(ShardDownloader):
         async def _status_for_model(
             model_id: ModelId,
         ) -> tuple[Path, RepoDownloadProgress]:
-            """Helper coroutine that builds the shard for a model and gets its download status."""
+            """此說明已翻譯為繁體中文。"""
             shard = await build_full_shard(model_id)
             return await self._status_for_shard(shard)
 

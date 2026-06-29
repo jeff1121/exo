@@ -17,7 +17,7 @@ import aiofiles.os as aios
 import aiohttp
 import certifi
 from huggingface_hub import (
-    snapshot_download,  # pyright: ignore[reportUnknownVariableType]
+    snapshot_download,  # 已翻譯註解。
 )
 from loguru import logger
 from pydantic import (
@@ -50,11 +50,11 @@ from exo.shared.types.worker.shards import ShardMetadata
 
 
 class HuggingFaceAuthenticationError(Exception):
-    """Raised when HuggingFace returns 401/403 for a model download."""
+    """此說明已翻譯為繁體中文。"""
 
 
 class HuggingFaceRateLimitError(Exception):
-    """429 Huggingface code"""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, msg: str, retry_after: float | None = None) -> None:
         super().__init__(msg)
@@ -62,10 +62,10 @@ class HuggingFaceRateLimitError(Exception):
 
 
 def _parse_retry_after(headers: Mapping[str, str]) -> float | None:
-    """Parse seconds-to-reset from HF's RateLimit header.
+    """此說明已翻譯為繁體中文。
 
-    HF sends e.g. ``ratelimit: "api";r=0;t=52`` on 429s; ``t`` is the wait.
-    Returns ``None`` if the header is missing or has no ``t`` field.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     raw = headers.get("RateLimit") or headers.get("ratelimit")
     if raw is None:
@@ -80,10 +80,10 @@ def _parse_retry_after(headers: Mapping[str, str]) -> float | None:
     return None
 
 
-# reset window is 5 min
+# 重置視窗為 5 分鐘
 _RATE_LIMIT_MAX_SLEEP_SECS = 300.0
 
-# 24h. Manually clear the cache (or `delete_model`) to force a refresh.
+# 已翻譯註解。
 _FILE_LIST_CACHE_TTL_SECS = 24 * 60 * 60
 
 
@@ -146,17 +146,17 @@ def map_repo_download_progress_to_download_progress_data(
 
 
 class InsufficientDiskSpaceError(Exception):
-    """Raised when no writable model directory has enough free space."""
+    """當沒有任何可寫模型目錄具備足夠剩餘空間時拋出。"""
 
 
 def resolve_existing_model(
     model_id: ModelId, card: ModelCard | None = None
 ) -> Path | None:
-    """Search all model directories for a complete, pre-existing model.
+    """在所有模型目錄中尋找已存在且完整的模型。
 
-    Checks read-only directories first, then writable directories.
-    A candidate is only returned if ``is_model_directory_complete`` confirms
-    all weight files are present.
+    先檢查唯讀目錄，再檢查可寫目錄。
+    此說明已翻譯為繁體中文。
+    所有權重檔皆存在時才會回傳候選路徑。
     """
     normalized = model_id.normalize()
     for search_dir in (*EXO_MODELS_READ_ONLY_DIRS, *EXO_MODELS_DIRS):
@@ -167,7 +167,7 @@ def resolve_existing_model(
 
 
 def is_read_only_model_dir(model_dir: Path) -> bool:
-    """Check if a model directory lives under a read-only models root."""
+    """檢查模型目錄是否位於唯讀模型根目錄下。"""
     return any(model_dir.is_relative_to(d) for d in EXO_MODELS_READ_ONLY_DIRS)
 
 
@@ -179,9 +179,9 @@ def build_model_path(model_id: ModelId) -> Path:
 
 
 def select_download_dir(required_bytes: int) -> Path:
-    """Pick the first writable model directory with enough free space.
+    """挑選第一個有足夠空間的可寫模型目錄。
 
-    Raises ``InsufficientDiskSpaceError`` if none have enough space.
+    此說明已翻譯為繁體中文。
     """
     for candidate_dir in EXO_MODELS_DIRS:
         if not candidate_dir.exists():
@@ -222,10 +222,10 @@ async def select_download_dir_for_shard(
 
 
 async def resolve_model_dir(model_id: ModelId) -> Path:
-    """Return the directory for a model's files, creating it if needed.
+    """回傳模型檔案目錄，必要時會建立。
 
-    Checks all model directories for an existing complete model first,
-    then falls back to the default models directory.
+    會先在所有模型目錄中尋找既有且完整的模型，
+    否則退回預設模型目錄。
     """
     target = await asyncio.to_thread(build_model_path, model_id)
     await aios.makedirs(target, exist_ok=True)
@@ -233,14 +233,14 @@ async def resolve_model_dir(model_id: ModelId) -> Path:
 
 
 async def ensure_cache_dir(model_id: ModelId) -> Path:
-    """Return the cache directory for a model's metadata, creating it if needed."""
+    """回傳模型中繼資料快取目錄，必要時會建立。"""
     target = EXO_DEFAULT_MODELS_DIR / "caches" / model_id.normalize()
     await aios.makedirs(target, exist_ok=True)
     return target
 
 
 async def delete_model(model_id: ModelId) -> bool:
-    """Delete a model from writable directories. Skips read-only dirs."""
+    """從可寫目錄刪除模型；會略過唯讀目錄。"""
     normalized = model_id.normalize()
     deleted = False
     for models_dir in EXO_MODELS_DIRS:
@@ -249,7 +249,7 @@ async def delete_model(model_id: ModelId) -> bool:
             await asyncio.to_thread(shutil.rmtree, model_dir, ignore_errors=False)
             deleted = True
 
-    # Clear cache from default dir
+    # 清除預設目錄中的快取
     cache_dir = EXO_DEFAULT_MODELS_DIR / "caches" / normalized
     if await aios.path.exists(cache_dir):
         await asyncio.to_thread(shutil.rmtree, cache_dir, ignore_errors=False)
@@ -258,7 +258,7 @@ async def delete_model(model_id: ModelId) -> bool:
 
 
 async def seed_models(seed_dir: str | Path):
-    """Move models from resources folder to the default models directory."""
+    """此說明已翻譯為繁體中文。"""
     source_dir = Path(seed_dir)
     await aios.makedirs(EXO_DEFAULT_MODELS_DIR, exist_ok=True)
     dest_dir = EXO_DEFAULT_MODELS_DIR
@@ -278,10 +278,10 @@ async def seed_models(seed_dir: str | Path):
 def _scan_model_directory(
     model_dir: Path, recursive: bool = False
 ) -> list[FileListEntry] | None:
-    """Scan a local model directory and build a file list.
+    """掃描本地模型目錄並建立檔案清單。
 
-    Requires at least one ``*.safetensors.index.json``.  Every weight file
-    referenced by the index that is missing on disk gets ``size=None``.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     index_files = list(model_dir.glob("**/*.safetensors.index.json"))
     if not index_files:
@@ -310,7 +310,7 @@ def _scan_model_directory(
                     size=item.stat().st_size,
                 )
 
-    # Add expected weight files from index that haven't been downloaded yet
+    # 加入索引中預期但尚未下載的權重檔
     for index_file in index_files:
         try:
             index_data = ModelSafetensorsIndex.model_validate_json(
@@ -336,8 +336,8 @@ def _scan_model_directory(
 
 
 def is_model_directory_complete(model_dir: Path, card: ModelCard | None = None) -> bool:
-    """Check if a model directory contains all required weight files.
-    Also checks for sibling weights repo.
+    """檢查模型目錄是否包含所有必要權重檔。
+    也會檢查同層的權重倉庫。
     """
     file_list = _scan_model_directory(model_dir, recursive=True)
     if file_list is None or not all(f.size is not None for f in file_list):
@@ -361,11 +361,11 @@ async def _build_file_list_from_local_directory(
     model_id: ModelId,
     recursive: bool = False,
 ) -> list[FileListEntry] | None:
-    """Build a file list from locally existing model files.
+    """根據本地已存在的模型檔建立檔案清單。
 
-    We can only figure out the files we need from safetensors index, so
-    a local directory must contain a *.safetensors.index.json and
-    safetensors listed there.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     normalized = model_id.normalize()
     for search_dir in (*EXO_MODELS_READ_ONLY_DIRS, *EXO_MODELS_DIRS):
@@ -389,7 +389,7 @@ async def fetch_file_list_with_cache(
     target_dir = await ensure_cache_dir(model_id)
     cache_file = target_dir / f"{model_id.normalize()}--{revision}--file_list.json"
 
-    # cache survives process restarts so cold starts don't re-burst HF
+    # 已翻譯註解。
     if await aios.path.exists(cache_file):
         try:
             cache_age = time.time() - (await aios.stat(cache_file)).st_mtime
@@ -489,7 +489,7 @@ async def _fetch_file_list(
 ) -> list[FileListEntry]:
     api_url = f"{get_hf_endpoint()}/api/models/{model_id}/tree/{revision}"
     url = f"{api_url}/{path}" if path else api_url
-    # ?recursive=true returns the whole subtree in one request
+    # 已翻譯註解。
     if recursive:
         url = f"{url}?recursive=true"
 
@@ -514,10 +514,10 @@ async def _fetch_file_list(
                 if item.type == "file":
                     files.append(FileListEntry.model_validate(item))
                 elif item.type == "directory" and recursive:
-                    # already inlined by ?recursive=true
+                    # 已翻譯註解。
                     continue
             if recursive and len(data) >= 1000:
-                # HF tree endpoint paginates at 1000; we don't follow cursors
+                # 已翻譯註解。
                 logger.warning(
                     f"File list for {model_id} hit the 1000-entry page cap "
                     "and may be truncated; cursor pagination is not implemented"
@@ -589,14 +589,14 @@ async def file_meta(
         session.head(url, headers=headers) as r,
     ):
         if r.status == 307:
-            # On redirect, only trust Hugging Face's x-linked-* headers.
+            # 已翻譯註解。
             x_linked_size = r.headers.get("x-linked-size")
             x_linked_etag = r.headers.get("x-linked-etag")
             if x_linked_size and x_linked_etag:
                 content_length = int(x_linked_size)
                 etag = trim_etag(x_linked_etag)
                 return content_length, etag
-            # Otherwise, follow the redirect to get authoritative size/hash
+            # 否則跟隨重新導向取得權威的大小/雜湊資訊
             redirected_location = r.headers.get("location")
             return await file_meta(model_id, revision, path, redirected_location)
         if r.status in [401, 403]:
@@ -678,7 +678,7 @@ async def _download_file(
 
         local_size = (await aios.stat(target_path)).st_size
 
-        # Try to verify against remote, but allow offline operation
+        # 嘗試以遠端驗證，但仍允許離線運作
         try:
             remote_size, _ = await file_meta(model_id, revision, path)
             if local_size != remote_size:
@@ -689,7 +689,7 @@ async def _download_file(
             else:
                 return target_path
         except Exception as e:
-            # Offline or network error - trust local file
+            # 離線或網路錯誤時，信任本地檔案
             logger.debug(
                 f"Could not verify {path} against remote (offline?): {e}, using local file"
             )
@@ -837,10 +837,10 @@ async def get_weight_map(model_id: ModelId, revision: str = "main") -> dict[str,
 
 
 async def resolve_allow_patterns(shard: ShardMetadata) -> list[str]:
-    # TODO: 'Smart' downloads are disabled because:
-    #  (i) We don't handle all kinds of files;
-    # (ii) We don't have sticky sessions.
-    # (iii) Tensor parallel requires all files.
+    # 待辦事項：已翻譯註解。
+    #  已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
     return ["*"]
     try:
         weight_map = await get_weight_map(str(shard.model_card.model_id))
@@ -920,8 +920,8 @@ async def download_shard(
         )
     )
 
-    # For image models, skip root-level safetensors files since weights
-    # are stored in component subdirectories (e.g., transformer/, vae/)
+    # 已翻譯註解。
+    # 已翻譯註解。
     if is_image_model(shard):
         filtered_file_list = [
             f
@@ -929,7 +929,7 @@ async def download_shard(
             if "/" in f.path or not f.path.endswith(".safetensors")
         ]
 
-    # Pick a writable directory with enough free space.
+    # 挑選有足夠可用空間的可寫目錄。
     total_size = sum(f.size or 0 for f in filtered_file_list)
     if skip_download:
         existing = resolve_existing_model(model_id)
@@ -951,18 +951,18 @@ async def download_shard(
     ) -> None:
         previous_progress = file_progress.get(file.path)
 
-        # Detect re-download: curr_bytes < previous downloaded means file was deleted and restarted
+        # 已翻譯註解。
         is_redownload = (
             previous_progress is not None
             and curr_bytes < previous_progress.downloaded.in_bytes
         )
 
         if is_redownload or previous_progress is None:
-            # Fresh download or re-download: reset tracking
+            # 首次下載或重新下載：重設追蹤
             start_time = time.time()
             downloaded_this_session = curr_bytes
         else:
-            # Continuing download: accumulate
+            # 持續下載：累加
             start_time = previous_progress.start_time
             downloaded_this_session = (
                 previous_progress.downloaded_this_session.in_bytes

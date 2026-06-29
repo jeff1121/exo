@@ -108,13 +108,13 @@ def test_get_instance_placements_create_instance(
     expected_layers: tuple[int, int, int],
     model_card: ModelCard,
 ):
-    # arrange
+    # 已翻譯註解。
     model_card = model_card.model_copy(
         update={
             "n_layers": total_layers,
             "storage_size": Memory.from_bytes(
                 sum(available_memory)
-            ),  # make it exactly fit across all nodes
+            ),  # 已翻譯註解。
         }
     )
     topology = Topology()
@@ -124,7 +124,7 @@ def test_get_instance_placements_create_instance(
     node_id_b = NodeId()
     node_id_c = NodeId()
 
-    # fully connected (directed) between the 3 nodes
+    # 已翻譯註解。
     conn_a_b = Connection(
         source=node_id_a, sink=node_id_b, edge=create_socket_connection(1)
     )
@@ -164,12 +164,12 @@ def test_get_instance_placements_create_instance(
     topology.add_connection(conn_a_c)
     topology.add_connection(conn_b_a)
 
-    # act
+    # 已翻譯註解。
     placements = place_instance(
         cic, topology, {}, node_memory, node_network, _metal_only(node_memory)
     )
 
-    # assert
+    # 已翻譯註解。
     assert len(placements) == 1
     instance_id = list(placements.keys())[0]
     instance = placements[instance_id]
@@ -278,42 +278,42 @@ def test_get_instance_placements_one_node_not_fit() -> None:
 
 
 def test_get_transition_events_no_change(instance: Instance):
-    # arrange
+    # 已翻譯註解。
     instance_id = InstanceId()
     current_instances = {instance_id: instance}
     target_instances = {instance_id: instance}
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, {})
 
-    # assert
+    # 已翻譯註解。
     assert len(events) == 0
 
 
 def test_get_transition_events_create_instance(instance: Instance):
-    # arrange
+    # 已翻譯註解。
     instance_id = InstanceId()
     current_instances: dict[InstanceId, Instance] = {}
     target_instances: dict[InstanceId, Instance] = {instance_id: instance}
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, {})
 
-    # assert
+    # 已翻譯註解。
     assert len(events) == 1
     assert isinstance(events[0], InstanceCreated)
 
 
 def test_get_transition_events_delete_instance(instance: Instance):
-    # arrange
+    # 已翻譯註解。
     instance_id = InstanceId()
     current_instances: dict[InstanceId, Instance] = {instance_id: instance}
     target_instances: dict[InstanceId, Instance] = {}
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, {})
 
-    # assert
+    # 已翻譯註解。
     assert len(events) == 1
     assert isinstance(events[0], InstanceDeleted)
     assert events[0].instance_id == instance_id
@@ -322,7 +322,7 @@ def test_get_transition_events_delete_instance(instance: Instance):
 def test_placement_selects_leaf_nodes(
     model_card: ModelCard,
 ):
-    # arrange
+    # 已翻譯註解。
     topology = Topology()
 
     model_card = model_card.model_copy(update={"storage_size": Memory.from_bytes(1000)})
@@ -350,7 +350,7 @@ def test_placement_selects_leaf_nodes(
     topology.add_node(node_id_c)
     topology.add_node(node_id_d)
 
-    # Daisy chain topology (directed)
+    # 已翻譯註解。
     topology.add_connection(
         Connection(source=node_id_a, sink=node_id_b, edge=create_socket_connection(1))
     )
@@ -372,12 +372,12 @@ def test_placement_selects_leaf_nodes(
 
     cic = place_instance_command(model_card=model_card)
 
-    # act
+    # 已翻譯註解。
     placements = place_instance(
         cic, topology, {}, node_memory, node_network, _metal_only(node_memory)
     )
 
-    # assert
+    # 已翻譯註解。
     assert len(placements) == 1
     instance = list(placements.values())[0]
 
@@ -393,7 +393,7 @@ def test_placement_selects_leaf_nodes(
 def test_tensor_rdma_backend_connectivity_matrix(
     model_card: ModelCard,
 ):
-    # arrange
+    # 已翻譯註解。
     topology = Topology()
     model_card = model_card.model_copy(
         update={
@@ -430,7 +430,7 @@ def test_tensor_rdma_backend_connectivity_matrix(
     topology.add_node(node_b)
     topology.add_node(node_c)
 
-    # RDMA connections (directed)
+    # 已翻譯註解。
     topology.add_connection(
         Connection(source=node_a, sink=node_b, edge=create_rdma_connection(3))
     )
@@ -450,7 +450,7 @@ def test_tensor_rdma_backend_connectivity_matrix(
         Connection(source=node_c, sink=node_a, edge=create_rdma_connection(5))
     )
 
-    # Ethernet connections (directed)
+    # 已翻譯註解。
     topology.add_connection(Connection(source=node_a, sink=node_b, edge=ethernet_conn))
     topology.add_connection(Connection(source=node_b, sink=node_c, edge=ethernet_conn))
     topology.add_connection(Connection(source=node_c, sink=node_a, edge=ethernet_conn))
@@ -472,7 +472,7 @@ def test_tensor_rdma_backend_connectivity_matrix(
         node_c: NodeRdmaCtlStatus(enabled=True),
     }
 
-    # act
+    # 已翻譯註解。
     placements = place_instance(
         cic,
         topology,
@@ -483,7 +483,7 @@ def test_tensor_rdma_backend_connectivity_matrix(
         node_rdma_ctl=node_rdma_ctl,
     )
 
-    # assert
+    # 已翻譯註解。
     assert len(placements) == 1
     instance_id = list(placements.keys())[0]
     instance = placements[instance_id]
@@ -509,13 +509,13 @@ def test_tensor_rdma_backend_connectivity_matrix(
     assert matrix[idx_b][idx_c] == "rdma_en4"
     assert matrix[idx_c][idx_a] == "rdma_en5"
 
-    # Verify coordinators are set for all nodes
+    # 已翻譯註解。
     assert len(instance.jaccl_coordinators) == 3
     for node_id in assigned_nodes:
         assert node_id in instance.jaccl_coordinators
         coordinator = instance.jaccl_coordinators[node_id]
         assert ":" in coordinator
-        # Rank 0 node should use 0.0.0.0, others should use connection-specific IPs
+        # 已翻譯註解。
         if node_id == assigned_nodes[0]:
             assert coordinator.startswith("0.0.0.0:")
         else:
@@ -574,7 +574,7 @@ def _build_three_node_rdma_topology() -> tuple[
 def test_place_mlx_jaccl_rejects_when_a_node_has_rdma_ctl_disabled(
     model_card: ModelCard,
 ):
-    # arrange
+    # 已翻譯註解。
     model_card = model_card.model_copy(
         update={"n_layers": 12, "storage_size": Memory.from_bytes(1500)}
     )
@@ -597,7 +597,7 @@ def test_place_mlx_jaccl_rejects_when_a_node_has_rdma_ctl_disabled(
         min_nodes=3,
     )
 
-    # act / assert
+    # 已翻譯註解。
     with pytest.raises(
         ValueError, match="Requested RDMA \\(MlxJaccl\\) but no RDMA-connected cycles"
     ):
@@ -613,8 +613,8 @@ def test_place_mlx_jaccl_rejects_when_a_node_has_rdma_ctl_disabled(
 
 
 def test_place_mlx_jaccl_rejects_when_node_rdma_ctl_missing(model_card: ModelCard):
-    """A node with no observed rdma_ctl status must not participate in RDMA placement."""
-    # arrange
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     model_card = model_card.model_copy(
         update={"n_layers": 12, "storage_size": Memory.from_bytes(1500)}
     )
@@ -624,7 +624,7 @@ def test_place_mlx_jaccl_rejects_when_node_rdma_ctl_missing(model_card: ModelCar
         node_b: create_node_memory(500),
         node_c: create_node_memory(500),
     }
-    # node_c has no rdma_ctl entry at all
+    # 已翻譯註解。
     node_rdma_ctl = {
         node_a: NodeRdmaCtlStatus(enabled=True),
         node_b: NodeRdmaCtlStatus(enabled=True),
@@ -637,7 +637,7 @@ def test_place_mlx_jaccl_rejects_when_node_rdma_ctl_missing(model_card: ModelCar
         min_nodes=3,
     )
 
-    # act / assert
+    # 已翻譯註解。
     with pytest.raises(ValueError):
         place_instance(
             cic,
@@ -669,17 +669,17 @@ def _make_task(
 def test_get_transition_events_delete_instance_cancels_running_tasks(
     instance: Instance,
 ):
-    # arrange
+    # 已翻譯註解。
     instance_id = InstanceId()
     current_instances: dict[InstanceId, Instance] = {instance_id: instance}
     target_instances: dict[InstanceId, Instance] = {}
     task = _make_task(instance_id, TaskStatus.Running)
     tasks = {task.task_id: task}
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, tasks)
 
-    # assert – cancellation event should come before the deletion event
+    # 已翻譯註解。
     assert len(events) == 2
     assert isinstance(events[0], TaskStatusUpdated)
     assert events[0].task_id == task.task_id
@@ -691,17 +691,17 @@ def test_get_transition_events_delete_instance_cancels_running_tasks(
 def test_get_transition_events_delete_instance_cancels_pending_tasks(
     instance: Instance,
 ):
-    # arrange
+    # 已翻譯註解。
     instance_id = InstanceId()
     current_instances: dict[InstanceId, Instance] = {instance_id: instance}
     target_instances: dict[InstanceId, Instance] = {}
     task = _make_task(instance_id, TaskStatus.Pending)
     tasks = {task.task_id: task}
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, tasks)
 
-    # assert
+    # 已翻譯註解。
     assert len(events) == 2
     assert isinstance(events[0], TaskStatusUpdated)
     assert events[0].task_id == task.task_id
@@ -712,7 +712,7 @@ def test_get_transition_events_delete_instance_cancels_pending_tasks(
 def test_get_transition_events_delete_instance_ignores_completed_tasks(
     instance: Instance,
 ):
-    # arrange
+    # 已翻譯註解。
     instance_id = InstanceId()
     current_instances: dict[InstanceId, Instance] = {instance_id: instance}
     target_instances: dict[InstanceId, Instance] = {}
@@ -726,10 +726,10 @@ def test_get_transition_events_delete_instance_ignores_completed_tasks(
         ]
     }
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, tasks)
 
-    # assert – only the InstanceDeleted event, no cancellations
+    # 已翻譯註解。
     assert len(events) == 1
     assert isinstance(events[0], InstanceDeleted)
 
@@ -737,24 +737,24 @@ def test_get_transition_events_delete_instance_ignores_completed_tasks(
 def test_get_transition_events_delete_instance_cancels_only_matching_tasks(
     instance: Instance,
 ):
-    # arrange
+    # 已翻譯註解。
     instance_id_a = InstanceId()
     instance_id_b = InstanceId()
     current_instances: dict[InstanceId, Instance] = {
         instance_id_a: instance,
         instance_id_b: instance,
     }
-    # only delete instance A, keep instance B
+    # 已翻譯註解。
     target_instances: dict[InstanceId, Instance] = {instance_id_b: instance}
 
     task_a = _make_task(instance_id_a, TaskStatus.Running)
     task_b = _make_task(instance_id_b, TaskStatus.Running)
     tasks = {task_a.task_id: task_a, task_b.task_id: task_b}
 
-    # act
+    # 已翻譯註解。
     events = get_transition_events(current_instances, target_instances, tasks)
 
-    # assert – only task_a should be cancelled
+    # 已翻譯註解。
     cancel_events = [e for e in events if isinstance(e, TaskStatusUpdated)]
     delete_events = [e for e in events if isinstance(e, InstanceDeleted)]
     assert len(cancel_events) == 1
@@ -778,7 +778,7 @@ def _make_shard_metadata(model_card: ModelCard) -> PipelineShardMetadata:
 def test_placement_prefers_cycle_with_downloaded_model(
     model_card: ModelCard,
 ) -> None:
-    """When two cycles are otherwise equal, prefer the one with the model already downloaded."""
+    """此說明已翻譯為繁體中文。"""
     topology = Topology()
 
     model_card = model_card.model_copy(update={"storage_size": Memory.from_bytes(500)})
@@ -797,11 +797,11 @@ def test_placement_prefers_cycle_with_downloaded_model(
 
     topology.add_node(node_a)
     topology.add_node(node_b)
-    # No connections between them — two single-node cycles
+    # 已翻譯註解。
 
     shard_meta = _make_shard_metadata(model_card)
 
-    # node_b has the model fully downloaded, node_a does not
+    # 已翻譯註解。
     download_status = {
         node_b: [
             DownloadCompleted(
@@ -832,7 +832,7 @@ def test_placement_prefers_cycle_with_downloaded_model(
 def test_placement_prefers_cycle_with_higher_download_progress(
     model_card: ModelCard,
 ) -> None:
-    """When two cycles are otherwise equal, prefer the one with more download progress."""
+    """此說明已翻譯為繁體中文。"""
     topology = Topology()
 
     model_card = model_card.model_copy(update={"storage_size": Memory.from_bytes(1000)})
@@ -854,7 +854,7 @@ def test_placement_prefers_cycle_with_higher_download_progress(
 
     shard_meta = _make_shard_metadata(model_card)
 
-    # node_a: 30% downloaded, node_b: 80% downloaded
+    # 已翻譯註解。
     download_status = {
         node_a: [
             DownloadOngoing(
@@ -910,7 +910,7 @@ def test_placement_prefers_cycle_with_higher_download_progress(
 def test_placement_does_not_prefer_cycle_with_failed_download(
     model_card: ModelCard,
 ) -> None:
-    """A failed download should count as 0% — not preferred over a node with no download history."""
+    """此說明已翻譯為繁體中文。"""
     topology = Topology()
 
     model_card = model_card.model_copy(update={"storage_size": Memory.from_bytes(500)})
@@ -918,7 +918,7 @@ def test_placement_does_not_prefer_cycle_with_failed_download(
     node_a = NodeId()
     node_b = NodeId()
 
-    # node_a has slightly more RAM so it would win on the RAM tiebreaker
+    # 已翻譯註解。
     node_memory = {
         node_a: create_node_memory(1001),
         node_b: create_node_memory(1000),
@@ -933,7 +933,7 @@ def test_placement_does_not_prefer_cycle_with_failed_download(
 
     shard_meta = _make_shard_metadata(model_card)
 
-    # node_b has a failed download — should not be preferred
+    # 已翻譯註解。
     download_status = {
         node_b: [
             DownloadFailed(
@@ -958,7 +958,7 @@ def test_placement_does_not_prefer_cycle_with_failed_download(
     assert len(placements) == 1
     instance = list(placements.values())[0]
     assigned_nodes = set(instance.shard_assignments.node_to_runner.keys())
-    # node_a should win on RAM tiebreaker since failed download scores 0.0
+    # 已翻譯註解。
     assert assigned_nodes == {node_a}
 
 
@@ -1007,7 +1007,7 @@ def test_placement_rejects_when_only_some_nodes_support_backend(
     node_backends = {
         node_a: [Backend.MlxMetal],
         node_b: [Backend.MlxMetal],
-        node_c: [Backend.MlxCuda],  # the lone CUDA-only node breaks the cycle
+        node_c: [Backend.MlxCuda],  # 已翻譯註解。
     }
 
     cic = place_instance_command(

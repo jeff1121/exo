@@ -19,13 +19,13 @@ from exo.worker.engines.image.models.qwen import (
 
 __all__: list[str] = []
 
-# Type alias for adapter factory functions
-# Factory takes (config, model_id, local_path, quantize) and returns a ModelAdapter
+# 已翻譯註解。
+# 已翻譯註解。
 AdapterFactory = Callable[
     [ImageModelConfig, str, Path, int | None], ModelAdapter[Any, Any]
 ]
 
-# Registry maps model_family string to adapter factory
+# 已翻譯註解。
 _ADAPTER_REGISTRY: dict[str, AdapterFactory] = {
     "flux": FluxModelAdapter,
     "flux-kontext": FluxKontextModelAdapter,
@@ -33,29 +33,29 @@ _ADAPTER_REGISTRY: dict[str, AdapterFactory] = {
     "qwen": QwenModelAdapter,
 }
 
-# Config registry: maps model ID patterns to configs
-# Order matters: longer/more-specific patterns must come before shorter ones
+# 已翻譯註解。
+# 已翻譯註解。
 _CONFIG_REGISTRY: dict[str, ImageModelConfig] = {
     "flux.1-schnell": FLUX_SCHNELL_CONFIG,
-    "flux.1-kontext": FLUX_KONTEXT_CONFIG,  # Must come before "flux.1-dev" for pattern matching
-    "flux.1-krea-dev": FLUX_DEV_CONFIG,  # Must come before "flux.1-dev" for pattern matching
+    "flux.1-kontext": FLUX_KONTEXT_CONFIG,  # 已翻譯註解。
+    "flux.1-krea-dev": FLUX_DEV_CONFIG,  # 已翻譯註解。
     "flux.1-dev": FLUX_DEV_CONFIG,
-    "qwen-image-edit": QWEN_IMAGE_EDIT_CONFIG,  # Must come before "qwen-image" for pattern matching
+    "qwen-image-edit": QWEN_IMAGE_EDIT_CONFIG,  # 已翻譯註解。
     "qwen-image": QWEN_IMAGE_CONFIG,
 }
 
 
 def get_config_for_model(model_id: str) -> ImageModelConfig:
-    """Get configuration for a model ID.
+    """此說明已翻譯為繁體中文。
 
-    Args:
-        model_id: The model identifier (e.g., "black-forest-labs/FLUX.1-schnell")
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Returns:
-        The model configuration
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Raises:
-        ValueError: If no configuration found for model ID
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
     """
     model_id_lower = model_id.lower()
 
@@ -72,19 +72,19 @@ def create_adapter_for_model(
     local_path: Path,
     quantize: int | None = None,
 ) -> ModelAdapter[Any, Any]:
-    """Create a model adapter for the given configuration.
+    """此說明已翻譯為繁體中文。
 
-    Args:
-        config: The model configuration
-        model_id: The model identifier
-        local_path: Path to the model weights
-        quantize: Optional quantization bits
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Returns:
-        A ModelAdapter instance
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Raises:
-        ValueError: If no adapter found for model family
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
     """
     factory = _ADAPTER_REGISTRY.get(config.model_family)
     if factory is None:

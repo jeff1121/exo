@@ -1,1 +1,1 @@
-# Test package for shared utilities
+# 已翻譯註解。

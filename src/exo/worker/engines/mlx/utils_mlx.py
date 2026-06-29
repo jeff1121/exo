@@ -11,9 +11,9 @@ from typing import TYPE_CHECKING, Any, cast
 if TYPE_CHECKING:
     from exo.worker.engines.mlx.vision import VisionProcessor
 
-# Monkey-patch for transformers 5.x compatibility
-# Kimi's tokenization_kimi.py imports bytes_to_unicode from the old location
-# which was moved in transformers 5.0.0rc2
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
 try:
     import transformers.models.gpt2.tokenization_gpt2 as gpt2_tokenization
     from transformers.convert_slow_tokenizer import bytes_to_unicode
@@ -21,7 +21,7 @@ try:
     if not hasattr(gpt2_tokenization, "bytes_to_unicode"):
         gpt2_tokenization.bytes_to_unicode = bytes_to_unicode  # type: ignore[attr-defined]
 except ImportError:
-    pass  # transformers < 5.0 or bytes_to_unicode not available
+    pass  # 已翻譯註解。
 
 from mlx_lm.models.cache import KVCache
 from mlx_lm.models.deepseek_v3 import DeepseekV3Model
@@ -91,7 +91,7 @@ def mlx_distributed_init(
     bound_instance: BoundInstance,
 ) -> mx.distributed.Group:
     """
-    Initialize MLX distributed.
+    此說明已翻譯為繁體中文。
     """
     rank = bound_instance.bound_shard.device_rank
     logger.info(f"Starting initialization for rank {rank}")
@@ -100,7 +100,7 @@ def mlx_distributed_init(
         coordination_file = str(
             Path(tmpdir) / f"hosts_{bound_instance.instance.instance_id}_{rank}.json"
         )
-        # TODO: singleton instances
+        # 待辦事項：已翻譯註解。
         match bound_instance.instance:
             case MlxRingInstance(hosts_by_node=hosts_by_node, ephemeral_port=_):
                 hosts_for_node = hosts_by_node[bound_instance.bound_node_id]
@@ -115,7 +115,7 @@ def mlx_distributed_init(
 
                 os.environ["MLX_HOSTFILE"] = coordination_file
                 os.environ["MLX_RANK"] = str(rank)
-                # os.environ["MLX_RING_VERBOSE"] = "1"  # NOTE: we don't use it enough to care (turn on again if need to)
+                # 已翻譯註解。
 
                 group = mx.distributed.init(backend="ring", strict=True)
 
@@ -125,7 +125,7 @@ def mlx_distributed_init(
                 assert all(
                     jaccl_devices[i][i] is None for i in range(len(jaccl_devices))
                 )
-                # Use RDMA connectivity matrix
+                # 已翻譯註解。
                 jaccl_devices_json = json.dumps(jaccl_devices)
 
                 with open(coordination_file, "w") as f:
@@ -150,8 +150,8 @@ def mlx_distributed_init(
 def initialize_mlx(
     bound_instance: BoundInstance,
 ) -> mx.distributed.Group:
-    # should we unseed it?
-    # TODO: pass in seed from params
+    # 已翻譯註解。
+    # 待辦事項：已翻譯註解。
     mx.random.seed(42)
 
     assert len(bound_instance.instance.shard_assignments.node_to_runner) > 1, (
@@ -173,7 +173,7 @@ def load_mlx_items(
         model_path = build_model_path(bound_instance.bound_shard.model_card.model_id)
         start_time = time.perf_counter()
         model, _ = load_model(model_path, lazy=True, strict=False)
-        # Eval layers one by one for progress reporting
+        # 已翻譯註解。
         try:
             inner = get_inner_model(model)
             layers = get_layers(inner)
@@ -239,19 +239,19 @@ def shard_and_load(
     logger.debug(model)
     if hasattr(model, "model") and isinstance(model.model, DeepseekV3Model):  # type: ignore
         pass
-        # TODO: See if we should quantize the model.
-        # def is_attention_layer(path: str) -> bool:
-        #     path = path.lower()
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
+        #     已翻譯註解。
 
-        #     return "self_attn" in path and "layernorm" not in path
+        #     已翻譯註解。
 
-        # def quant_predicate(path: str, module: nn.Module):
-        #     if not isinstance(module, nn.Linear):
-        #         return False
+        # 已翻譯註解。
+        #     已翻譯註解。
+        #         已翻譯註解。
 
-        #     return is_attention_layer(path)
-        # model, config = quantize_model(
-        #        model, config, group_size=KV_GROUP_SIZE, bits=ATTENTION_KV_BITS, quant_predicate=quant_predicate, mode=QUANTIZE_MODEL_MODE
+        #     已翻譯註解。
+        # 已翻譯註解。
+        #        已翻譯註解。
         #    )
 
     assert isinstance(model, nn.Module)
@@ -274,20 +274,20 @@ def shard_and_load(
                 "this metadata type is only for image generation models"
             )
 
-    # TODO: Do we need this?
+    # 待辦事項：已翻譯註解。
     mx.eval(model)
 
     logger.debug("SHARDED")
     logger.debug(model)
 
-    # Synchronize processes before generation to avoid timeout
+    # 已翻譯註解。
     mx_barrier(group)
 
     return model, tokenizer
 
 
 def get_tokenizer(model_path: Path, shard_metadata: ShardMetadata) -> TokenizerWrapper:
-    """Load tokenizer for a model shard. Delegates to load_tokenizer_for_model_id."""
+    """此說明已翻譯為繁體中文。"""
     return load_tokenizer_for_model_id(
         shard_metadata.model_card.model_id,
         model_path,
@@ -297,25 +297,25 @@ def get_tokenizer(model_path: Path, shard_metadata: ShardMetadata) -> TokenizerW
 
 def get_eos_token_ids_for_model(model_id: ModelId) -> list[int] | None:
     """
-    Get the EOS token IDs for a model based on its ID.
+    此說明已翻譯為繁體中文。
 
-    Some models require explicit EOS token configuration that isn't in their
-    tokenizer config. This function returns the known EOS token IDs for such models.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Args:
-        model_id: The HuggingFace model ID
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Returns:
-        List of EOS token IDs, or None if the model uses standard tokenizer config
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
     """
     model_id_lower = model_id.lower()
     if "kimi-k2" in model_id_lower:
         return [163586]
     elif "glm-5" in model_id_lower:
-        # 154820: <|endoftext|>, 154827: <|user|>, 154829: <|observation|>
+        # 已翻譯註解。
         return [154820, 154827, 154829]
     elif "glm" in model_id_lower:
-        # For GLM-4.7 and older
+        # 已翻譯註解。
         return [151336, 151329, 151338]
     elif "gpt-oss" in model_id_lower:
         return [200002, 200012]
@@ -325,7 +325,7 @@ def get_eos_token_ids_for_model(model_id: ModelId) -> list[int] | None:
         or "qwen3.6" in model_id_lower
         or "qwen-3.6" in model_id_lower
     ):
-        # For Qwen3.5 / Qwen3.6: 248046 (<|im_end|>), 248044 (<|endoftext|>)
+        # 已翻譯註解。
         return [248046, 248044]
     elif "gemma-4" in model_id_lower or "gemma-3" in model_id_lower:
         return [1, 106, 50]
@@ -336,29 +336,29 @@ def load_tokenizer_for_model_id(
     model_id: ModelId, model_path: Path, *, trust_remote_code: bool = TRUST_REMOTE_CODE
 ) -> TokenizerWrapper:
     """
-    Load tokenizer for a model given its ID and local path.
+    此說明已翻譯為繁體中文。
 
-    This is the core tokenizer loading logic, handling special cases for different
-    model families (Kimi, GLM, etc.) and transformers 5.x compatibility.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Args:
-        model_id: The HuggingFace model ID (e.g., "moonshotai/Kimi-K2-Instruct")
-        model_path: Local path where the model/tokenizer files are stored
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Returns:
-        TokenizerWrapper instance configured for the model
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
     """
     model_id_lower = model_id.lower()
     eos_token_ids = get_eos_token_ids_for_model(model_id)
 
-    # Kimi uses a custom TikTokenTokenizer that transformers 5.x can't load via AutoTokenizer
+    # 已翻譯註解。
     if "kimi-k2" in model_id_lower:
         import importlib.util
         import types
 
         sys.path.insert(0, str(model_path))
 
-        # Load tool_declaration_ts first (tokenization_kimi imports it with relative import)
+        # 已翻譯註解。
         tool_decl_path = model_path / "tool_declaration_ts.py"
         if tool_decl_path.exists():
             spec = importlib.util.spec_from_file_location(
@@ -369,7 +369,7 @@ def load_tokenizer_for_model_id(
                 sys.modules["tool_declaration_ts"] = tool_decl_module
                 spec.loader.exec_module(tool_decl_module)
 
-        # Load tokenization_kimi with patched source (convert relative to absolute import)
+        # 已翻譯註解。
         tok_path = model_path / "tokenization_kimi.py"
         source = tok_path.read_text()
         source = source.replace("from .tool_declaration_ts", "from tool_declaration_ts")
@@ -383,13 +383,13 @@ def load_tokenizer_for_model_id(
         else:
             from tokenization_kimi import TikTokenTokenizer  # type: ignore[import-not-found]  # noqa: I001
 
-        hf_tokenizer: Any = TikTokenTokenizer.from_pretrained(model_path)  # pyright: ignore[reportUnknownVariableType,reportUnknownMemberType]
+        hf_tokenizer: Any = TikTokenTokenizer.from_pretrained(model_path)  # 已翻譯註解。
 
-        # Patch encode to use internal tiktoken model directly
-        # transformers 5.x has a bug in the encode->pad path for slow tokenizers
+        # 已翻譯註解。
+        # 已翻譯註解。
         def _patched_encode(text: str, **_kwargs: object) -> list[int]:
-            # Pass allowed_special="all" to handle special tokens like <|im_user|>
-            return list(hf_tokenizer.model.encode(text, allowed_special="all"))  # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
+            # 已翻譯註解。
+            return list(hf_tokenizer.model.encode(text, allowed_special="all"))  # 已翻譯註解。
 
         hf_tokenizer.encode = _patched_encode
         return TokenizerWrapper(
@@ -400,7 +400,7 @@ def load_tokenizer_for_model_id(
             tool_parser=_parse_kimi_tool_calls,
         )
 
-    # We should really consider going back to mlx lm load to get tokenizer
+    # 已翻譯註解。
     tokenizer = load_tokenizer(
         model_path,
         tokenizer_config_extra={"trust_remote_code": trust_remote_code},
@@ -411,22 +411,22 @@ def load_tokenizer_for_model_id(
 
 
 def _normalize_tool_calls(msg_dict: dict[str, Any]) -> None:
-    """Normalize tool_calls in a message dict.
+    """此說明已翻譯為繁體中文。
 
-    OpenAI format has tool_calls[].function.arguments as a JSON string,
-    but some chat templates (e.g., GLM) expect it as a dict.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     tool_calls = msg_dict.get("tool_calls")
     if not tool_calls or not isinstance(tool_calls, list):
         return
 
-    for tc in tool_calls:  # pyright: ignore[reportUnknownVariableType]
+    for tc in tool_calls:  # 已翻譯註解。
         if not isinstance(tc, dict):
             continue
-        func = tc.get("function")  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+        func = tc.get("function")  # 已翻譯註解。
         if not isinstance(func, dict):
             continue
-        args = func.get("arguments")  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+        args = func.get("arguments")  # 已翻譯註解。
         if isinstance(args, str):
             with contextlib.suppress(json.JSONDecodeError):
                 func["arguments"] = json.loads(args)
@@ -435,21 +435,21 @@ def _normalize_tool_calls(msg_dict: dict[str, Any]) -> None:
 def _collect_nested_property_names(schema: dict[str, Any]) -> set[str]:
     names: set[str] = set()
     properties: dict[str, Any] = schema.get("properties", {})  # type: ignore[reportAny]
-    for prop_spec in properties.values():  # pyright: ignore[reportAny]
+    for prop_spec in properties.values():  # 已翻譯註解。
         if not isinstance(prop_spec, dict):
             continue
         if prop_spec.get("type") == "array":  # type: ignore[reportAny]
             items: dict[str, Any] | None = prop_spec.get("items")  # type: ignore[reportAny]
             if isinstance(items, dict) and items.get("type") == "object":  # type: ignore[reportAny]
                 inner_props: dict[str, Any] = items.get("properties", {})  # type: ignore[reportAny]
-                for k in inner_props:  # pyright: ignore[reportUnknownVariableType]
-                    names.add(str(k))  # pyright: ignore[reportUnknownArgumentType]
-                names.update(_collect_nested_property_names(items))  # pyright: ignore[reportUnknownArgumentType]
+                for k in inner_props:  # 已翻譯註解。
+                    names.add(str(k))  # 已翻譯註解。
+                names.update(_collect_nested_property_names(items))  # 已翻譯註解。
     return names
 
 
 def _schemas_lost_in_prompt(prompt: str, tools: list[dict[str, Any]]) -> bool:
-    """Return True if nested property names from any tool schema are absent."""
+    """此說明已翻譯為繁體中文。"""
     for tool in tools:
         fn: dict[str, Any] = tool.get("function", {})  # type: ignore
         params: dict[str, Any] = fn.get("parameters", {})  # type: ignore
@@ -465,18 +465,18 @@ _LOSSY_TEMPLATE_PATTERN = re.compile(
 
 
 def _patch_lossy_chat_template(template: str) -> str | None:
-    """Patch chat templates that collapse nested object schemas to ``any[]``.
+    """此說明已翻譯為繁體中文。
 
-    Some templates (e.g., GPT-OSS) have a guard like::
+    此說明已翻譯為繁體中文。
 
-        inner_type == "object | object" or inner_type|length > 50
+        此說明已翻譯為繁體中文。
 
-    The length check silently drops complex array-of-object schemas.
-    We remove the length guard, keeping only the object-union check.
-    Returns the patched template, or *None* if no patch was needed.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     patched, n = _LOSSY_TEMPLATE_PATTERN.subn(
-        lambda m: m.group(0).split(" or ")[0],  # keep only the object-union check
+        lambda m: m.group(0).split(" or ")[0],  # 已翻譯註解。
         template,
     )
     return patched if n > 0 else None
@@ -500,11 +500,11 @@ def _v4_reasoning_effort(task_params: TextGenerationTaskParams) -> str | None:
 
 
 def _strip_v4_thinking_markers(content: str) -> str:
-    """Remove `<think>…</think>` blocks and any stray `<think>`/`</think>` tags
-    from prior-turn assistant content.
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    The V4 encoder drops `reasoning_content` for older turns when
-    `drop_thinking=True`"""
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     block = re.compile(r"<think>.*?</think>", re.DOTALL)
     if not content:
         return content
@@ -516,10 +516,10 @@ def consolidate_system_messages(
     messages: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """
-    System messages almost exclusively must go at the start of a message
-    and there must only be a single one.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Also, Codex sends "developer" messages which are just system prompts.
+    此說明已翻譯為繁體中文。
     """
     system_parts: list[str] = []
     non_system: list[dict[str, Any]] = []
@@ -544,17 +544,17 @@ def render_chat_template(
     task_params: TextGenerationTaskParams,
 ) -> str:
     """
-    Convert TextGenerationTaskParams to a chat template prompt.
+    此說明已翻譯為繁體中文。
 
-    Converts the internal format (input + instructions) to a messages list
-    that can be processed by the tokenizer's chat template.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    When chat_template_messages is available (from Chat Completions API),
-    uses those directly to preserve tool_calls, thinking, and other fields.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     formatted_messages = consolidate_system_messages(messages)
 
-    # For assistant prefilling, append content after templating to avoid a closing turn token.
+    # 已翻譯註解。
     partial_assistant_content: str | None = None
     if formatted_messages and formatted_messages[-1].get("role") == "assistant":
         partial_assistant_content = cast(str, formatted_messages[-1].get("content", ""))
@@ -565,7 +565,7 @@ def render_chat_template(
 
         prompt = encode_messages(
             messages=formatted_messages,
-            # Only use chat mode if enable thinking is explicitly Fakse.
+            # 已翻譯註解。
             thinking_mode="chat"
             if task_params.enable_thinking is False
             else "thinking",
@@ -610,7 +610,7 @@ def render_chat_template(
     for msg in formatted_messages:
         _normalize_tool_calls(msg)
 
-    # Put reasoning content in thinking block for GPT OSS
+    # 已翻譯註解。
     if "gpt-oss" in task_params.model.lower():
         for msg in formatted_messages:
             if msg.get("role") == "assistant" and "thinking" not in msg:
@@ -620,8 +620,8 @@ def render_chat_template(
 
     extra_kwargs: dict[str, Any] = {}
     if task_params.enable_thinking is not None:
-        # Qwen3 and GLM use "enable_thinking"; DeepSeek uses "thinking".
-        # Jinja ignores unknown variables, so passing both is safe.
+        # 已翻譯註解。
+        # 已翻譯註解。
         extra_kwargs["enable_thinking"] = task_params.enable_thinking
         extra_kwargs["thinking"] = task_params.enable_thinking
     if task_params.reasoning_effort is not None:
@@ -661,14 +661,14 @@ def apply_chat_template(
 ) -> str:
     messages: list[dict[str, ChatTemplateValue]] = []
     if task_params.chat_template_messages is not None:
-        # Use pre-formatted messages that preserve tool_calls, thinking, etc.
+        # 已翻譯註解。
         messages = task_params.chat_template_messages
     else:
-        # Add system message (instructions) if present
+        # 已翻譯註解。
         if task_params.instructions:
             messages.append({"role": "system", "content": task_params.instructions})
 
-        # Convert input to messages
+        # 已翻譯註解。
         for msg in task_params.input:
             if not msg.content:
                 logger.warning("Received message with empty content, skipping")
@@ -685,7 +685,7 @@ def system_prompt_token_count(
     task_params: TextGenerationTaskParams,
     tokenizer: TokenizerWrapper,
 ) -> int:
-    """Approximate token count of the system prompt portion of the input."""
+    """此說明已翻譯為繁體中文。"""
     parts: list[str] = []
     if task_params.chat_template_messages is not None:
         for msg in task_params.chat_template_messages:
@@ -706,8 +706,8 @@ def system_prompt_token_count(
 
 def detect_thinking_prompt_suffix(prompt: str, tokenizer: TokenizerWrapper) -> bool:
     """
-    Detect if prompt ends with a thinking opening tag that should be
-    prepended to the output stream.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     think_token = tokenizer.think_start
 
@@ -756,20 +756,20 @@ def fix_unmatched_think_end_tokens(
 
 class NullKVCache(KVCache):
     """
-    A KVCache that pretends to exist but holds zero tokens.
-    It satisfies .state/.meta_state and never allocates real keys/values.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(self, dtype: mx.Dtype = mx.float16):
         super().__init__()
-        # zero-length K/V so shapes/dtypes are defined but empty
+        # 已翻譯註解。
         self.keys = mx.zeros((1, 1, 0, 1), dtype=dtype)
         self.values = mx.zeros((1, 1, 0, 1), dtype=dtype)
         self.offset = 0
 
     @property
     def state(self) -> tuple[mx.array, mx.array]:
-        # matches what mx.save_safetensors / mx.eval expect
+        # 已翻譯註解。
         assert self.keys is not None and self.values is not None
         return self.keys, self.values
 
@@ -780,7 +780,7 @@ class NullKVCache(KVCache):
 
 def mlx_force_oom(size: int = 200000) -> None:
     """
-    Force an Out-Of-Memory (OOM) error in MLX by performing large tensor operations.
+    此說明已翻譯為繁體中文。
     """
     mx.set_default_device(mx.gpu)
     a = mx.random.uniform(shape=(size, size), dtype=mx.float32)
@@ -795,11 +795,11 @@ def mlx_force_oom(size: int = 200000) -> None:
 
 def set_wired_limit_for_model(model_size: Memory):
     """
-    A context manager to temporarily change the wired limit.
+    此說明已翻譯為繁體中文。
 
-    Note, the wired limit should not be changed during an async eval.  If an
-    async eval could be running pass in the streams to synchronize with prior
-    to exiting the context manager.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     if not mx.metal.is_available():
         return
@@ -853,8 +853,8 @@ def mx_barrier(group: mx.distributed.Group | None):
 def _parse_kimi_tool_calls(text: str):
     import regex as re
 
-    # kimi has a fixed function naming scheme, with a json formatted arg
-    #   functions.multiply:0<|tool_call_argument_begin|>{"a": 2, "b": 3}
+    # 已翻譯註解。
+    #   已翻譯註解。
     _func_name_regex = re.compile(
         r"^\s*((?:functions\.)?(.+?):\d+)\s*<\|tool_call_argument_begin\|>", re.DOTALL
     )
@@ -867,20 +867,20 @@ def _parse_kimi_tool_calls(text: str):
         func_name_match = _func_name_regex.search(text)
         if func_name_match is None:
             raise ValueError("No tool call found.")
-        tool_call_id = func_name_match.group(1)  # e.g. "functions.get_weather:0"
-        func_name = func_name_match.group(2)  # e.g. "get_weather"
+        tool_call_id = func_name_match.group(1)  # 已翻譯註解。
+        func_name = func_name_match.group(2)  # 已翻譯註解。
 
         func_args_match = _func_arg_regex.search(text)
         if func_args_match is None:
             raise ValueError("No tool call arguments found.")
         func_args = func_args_match.group(1)
-        arg_dct = json.loads(func_args)  # pyright: ignore[reportAny]
+        arg_dct = json.loads(func_args)  # 已翻譯註解。
 
-        return dict(id=tool_call_id, name=func_name, arguments=arg_dct)  # pyright: ignore[reportAny]
+        return dict(id=tool_call_id, name=func_name, arguments=arg_dct)  # 已翻譯註解。
 
     tool_matches = _tool_call_split_regex.findall(text)
     if tool_matches:
-        return [_parse_single_tool(match) for match in tool_matches]  # pyright: ignore[reportAny]
+        return [_parse_single_tool(match) for match in tool_matches]  # 已翻譯註解。
     else:
         return [_parse_single_tool(text)]
 

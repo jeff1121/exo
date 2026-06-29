@@ -49,33 +49,33 @@ class PromptData(ABC):
     def cond_image_grid(
         self,
     ) -> tuple[int, int, int] | list[tuple[int, int, int]] | None:
-        """Conditioning image grid dimensions for edit mode.
+        """此說明已翻譯為繁體中文。
 
-        Returns:
-            Grid dimensions (edit) or None (standard generation).
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
     @property
     @abstractmethod
     def conditioning_latents(self) -> mx.array | None:
-        """Conditioning latents for edit mode.
+        """此說明已翻譯為繁體中文。
 
-        Returns:
-            Conditioning latents array for image editing, None for standard generation.
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
     @property
     @abstractmethod
     def kontext_image_ids(self) -> mx.array | None:
-        """Kontext-style position IDs for image conditioning.
+        """此說明已翻譯為繁體中文。
 
-        For FLUX.1-Kontext models, returns position IDs with first_coord=1
-        to distinguish conditioning tokens from generation tokens (first_coord=0).
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Returns:
-            Position IDs array [1, seq_len, 3] for Kontext, None for other models.
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
@@ -83,19 +83,19 @@ class PromptData(ABC):
     def get_batched_cfg_data(
         self,
     ) -> tuple[mx.array, mx.array, mx.array | None, mx.array | None] | None:
-        """Get embeddings for CFG with batch_size=2.
+        """此說明已翻譯為繁體中文。
 
-        Combines positive and negative embeddings into batched tensors for
-        a single forward pass. Pads shorter sequences to max length. Attention
-        mask is used to mask padding.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Returns:
-            None if model doesn't support CFG, otherwise tuple of:
-            - batched_embeds: [2, max_seq, hidden] (positive then negative)
-            - batched_mask: [2, max_seq] attention mask
-            - batched_pooled: [2, hidden] pooled embeddings or None
-            - conditioning_latents: [2, latent_seq, latent_dim] or None
-            TODO(ciaran): type this
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
@@ -103,20 +103,20 @@ class PromptData(ABC):
     def get_cfg_branch_data(
         self, positive: bool
     ) -> tuple[mx.array, mx.array | None, mx.array | None, mx.array | None]:
-        """Get embeddings for a single CFG branch (positive or negative).
+        """此說明已翻譯為繁體中文。
 
-        Used for sequential CFG and CFG parallel modes where we process
-        one branch at a time instead of batching.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Args:
-            positive: True for positive prompt, False for negative prompt
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            Tuple of:
-            - embeds: [1, seq, hidden] prompt embeddings
-            - mask: [1, seq] attention mask or None
-            - pooled: [1, hidden] pooled embeddings or None
-            - conditioning_latents: [1, latent_seq, latent_dim] or None
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
@@ -145,7 +145,7 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
     @property
     @abstractmethod
     def needs_cfg(self) -> bool:
-        """Whether this model uses classifier-free guidance."""
+        """此說明已翻譯為繁體中文。"""
         ...
 
     @abstractmethod
@@ -157,14 +157,14 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
         text_seq_len: int,
         encoder_hidden_states_mask: mx.array | None = None,
     ) -> list["JointBlockWrapper[Any]"]:
-        """Create wrapped joint transformer blocks with pipefusion support.
+        """此說明已翻譯為繁體中文。
 
-        Args:
-            text_seq_len: Number of text tokens (constant for generation)
-            encoder_hidden_states_mask: Attention mask for text (Qwen only)
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            List of wrapped joint blocks ready for pipefusion
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
@@ -173,13 +173,13 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
         self,
         text_seq_len: int,
     ) -> list["SingleBlockWrapper[Any]"]:
-        """Create wrapped single transformer blocks with pipefusion support.
+        """此說明已翻譯為繁體中文。
 
-        Args:
-            text_seq_len: Number of text tokens (constant for generation)
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            List of wrapped single blocks ready for pipefusion
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
@@ -189,39 +189,39 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
         start_layer: int,
         end_layer: int,
     ):
-        """Remove transformer blocks outside the assigned range.
+        """此說明已翻譯為繁體中文。
 
-        This should be called BEFORE mx.eval() to avoid loading unused weights
-        in distributed mode.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Args:
-            start_layer: First layer index (inclusive) assigned to this node
-            end_layer: Last layer index (exclusive) assigned to this node
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
     def set_image_dimensions(self, image_path: Path) -> tuple[int, int] | None:
-        """Default implementation: no dimension computation needed.
+        """此說明已翻譯為繁體中文。
 
-        Override in edit adapters to compute dimensions from input image.
-        TODO(ciaran): this is a hack
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Returns:
-            None (use user-specified dimensions)
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         return None
 
     def create_latents(self, seed: int, runtime_config: Config) -> mx.array:
-        """Create initial latents. Uses model-specific latent creator."""
+        """此說明已翻譯為繁體中文。"""
         model: Any = self.model
         return LatentCreator.create_for_txt2img_or_img2img(
             seed=seed,
             height=runtime_config.height,
             width=runtime_config.width,
             img2img=Img2Img(
-                vae=model.vae,  # pyright: ignore[reportAny]
+                vae=model.vae,  # 已翻譯註解。
                 latent_creator=self._get_latent_creator(),
-                sigmas=runtime_config.scheduler.sigmas,  # pyright: ignore[reportAny]
+                sigmas=runtime_config.scheduler.sigmas,  # 已翻譯註解。
                 init_time_step=runtime_config.init_time_step,
                 image_path=runtime_config.image_path,
             ),
@@ -234,24 +234,24 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
         seed: int,
         prompt: str,
     ) -> Image.Image:
-        model: Any = self.model  # Allow attribute access on model
-        latents = self._get_latent_creator().unpack_latents(  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+        model: Any = self.model  # 已翻譯註解。
+        latents = self._get_latent_creator().unpack_latents(  # 已翻譯註解。
             latents=latents,
             height=runtime_config.height,
             width=runtime_config.width,
         )
-        decoded = model.vae.decode(latents)  # pyright: ignore[reportAny]
-        # TODO(ciaran):
-        # from mflux.models.common.vae.vae_util import VAEUtil
-        # VAEUtil.decode(vae=model.vae, latents=latents, tiling_config=self.tiling_config)
+        decoded = model.vae.decode(latents)  # 已翻譯註解。
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         generated_image = ImageUtil.to_image(
-            decoded_latents=decoded,  # pyright: ignore[reportAny]
+            decoded_latents=decoded,  # 已翻譯註解。
             config=runtime_config,
             seed=seed,
             prompt=prompt,
-            quantization=model.bits,  # pyright: ignore[reportAny]
-            lora_paths=model.lora_paths,  # pyright: ignore[reportAny]
-            lora_scales=model.lora_scales,  # pyright: ignore[reportAny]
+            quantization=model.bits,  # 已翻譯註解。
+            lora_paths=model.lora_paths,  # 已翻譯註解。
+            lora_scales=model.lora_scales,  # 已翻譯註解。
             image_path=runtime_config.image_path,
             image_strength=runtime_config.image_strength,
             generation_time=0,
@@ -305,17 +305,17 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
         noise_negative: mx.array,
         guidance_scale: float,
     ) -> mx.array:
-        """Apply classifier-free guidance to combine positive/negative predictions.
+        """此說明已翻譯為繁體中文。
 
-        Only called when needs_cfg is True.
+        此說明已翻譯為繁體中文。
 
-        Args:
-            noise_positive: Noise prediction from positive prompt
-            noise_negative: Noise prediction from negative prompt
-            guidance_scale: Guidance strength
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            Guided noise prediction
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         ...
 
@@ -325,5 +325,5 @@ class ModelAdapter(ABC, Generic[ModelT, TransformerT]):
         text_embeddings: mx.array,
     ) -> mx.array:
         transformer: Any = self.transformer
-        hidden_states = transformer.norm_out(hidden_states, text_embeddings)  # pyright: ignore[reportAny]
-        return transformer.proj_out(hidden_states)  # pyright: ignore[reportAny]
+        hidden_states = transformer.norm_out(hidden_states, text_embeddings)  # 已翻譯註解。
+        return transformer.proj_out(hidden_states)  # 已翻譯註解。

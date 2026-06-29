@@ -1,15 +1,15 @@
 # type: ignore
 #!/usr/bin/env python3
-"""Disaggregated prefill-decode benchmark for exo (MLX → MLX).
+"""exo 的解耦式 prefill-decode 基準測試（MLX → MLX）。
 
-Spins up two MLX instances on the cluster, marks one as Prefill source and
-the other as Decode target via /v1/instance-links, then sends chat
-completions to the API. The master routes the request to the decode
-instance and stamps `prefill_endpoint` pointing at the prefill instance —
-the worker decides per-request whether to ship prefill remotely
-(uncached_count > REMOTE_PREFILL_MIN_TOKENS).
+在叢集上啟動兩個 MLX instance，將其一標記為 Prefill 來源、
+另一個透過 /v1/instance-links 標記為 Decode 目標，接著發送 chat
+completions 到 API。master 會把請求路由到 decode
+instance，並加上指向 prefill instance 的 `prefill_endpoint`——
+worker 會逐請求判斷是否遠端傳送 prefill
+（uncached_count > REMOTE_PREFILL_MIN_TOKENS）。
 
-Usage:
+使用方式：
     uv run python bench/prefill_decode_bench.py --model <id> --pp 2048,8192 --tg 128
     uv run python bench/prefill_decode_bench.py --model <id> --pp 4096 --tg 128 --repeat 3
     uv run python bench/prefill_decode_bench.py --model <id> --pp 2048 --tg 128 --dry-run
@@ -118,8 +118,8 @@ _TOP_LEVEL_TOML_KEYS = {
 
 
 def _inject_toml_into_argv() -> None:
-    """If --config X is in sys.argv, pre-load it and inject required CLI args
-    (--model, --pp, --tg) so argparse's required=True checks pass."""
+    """若 sys.argv 中有 --config X，先預載並注入必要 CLI 參數
+    （--model、--pp、--tg），讓 argparse 的 required=True 檢查通過。"""
     argv = sys.argv
     if "--config" not in argv:
         return
@@ -133,7 +133,7 @@ def _inject_toml_into_argv() -> None:
     def _has(flag: str) -> bool:
         return any(a == flag or a.startswith(flag + "=") for a in argv)
 
-    # --model: prefer top-level, then [decode].model
+    # --model：優先使用頂層設定，其次使用 [decode].model
     if not _has("--model"):
         model = cfg.get("model") or decode.get("model")
         if model:
@@ -163,7 +163,7 @@ def _inject_toml_into_argv() -> None:
 
 
 def _merge_toml_into_args(args: argparse.Namespace, cfg: dict[str, Any]) -> None:
-    """Apply top-level toml keys onto args namespace where args has a default."""
+    """將 toml 頂層鍵套用到 args namespace（僅在 args 仍是預設值時）。"""
     for key, value in cfg.items():
         if key in {"prefill", "decode"}:
             continue

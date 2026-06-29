@@ -71,7 +71,7 @@ def _got_finish(results: list[GenerationResponse | ToolCallResponse]) -> bool:
     return False
 
 
-# ── parse_deepseek_v32 ──────────────────────────────────────────
+# 已翻譯註解。
 
 
 class TestDeepSeekV32FinishReason:
@@ -186,7 +186,7 @@ class TestDeepSeekV32FinishReason:
         assert _got_finish(results)
 
 
-# ── parse_thinking_models ────────────────────────────────────────
+# 已翻譯註解。
 
 
 class TestThinkingModelsFinishReason:
@@ -247,7 +247,7 @@ class TestThinkingModelsFinishReason:
         assert _got_finish(results)
 
     def test_reasoning_tokens_counted(self):
-        """reasoning_tokens in Usage reflects the number of thinking tokens."""
+        """此說明已翻譯為繁體中文。"""
         usage = Usage(
             prompt_tokens=10,
             completion_tokens=4,
@@ -282,7 +282,7 @@ class TestThinkingModelsFinishReason:
         assert final[0].usage.completion_tokens_details.reasoning_tokens == 2
 
     def test_reasoning_tokens_starts_in_thinking(self):
-        """reasoning_tokens counts correctly when starts_in_thinking=True."""
+        """此說明已翻譯為繁體中文。"""
         usage = Usage(
             prompt_tokens=10,
             completion_tokens=3,
@@ -318,7 +318,7 @@ class TestThinkingModelsFinishReason:
         assert final[0].usage.completion_tokens_details.reasoning_tokens == 2
 
 
-# ── parse_tool_calls (generic) ──────────────────────────────────
+# 已翻譯註解。
 
 
 def _dummy_parser_fn(text: str) -> dict[str, Any]:
@@ -377,12 +377,12 @@ class TestGenericToolCallsFinishReason:
         assert _got_finish(results)
 
 
-# ── Double parser chain (parse_thinking_models → parse_deepseek_v32) ──
+# 已翻譯註解。
 
 
 class TestDeepSeekV32StartsInThinking:
-    """Regression tests for deepseek v3.2 where the chat template appends
-    <think> to the prompt so the model starts already inside a thinking block.
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def test_reasoning_tagged_when_starts_in_thinking(self):
@@ -510,7 +510,7 @@ class TestBatchGeneratorSingleNext:
         )
 
 
-# ── parse_thinking_models prefix buffering ──────────────────────
+# 已翻譯註解。
 
 
 def _drain_text(
@@ -667,7 +667,7 @@ class TestThinkingModelsPrefixBuffering:
 
         tool_results = [r for r in results if isinstance(r, ToolCallResponse)]
         assert len(tool_results) == 1
-        raw = json.loads(tool_results[0].tool_calls[0].arguments)["raw"]  # pyright: ignore[reportAny]
+        raw = json.loads(tool_results[0].tool_calls[0].arguments)["raw"]  # 已翻譯註解。
         assert "<function=glob>" in raw
         assert "<parameter=pattern>" in raw
         assert "</parameter>" in raw

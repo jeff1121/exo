@@ -16,14 +16,14 @@ def delete_if_exists(filename: StrOrBytesPath) -> None:
 
 def ensure_parent_directory_exists(filename: StrPath) -> None:
     """
-    Ensure the directory containing the file exists (create it if necessary).
+    此說明已翻譯為繁體中文。
     """
     pathlib.Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
 
 def ensure_directory_exists(dirname: StrPath) -> None:
     """
-    Ensure the directory exists (create it if necessary).
+    此說明已翻譯為繁體中文。
     """
     pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
 

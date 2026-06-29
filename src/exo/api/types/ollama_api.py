@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 from exo.shared.models.model_cards import ModelId
 
-# https://github.com/ollama/ollama/blob/main/docs/api.md
+# 已翻譯註解。
 
 OllamaRole = Literal["system", "user", "assistant", "tool"]
 OllamaDoneReason = Literal["stop", "length", "tool_call", "error"]

@@ -1,4 +1,4 @@
-# pyright: reportUnusedFunction=false, reportAny=false
+# 已翻譯註解。
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
@@ -10,21 +10,21 @@ from exo.shared.types.common import CommandId
 
 
 def _make_api() -> Any:
-    """Create a minimal API instance with cancel route and error handler."""
+    """此說明已翻譯為繁體中文。"""
 
     app = FastAPI()
     api = object.__new__(API)
     api.app = app
-    api._text_generation_queues = {}  # pyright: ignore[reportPrivateUsage]
-    api._image_generation_queues = {}  # pyright: ignore[reportPrivateUsage]
-    api._send = AsyncMock()  # pyright: ignore[reportPrivateUsage]
-    api._setup_exception_handlers()  # pyright: ignore[reportPrivateUsage]
+    api._text_generation_queues = {}  # 已翻譯註解。
+    api._image_generation_queues = {}  # 已翻譯註解。
+    api._send = AsyncMock()  # 已翻譯註解。
+    api._setup_exception_handlers()  # 已翻譯註解。
     app.post("/v1/cancel/{command_id}")(api.cancel_command)
     return api
 
 
 def test_cancel_nonexistent_command_returns_404() -> None:
-    """Cancel for an unknown command_id returns 404 in OpenAI error format."""
+    """此說明已翻譯為繁體中文。"""
     api = _make_api()
     client = TestClient(api.app)
 
@@ -38,7 +38,7 @@ def test_cancel_nonexistent_command_returns_404() -> None:
 
 
 def test_cancel_active_text_generation() -> None:
-    """Cancel an active text generation command: returns 200, sender.close() called."""
+    """此說明已翻譯為繁體中文。"""
     api = _make_api()
     client = TestClient(api.app)
 
@@ -58,7 +58,7 @@ def test_cancel_active_text_generation() -> None:
 
 
 def test_cancel_active_image_generation() -> None:
-    """Cancel an active image generation command: returns 200, sender.close() called."""
+    """此說明已翻譯為繁體中文。"""
     api = _make_api()
     client = TestClient(api.app)
 

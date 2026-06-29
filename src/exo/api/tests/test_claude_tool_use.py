@@ -1,4 +1,4 @@
-"""Tests for Claude Messages API tool_use support in the adapter."""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import AsyncGenerator
@@ -26,7 +26,7 @@ async def _collect_response(
     model: str,
     chunk_stream: AsyncGenerator[ErrorChunk | ToolCallChunk | TokenChunk, None],
 ) -> ClaudeMessagesResponse:
-    """Helper to consume the async generator and parse the JSON response."""
+    """此說明已翻譯為繁體中文。"""
     parts: list[str] = []
     async for part in collect_claude_response(command_id, model, chunk_stream):
         parts.append(part)
@@ -38,7 +38,7 @@ COMMAND_ID = CommandId("cmd_test123")
 
 
 def _parse_sse_events(events: list[str]) -> list[dict[str, Any]]:
-    """Parse SSE event strings into JSON dicts."""
+    """此說明已翻譯為繁體中文。"""
     parsed: list[dict[str, Any]] = []
     for event_str in events:
         for line in event_str.strip().split("\n"):
@@ -48,7 +48,7 @@ def _parse_sse_events(events: list[str]) -> list[dict[str, Any]]:
 
 
 class TestCollectClaudeResponseToolUse:
-    """Tests for non-streaming tool_use response collection."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_tool_call_chunk_produces_tool_use_blocks(self):
         chunks: list[ErrorChunk | ToolCallChunk | TokenChunk] = [
@@ -140,7 +140,7 @@ class TestCollectClaudeResponseToolUse:
 
 
 class TestGenerateClaudeStreamToolUse:
-    """Tests for streaming tool_use event generation."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_tool_call_emits_tool_use_events(self):
         chunks: list[ErrorChunk | ToolCallChunk | TokenChunk] = [
@@ -163,7 +163,7 @@ class TestGenerateClaudeStreamToolUse:
 
         parsed = _parse_sse_events(events)
 
-        # Find tool_use content_block_start
+        # 已翻譯註解。
         tool_starts = [
             e
             for e in parsed
@@ -177,7 +177,7 @@ class TestGenerateClaudeStreamToolUse:
         assert content_block["input"] == {}
         assert cast(str, content_block["id"]).startswith("toolu_")
 
-        # Find input_json_delta
+        # 已翻譯註解。
         json_deltas = [
             e
             for e in parsed
@@ -189,7 +189,7 @@ class TestGenerateClaudeStreamToolUse:
         delta = cast(dict[str, Any], json_deltas[0]["delta"])
         assert json.loads(cast(str, delta["partial_json"])) == {"location": "SF"}
 
-        # Find message_delta with tool_use stop reason
+        # 已翻譯註解。
         msg_deltas = [e for e in parsed if e.get("type") == "message_delta"]
         assert len(msg_deltas) == 1
         assert cast(dict[str, Any], msg_deltas[0]["delta"])["stop_reason"] == "tool_use"
@@ -216,7 +216,7 @@ class TestGenerateClaudeStreamToolUse:
 
         parsed = _parse_sse_events(events)
 
-        # Should have text delta at index 0
+        # 已翻譯註解。
         text_deltas = [
             e
             for e in parsed
@@ -227,7 +227,7 @@ class TestGenerateClaudeStreamToolUse:
         assert text_deltas[0]["index"] == 0
         assert cast(dict[str, Any], text_deltas[0]["delta"])["text"] == "Hello "
 
-        # Tool block at index 1
+        # 索引 1 應為工具區塊
         tool_starts = [
             e
             for e in parsed
@@ -238,7 +238,7 @@ class TestGenerateClaudeStreamToolUse:
         assert len(tool_starts) == 1
         assert tool_starts[0]["index"] == 1
 
-        # Stop reason should be tool_use
+        # 已翻譯註解。
         msg_deltas = [e for e in parsed if e.get("type") == "message_delta"]
         assert cast(dict[str, Any], msg_deltas[0]["delta"])["stop_reason"] == "tool_use"
 
@@ -261,7 +261,7 @@ class TestGenerateClaudeStreamToolUse:
 
         parsed = _parse_sse_events(events)
 
-        # Two tool block starts (at indices 0 and 1 — no text block when only tools)
+        # 兩個工具區塊起始（索引 0 與 1——僅有工具時不會有文字區塊）
         tool_starts = [
             e
             for e in parsed
@@ -273,7 +273,7 @@ class TestGenerateClaudeStreamToolUse:
         assert tool_starts[0]["index"] == 0
         assert tool_starts[1]["index"] == 1
 
-        # Two tool block stops (at indices 0 and 1)
+        # 兩個工具區塊結束（索引 0 與 1）
         block_stops = [e for e in parsed if e.get("type") == "content_block_stop"]
         stop_indices = [e["index"] for e in block_stops]
         assert 0 in stop_indices

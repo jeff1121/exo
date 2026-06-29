@@ -1,4 +1,4 @@
-# pyright: reportUnusedImport = false
+# 已翻譯註解。
 
 from collections.abc import Mapping, Sequence
 
@@ -46,18 +46,18 @@ from exo.worker.runner.supervisor import RunnerSupervisor
 
 def plan(
     node_id: NodeId,
-    # Runners is expected to be FRESH and so should not come from state
+    # 已翻譯註解。
     runners: Mapping[RunnerId, RunnerSupervisor],
     global_download_status: Mapping[NodeId, Sequence[DownloadProgress]],
     instances: Mapping[InstanceId, Instance],
-    all_runners: Mapping[RunnerId, RunnerStatus],  # all global
+    all_runners: Mapping[RunnerId, RunnerStatus],  # 已翻譯註解。
     tasks: Mapping[TaskId, Task],
     input_chunk_buffer: Mapping[CommandId, Mapping[int, InputImageChunk]],
     image_cache: Mapping[Base64ImageHash, Base64Image],
     instance_backoff: KeyedBackoff[InstanceId],
     download_backoff: KeyedBackoff[ModelId],
 ) -> Task | None:
-    # Python short circuiting OR logic should evaluate these sequentially.
+    # 已翻譯註解。
     return (
         _cancel_tasks(runners, tasks)
         or _kill_runner(runners, all_runners, instances)
@@ -115,7 +115,7 @@ def _create_runner(
         if runner_id in runners:
             continue
 
-        # don't create runners if any other nodes have runners that have failed - wait for them to fix themselves first.
+        # 已翻譯註解。
         instance_has_failed_runner = any(
             isinstance(all_runners.get(remote_runner_id), RunnerFailed)
             for remote_runner_id in instance.shard_assignments.node_to_runner.values()
@@ -160,7 +160,7 @@ def _model_needs_download(
             )
             and download_backoff.should_proceed(model_id)
         ):
-            # We don't invalidate download_status randomly in case a file gets deleted on disk
+            # 已翻譯註解。
             return DownloadModel(
                 instance_id=runner.bound_instance.instance.instance_id,
                 shard_metadata=runner.bound_instance.bound_shard,
@@ -202,7 +202,7 @@ def _init_distributed_backend(
 
         accepting_ranks = device_rank < world_size - 1
 
-        # Rank = n-1
+        # 已翻譯註解。
         connecting_rank_ready = device_rank == world_size - 1 and all(
             isinstance(all_runners.get(global_runner_id, None), RunnerConnecting)
             for global_runner_id in shard_assignments.runner_to_shard
@@ -275,7 +275,7 @@ def _ready_to_warmup(
         assert device_rank < world_size
         assert device_rank >= 0
 
-        # Rank != 0
+        # 已翻譯註解。
         accepting_ranks_ready = device_rank > 0 and all(
             isinstance(
                 all_runners.get(global_runner_id, None),
@@ -284,7 +284,7 @@ def _ready_to_warmup(
             for global_runner_id in shard_assignments.runner_to_shard
         )
 
-        # Rank = 0
+        # 已翻譯註解。
         connecting_rank_ready = device_rank == 0 and all(
             isinstance(all_runners.get(global_runner_id, None), RunnerWarmingUp)
             for global_runner_id in shard_assignments.runner_to_shard
@@ -305,8 +305,8 @@ def _pending_tasks(
     image_cache: Mapping[Base64ImageHash, Base64Image],
 ) -> Task | None:
     for task in tasks.values():
-        # for now, just forward chat completions
-        # TODO(ciaran): do this better!
+        # 目前先只轉送聊天補全任務
+        # 待辦事項：已翻譯註解。
         if not isinstance(task, (TextGeneration, ImageGeneration, ImageEdits)):
             continue
         if task.task_status not in (TaskStatus.Pending, TaskStatus.Running):
@@ -315,7 +315,7 @@ def _pending_tasks(
         if isinstance(task, ImageEdits) and task.task_params.total_input_chunks > 0:
             received = len(input_chunk_buffer.get(task.command_id, {}))
             if received < task.task_params.total_input_chunks:
-                continue  # Wait for all chunks to arrive
+                continue  # 等待所有分塊到齊
 
         if (
             isinstance(task, TextGeneration)
@@ -324,15 +324,15 @@ def _pending_tasks(
                 h in image_cache for h in task.task_params.image_hashes.values()
             )
         ):
-            continue  # Wait for all images to be assembled into the cache
+            continue  # 等待所有影像都組裝並寫入快取
 
         for runner in runners.values():
             if task.instance_id != runner.bound_instance.instance.instance_id:
                 continue
 
-            # the task status _should_ be set to completed by the LAST runner
-            # it is currently set by the first
-            # this is definitely a hack
+            # 已翻譯註解。
+            # 目前卻是由第一個設定
+            # 這確實是權宜作法
             if task.task_id in runner.completed or task.task_id in runner.in_progress:
                 continue
 

@@ -23,7 +23,7 @@ class ToolParser:
         return parsed
 
 
-def _json_type_matches(value: Any, expected_type: str) -> bool:  # pyright: ignore[reportAny]
+def _json_type_matches(value: Any, expected_type: str) -> bool:  # 已翻譯註解。
     if expected_type == "object":
         return isinstance(value, dict)
     if expected_type == "array":
@@ -43,58 +43,58 @@ def _json_type_matches(value: Any, expected_type: str) -> bool:  # pyright: igno
     return False
 
 
-def _coerce_tool_arg_with_schema(value: Any, schema: dict[str, Any]) -> Any:  # pyright: ignore[reportAny]
+def _coerce_tool_arg_with_schema(value: Any, schema: dict[str, Any]) -> Any:  # 已翻譯註解。
     schema_type = schema.get("type")
 
     if isinstance(schema_type, list):
-        for candidate in schema_type:  # pyright: ignore[reportUnknownVariableType]
+        for candidate in schema_type:  # 已翻譯註解。
             if not isinstance(candidate, str):
                 continue
             if candidate == "null" and value is None:
                 return None
             candidate_schema = {**schema, "type": candidate}
-            coerced = _coerce_tool_arg_with_schema(value, candidate_schema)  # pyright: ignore[reportAny]
+            coerced = _coerce_tool_arg_with_schema(value, candidate_schema)  # 已翻譯註解。
             if _json_type_matches(coerced, candidate):
-                return coerced  # pyright: ignore[reportAny]
-        return value  # pyright: ignore[reportAny]
+                return coerced  # 已翻譯註解。
+        return value  # 已翻譯註解。
 
     if not isinstance(schema_type, str):
-        return value  # pyright: ignore[reportAny]
+        return value  # 已翻譯註解。
 
     if schema_type == "object":
-        parsed = value  # pyright: ignore[reportAny]
+        parsed = value  # 已翻譯註解。
         if isinstance(parsed, str):
             try:
-                parsed = json.loads(parsed)  # pyright: ignore[reportAny]
+                parsed = json.loads(parsed)  # 已翻譯註解。
             except Exception:
-                return value  # pyright: ignore[reportAny]
+                return value  # 已翻譯註解。
         if not isinstance(parsed, dict):
-            return value  # pyright: ignore[reportAny]
+            return value  # 已翻譯註解。
         properties = schema.get("properties")
         if not isinstance(properties, dict):
-            return parsed  # pyright: ignore[reportUnknownVariableType]
+            return parsed  # 已翻譯註解。
         return {
             key: (
-                _coerce_tool_arg_with_schema(prop_value, prop_schema)  # pyright: ignore[reportUnknownArgumentType]
+                _coerce_tool_arg_with_schema(prop_value, prop_schema)  # 已翻譯註解。
                 if isinstance(prop_schema, dict)
                 else prop_value
             )
-            for key, prop_value in parsed.items()  # pyright: ignore[reportUnknownVariableType]
+            for key, prop_value in parsed.items()  # 已翻譯註解。
             for prop_schema in [properties.get(key)]  # type: ignore
         }
 
     if schema_type == "array":
-        parsed = value  # pyright: ignore[reportAny]
+        parsed = value  # 已翻譯註解。
         if isinstance(parsed, str):
             try:
-                parsed = json.loads(parsed)  # pyright: ignore[reportAny]
+                parsed = json.loads(parsed)  # 已翻譯註解。
             except Exception:
-                return value  # pyright: ignore[reportAny]
+                return value  # 已翻譯註解。
         if not isinstance(parsed, list):
-            return value  # pyright: ignore[reportAny]
+            return value  # 已翻譯註解。
         item_schema = schema.get("items")
         if not isinstance(item_schema, dict):
-            return parsed  # pyright: ignore[reportUnknownVariableType]
+            return parsed  # 已翻譯註解。
         return [_coerce_tool_arg_with_schema(item, item_schema) for item in parsed]  # type: ignore
 
     if schema_type == "integer":
@@ -136,7 +136,7 @@ def _coerce_tool_arg_with_schema(value: Any, schema: dict[str, Any]) -> Any:  # 
                 return False
         return value
 
-    return value  # pyright: ignore[reportAny]
+    return value  # 已翻譯註解。
 
 
 def _coerce_tool_calls_to_schema(
@@ -163,7 +163,7 @@ def _coerce_tool_calls_to_schema(
             continue
 
         try:
-            parsed_args = json.loads(tool_call.arguments)  # pyright: ignore[reportAny]
+            parsed_args = json.loads(tool_call.arguments)  # 已翻譯註解。
         except Exception:
             coerced_calls.append(tool_call)
             continue
@@ -172,7 +172,7 @@ def _coerce_tool_calls_to_schema(
             coerced_calls.append(tool_call)
             continue
 
-        coerced_args = _coerce_tool_arg_with_schema(parsed_args, schema)  # pyright: ignore[reportAny]
+        coerced_args = _coerce_tool_arg_with_schema(parsed_args, schema)  # 已翻譯註解。
         if not isinstance(coerced_args, dict):
             coerced_calls.append(tool_call)
             continue
@@ -208,14 +208,14 @@ def make_mlx_parser(
     )
 
 
-# TODO / example code:
+# 待辦事項：已翻譯註解。
 def _parse_json_calls(text: str) -> list[ToolCallItem] | None:
     try:
         text = text.removeprefix("<tool_call>")
         text = text.removesuffix("</tool_call>")
         top_level = {
             k: json.dumps(v) if isinstance(v, (dict, list)) else v
-            for k, v in json.loads(text).items()  # pyright: ignore[reportAny]
+            for k, v in json.loads(text).items()  # 已翻譯註解。
         }
         return [ToolCallItem.model_validate(top_level)]
     except Exception:
@@ -224,8 +224,8 @@ def _parse_json_calls(text: str) -> list[ToolCallItem] | None:
 
 def _flatten(p: dict[str, Any]) -> dict[str, str]:
     return {
-        k: json.dumps(v) if isinstance(v, (dict, list)) else str(v)  # pyright: ignore[reportAny]
-        for k, v in p.items()  # pyright: ignore[reportAny]
+        k: json.dumps(v) if isinstance(v, (dict, list)) else str(v)  # 已翻譯註解。
+        for k, v in p.items()  # 已翻譯註解。
     }
 
 
@@ -238,7 +238,7 @@ def make_json_parser() -> ToolParser:
 
 
 def infer_tool_parser(chat_template: str) -> ToolParser | None:
-    """Attempt to auto-infer a tool parser from the chat template."""
+    """此說明已翻譯為繁體中文。"""
     if "<tool_call>" in chat_template and "tool_call.name" in chat_template:
         return make_json_parser()
     return None

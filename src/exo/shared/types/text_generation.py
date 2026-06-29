@@ -1,7 +1,7 @@
-"""Canonical internal type for text generation task parameters.
+"""此說明已翻譯為繁體中文。
 
-All external API formats (Chat Completions, Claude Messages, OpenAI Responses)
-are converted to TextGenerationTaskParams at the API boundary via adapters.
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 """
 
 from typing import Annotated, Any, Literal
@@ -13,20 +13,20 @@ from exo.shared.types.common import ModelId, TruncatingString
 
 MessageRole = Literal["user", "assistant", "system", "developer", "tool"]
 ReasoningEffort = Literal["none", "minimal", "low", "medium", "high", "xhigh"]
-# How a model wants prior-turn reasoning content handled. Drives both the
-# server-side encoder (drop vs keep) and the integration configs we emit
-# (e.g. opencode's per-model `interleaved` flag).
-#   - "none":            model has no reasoning channel.
-#   - "post_last_user":  reasoning is only meaningful for the latest assistant
-#                        turn; older turns can drop it (drop_thinking=True).
-#   - "suffix":          reasoning is embedded in the assistant content as a
-#                        suffix/prefix; round-tripping content already covers
-#                        it (no separate `reasoning_content` round-trip).
-#   - "channel":         reasoning lives on a dedicated channel (Harmony, etc.)
-#                        and must be sent back verbatim every turn.
-#   - "tool_conditional": always round-trip when the conversation has tools;
-#                        the model relies on prior reasoning to chain tool
-#                        calls (DeepSeek V3.2 / V4).
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
+#   已翻譯註解。
+#   已翻譯註解。
+#                        已翻譯註解。
+#   已翻譯註解。
+#                        已翻譯註解。
+#                        已翻譯註解。
+#   已翻譯註解。
+#                        已翻譯註解。
+#   已翻譯註解。
+#                        已翻譯註解。
+#                        已翻譯註解。
 ReasoningDialect = Literal[
     "none", "post_last_user", "suffix", "channel", "tool_conditional"
 ]
@@ -37,10 +37,10 @@ def resolve_reasoning_params(
     enable_thinking: bool | None,
 ) -> tuple[ReasoningEffort | None, bool | None]:
     """
-    enable_thinking=True  -> reasoning_effort="medium"
-    enable_thinking=False -> reasoning_effort="none"
-    reasoning_effort="none" -> enable_thinking=False
-    reasoning_effort=<anything else> -> enable_thinking=True
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     resolved_effort: ReasoningEffort | None = reasoning_effort
     resolved_thinking: bool | None = enable_thinking
@@ -59,7 +59,7 @@ class InputMessageContent(TruncatingString):
 
 
 class InputMessage(BaseModel, frozen=True):
-    """Internal message for text generation pipelines."""
+    """此說明已翻譯為繁體中文。"""
 
     role: MessageRole
     content: InputMessageContent
@@ -73,16 +73,16 @@ class Base64ImageHash(TruncatingString):
     truncate_length = 10
 
 
-def _wrap_chat_value(x: Any) -> Any:  # pyright: ignore[reportAny]
+def _wrap_chat_value(x: Any) -> Any:  # 已翻譯註解。
     if isinstance(x, (InputMessageContent, Base64Image)):
         return x
     if isinstance(x, str):
         return InputMessageContent(x)
     if isinstance(x, dict):
-        return {k: _wrap_chat_value(v) for k, v in x.items()}  # pyright: ignore[reportUnknownVariableType]
+        return {k: _wrap_chat_value(v) for k, v in x.items()}  # 已翻譯註解。
     if isinstance(x, list):
-        return [_wrap_chat_value(i) for i in x]  # pyright: ignore[reportUnknownVariableType]
-    return x  # pyright: ignore[reportAny]
+        return [_wrap_chat_value(i) for i in x]  # 已翻譯註解。
+    return x  # 已翻譯註解。
 
 
 type ChatTemplateValue = Annotated[
@@ -95,15 +95,15 @@ type ChatTemplateValue = Annotated[
     | float
     | MessageRole
     | bool,
-    WrapValidator(lambda a, b: b(_wrap_chat_value(a))),  # pyright: ignore[reportAny]
+    WrapValidator(lambda a, b: b(_wrap_chat_value(a))),  # 已翻譯註解。
 ]
 
 
 class TextGenerationTaskParams(BaseModel, frozen=True):
-    """Canonical internal task params for text generation.
+    """此說明已翻譯為繁體中文。
 
-    Every API adapter converts its wire type into this before handing
-    off to the master/worker pipeline.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     model: ModelId

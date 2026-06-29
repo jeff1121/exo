@@ -23,7 +23,7 @@ def stream_chat(host: str, query: str) -> None:
                 if not line:
                     continue
 
-                # SSE lines look like: "data: {...}" or "data: [DONE]"
+                # SSE 行格式類似：「data: {...}」或「data: [DONE]」
                 if not line.startswith("data:"):
                     continue
 

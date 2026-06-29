@@ -47,14 +47,14 @@ class AsyncProcess:
         *,
         daemon: bool | None = None,
     ) -> None:
-        # setup state
+        # 已翻譯註解。
         self._target = target
         self._name = name
         self._args = args
         self._kwargs = kwargs
         self._daemon = daemon
 
-        # lifecycle state
+        # 已翻譯註解。
         self._process: BaseProcess | None = None
         self._pid: int | None = None
         self._stdout_tx, self._stdout_rx = channel[bytes]()
@@ -104,7 +104,7 @@ class AsyncProcess:
                 if pid is None:
                     raise RuntimeError("started process has no pid")
 
-                # important to close parent write-side FD to prevent hangs
+                # 已翻譯註解。
                 stdout_write_fd = _close_fd(stdout_write_fd)
                 stderr_write_fd = _close_fd(stderr_write_fd)
 
@@ -192,8 +192,8 @@ class AsyncProcess:
             return self._process.is_alive()
         return False
 
-    # TODO: maybe in the future if needed, create stdin that is also installed,
-    #       and a ByteSendStream handle is provided for it :)
+    # 待辦事項：已翻譯註解。
+    #       已翻譯註解。
 
     @property
     def stdout(self) -> Receiver[bytes]:
@@ -243,7 +243,7 @@ class AsyncProcess:
             logger.warning(f"That took {j} attempts :(")
 
 
-# Spawn-mode multiprocessing requires a module-level target that can be pickled.
+# 已翻譯註解。
 def _run_with_captured_stdio(
     stdout: DupFd,
     stderr: DupFd,

@@ -5,9 +5,9 @@ from exo.shared.types.topology import Connection, SocketConnection
 
 
 def test_state_serialization_roundtrip() -> None:
-    """Verify that State → JSON → State round-trip preserves topology."""
+    """此說明已翻譯為繁體中文。"""
 
-    # --- build a simple state ------------------------------------------------
+    # 已翻譯註解。
     node_a = NodeId("node-a")
     node_b = NodeId("node-b")
 

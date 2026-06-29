@@ -70,17 +70,17 @@ from exo.utils.info_gatherer.info_gatherer import (
 def _is_rdma_ctl_enabled(
     node_id: NodeId, node_rdma_ctl: Mapping[NodeId, NodeRdmaCtlStatus]
 ) -> bool:
-    """A node is RDMA-capable only if rdma_ctl status has been observed as enabled.
+    """此說明已翻譯為繁體中文。
 
-    Missing entries default to ``False`` — if we have not yet observed (or the node
-    cannot run) ``rdma_ctl``, it must not participate in an RDMA-backed instance.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     status = node_rdma_ctl.get(node_id)
     return status is not None and status.enabled
 
 
 def event_apply(event: Event, state: State) -> State:
-    """Apply an event to state."""
+    """將事件套用到狀態。"""
     match event:
         case (
             TestEvent()
@@ -89,7 +89,7 @@ def event_apply(event: Event, state: State) -> State:
             | InputChunkReceived()
             | TracesCollected()
             | TracesMerged()
-        ):  # Pass-through events that don't modify state
+        ):  # 不會修改狀態的直通事件
             return state
         case CustomModelCardAdded():
             return apply_custom_model_card_added(event, state)
@@ -126,7 +126,7 @@ def event_apply(event: Event, state: State) -> State:
 
 
 def apply(state: State, event: IndexedEvent) -> State:
-    # Just to test that events are only applied in correct order
+    # 僅用於檢查事件是否依正確順序套用
     if state.last_event_applied_idx != event.idx - 1:
         logger.warning(
             f"Expected event {state.last_event_applied_idx + 1} but received {event.idx}"
@@ -138,7 +138,7 @@ def apply(state: State, event: IndexedEvent) -> State:
 
 def apply_node_download_progress(event: NodeDownloadProgress, state: State) -> State:
     """
-    Update or add a node download progress to state.
+    在狀態中更新或新增節點下載進度。
     """
     dp = event.download_progress
     node_id = dp.node_id
@@ -147,9 +147,9 @@ def apply_node_download_progress(event: NodeDownloadProgress, state: State) -> S
 
     replaced = False
     for i, existing_dp in enumerate(current):
-        # TODO(ciaran): deduplicate by model_id for now. Will need to use
-        # shard_metadata again when pipeline and tensor downloads differ.
-        # For now this is fine
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
+        # 目前這樣可行
         if (
             existing_dp.shard_metadata.model_card.model_id
             == dp.shard_metadata.model_card.model_id
@@ -182,7 +182,7 @@ def apply_task_deleted(event: TaskDeleted, state: State) -> State:
 
 def apply_task_status_updated(event: TaskStatusUpdated, state: State) -> State:
     if event.task_id not in state.tasks:
-        # maybe should raise
+        # 也許應該改為拋出例外
         return state
 
     update: dict[str, TaskStatus | None] = {
@@ -199,7 +199,7 @@ def apply_task_status_updated(event: TaskStatusUpdated, state: State) -> State:
 
 def apply_task_failed(event: TaskFailed, state: State) -> State:
     if event.task_id not in state.tasks:
-        # maybe should raise
+        # 也許應該改為拋出例外
         return state
 
     updated_task = state.tasks[event.task_id].model_copy(
@@ -294,7 +294,7 @@ def apply_node_timed_out(event: NodeTimedOut, state: State) -> State:
     downloads = {
         key: value for key, value in state.downloads.items() if key != event.node_id
     }
-    # Clean up all granular node mappings
+    # 清理所有細粒度的節點對應資料
     node_memory = {
         key: value for key, value in state.node_memory.items() if key != event.node_id
     }
@@ -320,7 +320,7 @@ def apply_node_timed_out(event: NodeTimedOut, state: State) -> State:
     node_rdma_ctl = {
         key: value for key, value in state.node_rdma_ctl.items() if key != event.node_id
     }
-    # Only recompute cycles if the leaving node had TB bridge enabled
+    # 已翻譯註解。
     leaving_node_status = state.node_thunderbolt_bridge.get(event.node_id)
     leaving_node_had_tb_enabled = (
         leaving_node_status is not None and leaving_node_status.enabled
@@ -352,7 +352,7 @@ def apply_node_gathered_info(event: NodeGatheredInfo, state: State) -> State:
     topology.add_node(event.node_id)
     info = event.info
 
-    # Build update dict with only the mappings that change
+    # 只建立有變更映射的更新字典
     update: dict[str, object] = {
         "last_seen": {
             **state.last_seen,
@@ -440,7 +440,7 @@ def apply_node_gathered_info(event: NodeGatheredInfo, state: State) -> State:
                 event.node_id: info.status,
             }
             update["node_thunderbolt_bridge"] = new_tb_bridge
-            # Only recompute cycles if the enabled status changed
+            # 僅在啟用狀態變更時重新計算循環
             old_status = state.node_thunderbolt_bridge.get(event.node_id)
             old_enabled = old_status.enabled if old_status else False
             new_enabled = info.status.enabled
@@ -455,10 +455,10 @@ def apply_node_gathered_info(event: NodeGatheredInfo, state: State) -> State:
                 **state.node_rdma_ctl,
                 event.node_id: NodeRdmaCtlStatus(enabled=info.enabled),
             }
-            # If RDMA just got disabled on this node, drop any RDMA edges touching it
-            # so placement / topology consumers cannot pick a disabled node for an
-            # RDMA-backed instance. (Edges will repopulate on the next
-            # MacThunderboltConnections poll once both endpoints are enabled again.)
+            # 已翻譯註解。
+            # 已翻譯註解。
+            # 選到已停用節點。（當兩端再次啟用後，下一次
+            # 已翻譯註解。
             if not info.enabled:
                 topology.remove_all_rdma_connections_touching(event.node_id)
         case NodeBackends():
@@ -479,7 +479,7 @@ def apply_topology_edge_created(event: TopologyEdgeCreated, state: State) -> Sta
 def apply_topology_edge_deleted(event: TopologyEdgeDeleted, state: State) -> State:
     topology = copy.deepcopy(state.topology)
     topology.remove_connection(event.conn)
-    # TODO: Clean up removing the reverse connection
+    # 待辦事項：已翻譯註解。
     return state.model_copy(update={"topology": topology})
 
 

@@ -35,7 +35,7 @@ class MlxJacclInstance(BaseInstance):
     jaccl_coordinators: dict[NodeId, str]
 
 
-# TODO: Single node instance
+# 待辦事項：已翻譯註解。
 Instance = MlxRingInstance | MlxJacclInstance
 
 

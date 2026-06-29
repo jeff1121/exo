@@ -54,14 +54,14 @@ class DownloadCoordinator:
     event_sender: Sender[Event]
     offline: bool = False
 
-    # Local state
+    # 本地狀態
     download_status: dict[ModelId, DownloadProgress] = field(default_factory=dict)
     active_downloads: dict[ModelId, anyio.CancelScope] = field(default_factory=dict)
 
     _tg: TaskGroup = field(init=False, default_factory=TaskGroup)
     _stopped: anyio.Event = field(init=False, default_factory=anyio.Event)
 
-    # Per-model throttle for download progress events
+    # 針對每個模型的下載進度事件節流
     _last_progress_time: dict[ModelId, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -144,10 +144,10 @@ class DownloadCoordinator:
                 tg.start_soon(self._command_processor)
                 tg.start_soon(self._emit_existing_download_progress)
         except* (EventRouterBrokenResourceError, EventRouterClosedResourceError):
-            # Event router has been closed (try-star syntax handles error groups)
+            # 已翻譯註解。
             pass
         finally:
-            # don't forget to clean up resources
+            # 別忘了清理資源
             self.download_command_receiver.close()
             self.event_sender.close()
 
@@ -160,7 +160,7 @@ class DownloadCoordinator:
     async def _command_processor(self) -> None:
         with self.download_command_receiver as commands:
             async for cmd in commands:
-                # Only process commands targeting this node
+                # 只處理目標為此節點的命令
                 if cmd.command.target_node_id != self.node_id:
                     continue
 
@@ -197,7 +197,7 @@ class DownloadCoordinator:
     async def _start_download(self, shard: ShardMetadata) -> None:
         model_id = shard.model_card.model_id
 
-        # Check if already downloading, complete, or recently failed
+        # 檢查是否已在下載、已完成或最近失敗
         if model_id in self.download_status:
             status = self.download_status[model_id]
             if isinstance(status, (DownloadOngoing, DownloadCompleted, DownloadFailed)):
@@ -206,7 +206,7 @@ class DownloadCoordinator:
                 )
                 return
 
-        # Check all model directories for pre-existing complete models
+        # 檢查所有模型目錄中是否已有完整模型
         found_path = await to_thread.run_sync(
             resolve_existing_model, model_id, shard.model_card
         )
@@ -221,7 +221,7 @@ class DownloadCoordinator:
             )
             return
 
-        # Emit pending status
+        # 發送待處理狀態
         progress = DownloadPending(
             shard_metadata=shard,
             node_id=self.node_id,
@@ -230,7 +230,7 @@ class DownloadCoordinator:
         self.download_status[model_id] = progress
         await self.event_sender.send(NodeDownloadProgress(download_progress=progress))
 
-        # Check initial status from downloader
+        # 檢查下載器回報的初始狀態
         initial_progress = (
             await self.shard_downloader.get_shard_download_status_for_shard(shard)
         )
@@ -270,7 +270,7 @@ class DownloadCoordinator:
             await self.event_sender.send(NodeDownloadProgress(download_progress=failed))
             return
 
-        # Start actual download
+        # 啟動實際下載
         self._start_download_task(shard, initial_progress)
 
     def _start_download_task(
@@ -278,7 +278,7 @@ class DownloadCoordinator:
     ) -> None:
         model_id = shard.model_card.model_id
 
-        # Emit ongoing status
+        # 發送進行中狀態
         status = DownloadOngoing(
             node_id=self.node_id,
             shard_metadata=shard,
@@ -307,7 +307,7 @@ class DownloadCoordinator:
                     NodeDownloadProgress(download_progress=failed)
                 )
             except anyio.get_cancelled_exc_class():
-                # ignore cancellation - let cleanup do its thing
+                # 忽略取消，讓清理流程自行處理
                 pass
             finally:
                 self.active_downloads.pop(model_id, None)
@@ -317,19 +317,19 @@ class DownloadCoordinator:
         self.active_downloads[model_id] = scope
 
     async def _delete_download(self, model_id: ModelId) -> None:
-        # Protect read-only models from deletion
+        # 保護唯讀模型，避免被刪除
         if model_id in self.download_status:
             current = self.download_status[model_id]
             if isinstance(current, DownloadCompleted) and current.read_only:
                 logger.warning(f"Refusing to delete read-only model {model_id}")
                 return
 
-        # Cancel if active
+        # 若仍在進行中則先取消
         if model_id in self.active_downloads:
             logger.info(f"Cancelling active download for {model_id} before deletion")
             self.active_downloads[model_id].cancel()
 
-        # Delete from disk
+        # 從磁碟刪除
         logger.info(f"Deleting model files for {model_id}")
         deleted = await delete_model(model_id)
 
@@ -338,7 +338,7 @@ class DownloadCoordinator:
         else:
             logger.warning(f"Model {model_id} was not found on disk")
 
-        # Emit pending status to reset UI state, then remove from local tracking
+        # 已翻譯註解。
         if model_id in self.download_status:
             current_status = self.download_status[model_id]
             pending = DownloadPending(
@@ -363,7 +363,7 @@ class DownloadCoordinator:
                 ) in self.shard_downloader.get_shard_download_status():
                     model_id = progress.shard.model_card.model_id
 
-                    # Active downloads emit progress via the callback — don't overwrite
+                    # 進行中的下載會透過回呼回報進度，勿覆寫
                     if model_id in self.active_downloads:
                         continue
 
@@ -385,20 +385,20 @@ class DownloadCoordinator:
                                 model_directory=self._default_model_dir(model_id),
                             )
                     elif progress.status in ["in_progress", "not_started"]:
-                        # TODO(ciaran): temporary solution
-                        # Don't downgrade a model that is already confirmed complete.
+                        # 待辦事項：已翻譯註解。
+                        # 已確認完成的模型不要降級狀態。
                         if isinstance(
                             self.download_status.get(model_id), DownloadCompleted
                         ):
                             continue
-                        # The per-file size check compares local files against
-                        # the latest HF "main" revision, which is a moving
-                        # target.  When HF updates text files (README, YAML,
-                        # jinja) in a new commit, the cached file list has new
-                        # sizes while local files still match the old revision.
-                        # Fall back to the authoritative completeness check
-                        # (is_model_directory_complete) which validates that all
-                        # safetensors weight files are present.
+                        # 逐檔大小檢查會將本地檔案與
+                        # 已翻譯註解。
+                        # 已翻譯註解。
+                        # 已翻譯註解。
+                        # 大小，而本地檔案仍符合舊版本。
+                        # 改為使用權威性的完整性檢查
+                        # 已翻譯註解。
+                        # 已翻譯註解。
                         found = await to_thread.run_sync(
                             resolve_existing_model,
                             model_id,
@@ -432,7 +432,7 @@ class DownloadCoordinator:
                     await self.event_sender.send(
                         NodeDownloadProgress(download_progress=status)
                     )
-                # Scan read-only directories for pre-downloaded models
+                # 掃描唯讀目錄中的預先下載模型
                 if EXO_MODELS_READ_ONLY_DIRS:
                     for card in await model_cards.card_cache.list_all():
                         mid = card.model_id

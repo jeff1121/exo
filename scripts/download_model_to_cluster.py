@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Download a model to every node in an exo cluster, bypassing placement.
+"""將模型下載到 exo 叢集中的每個節點，略過 placement。
 
-Usage:
+使用方式：
     uv run python scripts/download_model_to_cluster.py zai-org/GLM-5.1 --host james
 
-This fetches the ModelCard from HuggingFace locally (to get n_layers),
-constructs a full-model PipelineShardMetadata (world_size=1, one shard
-covering every layer), and POSTs /download/start to the target exo API
-for each node currently in the topology. It then polls /state/downloads
-until every node reports DownloadCompleted.
+此腳本會先在本機從 HuggingFace 取得 ModelCard（以取得 n_layers），
+建立完整模型的 PipelineShardMetadata（world_size=1，單一 shard
+覆蓋所有層），並對目標 exo API 的每個節點送出 /download/start
+接著輪詢 /state/downloads
+直到所有節點回報 DownloadCompleted。
 
-No placement is required. Works with a cluster of any size, including 1.
+不需要 placement。適用於任何大小的叢集（包含 1 節點）。
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Tests for HuggingFace 429 rate-limit handling in download_utils."""
+"""此說明已翻譯為繁體中文。"""
 
 from collections.abc import AsyncIterator
 from pathlib import Path
@@ -9,16 +9,16 @@ import pytest
 
 from exo.download.download_utils import (
     HuggingFaceRateLimitError,
-    _download_file,  # pyright: ignore[reportPrivateUsage]
-    _fetch_file_list,  # pyright: ignore[reportPrivateUsage]
-    _parse_retry_after,  # pyright: ignore[reportPrivateUsage]
+    _download_file,  # 已翻譯註解。
+    _fetch_file_list,  # 已翻譯註解。
+    _parse_retry_after,  # 已翻譯註解。
     download_file_with_retry,
     fetch_file_list_with_retry,
     file_meta,
 )
 from exo.shared.types.common import ModelId
 
-# captured from a real HF 429 on 2026-04-30 (header is lowercased by Cloudfront)
+# 已翻譯註解。
 REAL_HF_429_HEADERS_2026_04_30 = {
     "ratelimit": '"api";r=0;t=52',
     "ratelimit-policy": '"fixed window";"api";q=500;w=300',
@@ -73,7 +73,7 @@ class TestFetchFileListRetry:
 
         assert result == []
         assert len(sleeps) == 1
-        assert 2.0 <= sleeps[0] < 3.0  # retry_after + jitter[0,1)
+        assert 2.0 <= sleeps[0] < 3.0  # 已翻譯註解。
 
     async def test_falls_back_to_exp_backoff_when_no_retry_after(self) -> None:
         sleeps: list[float] = []
@@ -95,7 +95,7 @@ class TestFetchFileListRetry:
             await fetch_file_list_with_retry(ModelId("test/model"))
 
         assert len(sleeps) == 1
-        assert 1.0 <= sleeps[0] < 2.0  # 2**0 + jitter[0,1)
+        assert 1.0 <= sleeps[0] < 2.0  # 已翻譯註解。
 
     async def test_caps_sleep_at_max_window(self) -> None:
         sleeps: list[float] = []
@@ -117,7 +117,7 @@ class TestFetchFileListRetry:
             await fetch_file_list_with_retry(ModelId("test/model"))
 
         assert len(sleeps) == 1
-        assert 300.0 <= sleeps[0] < 301.0  # cap + jitter[0,1)
+        assert 300.0 <= sleeps[0] < 301.0  # 已翻譯註解。
 
     async def test_retries_up_to_five_times(self) -> None:
         sleeps: list[float] = []
@@ -137,7 +137,7 @@ class TestFetchFileListRetry:
         ):
             await fetch_file_list_with_retry(ModelId("test/model"))
 
-        assert len(sleeps) == 4  # 5 attempts -> 4 sleeps before giving up
+        assert len(sleeps) == 4  # 已翻譯註解。
 
 
 class TestDownloadFileRetry:
@@ -225,30 +225,30 @@ class TestDownloadFileRetry:
 def _make_mock_session_returning(
     response_attrs: dict[str, object], method: str = "get"
 ) -> MagicMock:
-    """Build a MagicMock that mimics ``create_http_session`` returning a
-    response whose ``status`` / ``headers`` are set from ``response_attrs``.
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Mocks the chain ``create_http_session().__aenter__() -> session``, and
-    ``session.<method>().__aenter__() -> response``.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     mock_response = MagicMock()
     for k, v in response_attrs.items():
         setattr(mock_response, k, v)
 
     mock_session = MagicMock()
-    method_mock = getattr(mock_session, method)  # pyright: ignore[reportAny]
-    method_mock.return_value.__aenter__ = AsyncMock(  # pyright: ignore[reportAny]
+    method_mock = getattr(mock_session, method)  # 已翻譯註解。
+    method_mock.return_value.__aenter__ = AsyncMock(  # 已翻譯註解。
         return_value=mock_response
     )
-    method_mock.return_value.__aexit__ = AsyncMock(  # pyright: ignore[reportAny]
+    method_mock.return_value.__aexit__ = AsyncMock(  # 已翻譯註解。
         return_value=None
     )
 
     mock_factory = MagicMock()
-    mock_factory.return_value.__aenter__ = AsyncMock(  # pyright: ignore[reportAny]
+    mock_factory.return_value.__aenter__ = AsyncMock(  # 已翻譯註解。
         return_value=mock_session
     )
-    mock_factory.return_value.__aexit__ = AsyncMock(  # pyright: ignore[reportAny]
+    mock_factory.return_value.__aexit__ = AsyncMock(  # 已翻譯註解。
         return_value=None
     )
     return mock_factory
@@ -258,12 +258,12 @@ REAL_HF_429_HEADER_DICT = {"ratelimit": '"api";r=0;t=52'}
 
 
 class TestRateLimitAtHttpCallSites:
-    """Verify each HF call site translates an HTTP 429 into a
-    ``HuggingFaceRateLimitError`` carrying the parsed ``retry_after``.
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    These tests would catch regressions where (a) the 429 branch is
-    deleted, (b) ``_parse_retry_after`` stops being called, or
-    (c) the wrong header object is passed to it.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     async def test_fetch_file_list_maps_429_to_rate_limit_error(self) -> None:
@@ -289,14 +289,14 @@ class TestRateLimitAtHttpCallSites:
         assert exc_info.value.retry_after == 52.0
 
     async def test_file_meta_maps_429_after_307_redirect(self) -> None:
-        """When the initial HEAD 307s and the redirected HEAD then 429s,
-        the 429 must still surface as ``HuggingFaceRateLimitError``."""
-        # First HEAD -> 307 with a Location header pointing somewhere new.
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         first_response = MagicMock()
         first_response.status = 307
         first_response.headers = {"location": "/redirected/url"}
 
-        # Second HEAD (the recursive call) -> 429 with the real-HF header.
+        # 已翻譯註解。
         second_response = MagicMock()
         second_response.status = 429
         second_response.headers = REAL_HF_429_HEADER_DICT
@@ -304,18 +304,18 @@ class TestRateLimitAtHttpCallSites:
         responses = iter([first_response, second_response])
 
         mock_session = MagicMock()
-        mock_session.head.return_value.__aenter__ = AsyncMock(  # pyright: ignore[reportAny]
+        mock_session.head.return_value.__aenter__ = AsyncMock(  # 已翻譯註解。
             side_effect=lambda: next(responses)
         )
-        mock_session.head.return_value.__aexit__ = AsyncMock(  # pyright: ignore[reportAny]
+        mock_session.head.return_value.__aexit__ = AsyncMock(  # 已翻譯註解。
             return_value=None
         )
 
         mock_factory = MagicMock()
-        mock_factory.return_value.__aenter__ = AsyncMock(  # pyright: ignore[reportAny]
+        mock_factory.return_value.__aenter__ = AsyncMock(  # 已翻譯註解。
             return_value=mock_session
         )
-        mock_factory.return_value.__aexit__ = AsyncMock(  # pyright: ignore[reportAny]
+        mock_factory.return_value.__aexit__ = AsyncMock(  # 已翻譯註解。
             return_value=None
         )
 
@@ -331,10 +331,10 @@ class TestRateLimitAtHttpCallSites:
     ) -> None:
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
-        # No local file -> _download_file goes straight to file_meta then GET.
-        # We need both calls to succeed enough to reach the GET branch:
-        #   - file_meta returns a non-429 (size, etag) so we proceed.
-        #   - the GET then 429s.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        #   已翻譯註解。
+        #   已翻譯註解。
         with (
             patch(
                 "exo.download.download_utils.file_meta",

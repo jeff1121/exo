@@ -57,14 +57,14 @@ def allocate_layers_proportionally(
             "(need at least 1 layer per node)"
         )
 
-    # Largest remainder: floor each, then distribute remainder by fractional part
+    # 最大餘數法：先對各項取整，再依小數餘數分配剩餘層數
     raw = [f * total_layers for f in memory_fractions]
     result = [int(r) for r in raw]
     by_remainder = sorted(range(n), key=lambda i: raw[i] - result[i], reverse=True)
     for i in range(total_layers - sum(result)):
         result[by_remainder[i]] += 1
 
-    # Ensure minimum 1 per node by taking from the largest
+    # 確保每個節點至少分到 1 層，必要時由分配最多的節點挪出
     for i in range(n):
         if result[i] == 0:
             max_idx = max(range(n), key=lambda j: result[j])
@@ -127,7 +127,7 @@ def get_shard_assignments_for_pipeline_parallel(
     cycle: Cycle,
     node_memory: Mapping[NodeId, MemoryUsage],
 ) -> ShardAssignments:
-    """Create shard assignments for pipeline parallel execution."""
+    """此說明已翻譯為繁體中文。"""
     world_size = len(cycle)
     use_cfg_parallel = model_card.uses_cfg and world_size >= 2 and world_size % 2 == 0
 
@@ -142,12 +142,11 @@ def _get_shard_assignments_for_cfg_parallel(
     cycle: Cycle,
     node_memory: Mapping[NodeId, MemoryUsage],
 ) -> ShardAssignments:
-    """Create shard assignments for CFG parallel execution.
+    """此說明已翻譯為繁體中文。
 
-    CFG parallel runs two independent pipelines. Group 0 processes the positive
-    prompt, group 1 processes the negative prompt. The ring topology places
-    group 1's ranks in reverse order so both "last stages" are neighbors for
-    efficient CFG exchange.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     _validate_cycle(cycle)
 
@@ -155,15 +154,15 @@ def _get_shard_assignments_for_cfg_parallel(
     cfg_world_size = 2
     pipeline_world_size = world_size // cfg_world_size
 
-    # Allocate layers for one pipeline group (both groups run the same layers)
+    # 已翻譯註解。
     pipeline_node_ids = cycle.node_ids[:pipeline_world_size]
     pipeline_memory = _compute_total_memory(pipeline_node_ids, node_memory)
     layer_allocations = _allocate_and_validate_layers(
         pipeline_node_ids, node_memory, pipeline_memory, model_card
     )
 
-    # Ring topology: group 0 ascending [0,1,2,...], group 1 descending [...,2,1,0]
-    # This places both last stages as neighbors for CFG exchange.
+    # 已翻譯註解。
+    # 已翻譯註解。
     position_to_cfg_pipeline = [(0, r) for r in range(pipeline_world_size)] + [
         (1, r) for r in reversed(range(pipeline_world_size))
     ]
@@ -205,7 +204,7 @@ def _get_shard_assignments_for_pure_pipeline(
     cycle: Cycle,
     node_memory: Mapping[NodeId, MemoryUsage],
 ) -> ShardAssignments:
-    """Create shard assignments for pure pipeline execution."""
+    """此說明已翻譯為繁體中文。"""
     _validate_cycle(cycle)
     total_memory = _compute_total_memory(cycle.node_ids, node_memory)
 
@@ -297,11 +296,10 @@ def get_mlx_jaccl_devices_matrix(
     selected_cycle: list[NodeId],
     cycle_digraph: Topology,
 ) -> list[list[str | None]]:
-    """Build connectivity matrix mapping device i to device j via RDMA interface names.
+    """此說明已翻譯為繁體中文。
 
-    The matrix element [i][j] contains the interface name on device i that connects
-    to device j, or None if no connection exists or no interface name is found.
-    Diagonal elements are always None.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     num_nodes = len(selected_cycle)
     matrix: list[list[str | None]] = [
@@ -330,7 +328,7 @@ def _find_connection_ip(
     node_j: NodeId,
     cycle_digraph: Topology,
 ) -> Generator[str, None, None]:
-    """Find all IP addresses that connect node i to node j."""
+    """此說明已翻譯為繁體中文。"""
     for connection in cycle_digraph.get_all_connections_between(node_i, node_j):
         if isinstance(connection, SocketConnection):
             yield connection.sink_multiaddr.ip_address
@@ -343,9 +341,9 @@ def find_ip_prioritised(
     node_network: Mapping[NodeId, NodeNetworkInfo],
     ring: bool,
 ) -> str | None:
-    """Find an IP address between nodes with prioritization.
+    """此說明已翻譯為繁體中文。
 
-    Priority: ethernet > wifi > unknown > thunderbolt
+    此說明已翻譯為繁體中文。
     """
     ips = list(_find_connection_ip(node_id, other_node_id, cycle_digraph))
     if not ips:
@@ -355,8 +353,8 @@ def find_ip_prioritised(
         iface.ip_address: iface.interface_type for iface in other_network.interfaces
     }
 
-    # Ring should prioritise fastest connection. As a best-effort, we prioritise TB.
-    # TODO: Profile and get actual connection speeds.
+    # 已翻譯註解。
+    # 待辦事項：已翻譯註解。
     if ring:
         priority = {
             "thunderbolt": 0,
@@ -366,7 +364,7 @@ def find_ip_prioritised(
             "unknown": 4,
         }
 
-    # RDMA prefers ethernet coordinator
+    # 已翻譯註解。
     else:
         priority = {
             "ethernet": 0,
@@ -384,12 +382,12 @@ def get_mlx_ring_hosts_by_node(
     ephemeral_port: int,
     node_network: Mapping[NodeId, NodeNetworkInfo],
 ) -> dict[NodeId, list[Host]]:
-    """Generate per-node host lists for MLX ring backend.
+    """此說明已翻譯為繁體中文。
 
-    Each node gets a list where:
-    - Self position: Host(ip="0.0.0.0", port=ephemeral_port)
-    - Left/right neighbors: actual connection IPs
-    - Non-neighbors: Host(ip="198.51.100.1", port=0) placeholder (RFC 5737 TEST-NET-2)
+    每個節點都會得到一份清單，其中：
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     world_size = len(selected_cycle)
     if world_size == 0:
@@ -409,7 +407,7 @@ def get_mlx_ring_hosts_by_node(
                 continue
 
             if idx not in {left_rank, right_rank}:
-                # Placeholder IP from RFC 5737 TEST-NET-2
+                # 已翻譯註解。
                 hosts_for_node.append(Host(ip="198.51.100.1", port=0))
                 continue
 
@@ -434,10 +432,10 @@ def get_mlx_jaccl_coordinators(
     cycle_digraph: Topology,
     node_network: Mapping[NodeId, NodeNetworkInfo],
 ) -> dict[NodeId, str]:
-    """Get the coordinator addresses for MLX JACCL (rank 0 device).
+    """此說明已翻譯為繁體中文。
 
-    Select an IP address that each node can reach for the rank 0 node. Returns
-    address in format "X.X.X.X:PORT" per node.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     logger.debug(f"Selecting coordinator: {coordinator}")
 

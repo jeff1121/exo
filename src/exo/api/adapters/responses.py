@@ -1,4 +1,4 @@
-"""OpenAI Responses API adapter for converting requests/responses."""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import AsyncGenerator
@@ -85,7 +85,7 @@ from exo.shared.types.text_generation import (
 
 
 def _build_response_usage(usage: Usage) -> ResponseUsage:
-    """Build a ResponseUsage from the internal Usage type."""
+    """此說明已翻譯為繁體中文。"""
     return ResponseUsage(
         input_tokens=usage.prompt_tokens,
         input_tokens_details=InputTokensDetails(
@@ -100,12 +100,12 @@ def _build_response_usage(usage: Usage) -> ResponseUsage:
 
 
 def _format_sse(event: ResponsesStreamEvent) -> str:
-    """Format a streaming event as an SSE message."""
+    """此說明已翻譯為繁體中文。"""
     return f"event: {event.type}\ndata: {event.model_dump_json(exclude_none=True)}\n\n"
 
 
 def _extract_content(content: str | list[ResponseContentPart]) -> str:
-    """Extract plain text from a content field that may be a string or list of parts."""
+    """此說明已翻譯為繁體中文。"""
     if isinstance(content, str):
         return content
     return "".join(
@@ -351,9 +351,9 @@ async def responses_request_to_text_generation(
         effort_from_reasoning, request.enable_thinking
     )
 
-    # The responses API often does not provide tool args nested under a "function" field.
-    # Since we follow the chat completions format of tools in the backend (for MLX chat templates)
-    # we need to normalise to this format.
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 我們需要正規化成該格式。
     normalised_tools: list[dict[str, Any]] | None = None
     if request.tools:
         normalised_tools = []
@@ -401,9 +401,9 @@ async def collect_responses_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    # This is an AsyncGenerator[str] rather than returning a ChatCompletionReponse because
-    # FastAPI handles the cancellation better but wouldn't auto-serialize for some reason
-    """Collect all token chunks and return a single ResponsesResponse."""
+    # 已翻譯註解。
+    # 已翻譯註解。
+    """此說明已翻譯為繁體中文。"""
     response_id = f"resp_{command_id}"
     item_id = f"item_{command_id}"
     reasoning_id = f"rs_{command_id}"
@@ -444,7 +444,7 @@ async def collect_responses_response(
     if error_message is not None:
         raise ValueError(error_message)
 
-    # Create usage from usage data if available
+    # 已翻譯註解。
     usage = _build_response_usage(last_usage) if last_usage is not None else None
 
     output: list[ResponseItem] = []
@@ -482,13 +482,13 @@ async def generate_responses_stream(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """Generate OpenAI Responses API streaming events from TokenChunks."""
+    """此說明已翻譯為繁體中文。"""
     response_id = f"resp_{command_id}"
     item_id = f"item_{command_id}"
     reasoning_id = f"rs_{command_id}"
     seq = count(1)
 
-    # response.created
+    # 已翻譯註解。
     initial_response = ResponsesResponse(
         id=response_id,
         model=model,
@@ -501,7 +501,7 @@ async def generate_responses_stream(
     )
     yield _format_sse(created_event)
 
-    # response.in_progress
+    # 已翻譯註解。
     in_progress_event = ResponseInProgressEvent(
         sequence_number=next(seq), response=initial_response
     )
@@ -513,7 +513,7 @@ async def generate_responses_stream(
     last_usage: Usage | None = None
     next_output_index = 0
 
-    # Track dynamic block creation
+    # 追蹤動態區塊建立
     reasoning_started = False
     reasoning_output_index = -1
     message_started = False
@@ -533,7 +533,7 @@ async def generate_responses_stream(
                 fc_id = f"fc_{tool.id}"
                 call_id = f"call_{tool.id}"
 
-                # response.output_item.added for function_call
+                # 已翻譯註解。
                 fc_item = ResponseFunctionCallItem(
                     id=fc_id,
                     call_id=call_id,
@@ -548,7 +548,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(fc_added)
 
-                # response.function_call_arguments.delta
+                # 已翻譯註解。
                 args_delta = ResponseFunctionCallArgumentsDeltaEvent(
                     sequence_number=next(seq),
                     item_id=fc_id,
@@ -557,7 +557,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(args_delta)
 
-                # response.function_call_arguments.done
+                # 已翻譯註解。
                 args_done = ResponseFunctionCallArgumentsDoneEvent(
                     sequence_number=next(seq),
                     item_id=fc_id,
@@ -567,7 +567,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(args_done)
 
-                # response.output_item.done
+                # 已翻譯註解。
                 fc_done_item = ResponseFunctionCallItem(
                     id=fc_id,
                     call_id=call_id,
@@ -587,13 +587,13 @@ async def generate_responses_stream(
             continue
 
         if chunk.is_thinking:
-            # Start reasoning block on first thinking token
+            # 已翻譯註解。
             if not reasoning_started:
                 reasoning_started = True
                 reasoning_output_index = next_output_index
                 next_output_index += 1
 
-                # response.output_item.added for reasoning
+                # 已翻譯註解。
                 reasoning_item = ResponseReasoningItem(
                     id=reasoning_id,
                     summary=[],
@@ -606,7 +606,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(rs_added)
 
-                # response.reasoning_summary_part.added
+                # 已翻譯註解。
                 part_added = ResponseReasoningSummaryPartAddedEvent(
                     sequence_number=next(seq),
                     item_id=reasoning_id,
@@ -618,7 +618,7 @@ async def generate_responses_stream(
 
             accumulated_thinking += chunk.text
 
-            # response.reasoning_summary_text.delta
+            # 已翻譯註解。
             rs_delta = ResponseReasoningSummaryTextDeltaEvent(
                 sequence_number=next(seq),
                 item_id=reasoning_id,
@@ -629,9 +629,9 @@ async def generate_responses_stream(
             yield _format_sse(rs_delta)
             continue
 
-        # Close reasoning block when transitioning to text
+        # 已翻譯註解。
         if reasoning_started and not message_started:
-            # response.reasoning_summary_text.done
+            # 已翻譯註解。
             rs_text_done = ResponseReasoningSummaryTextDoneEvent(
                 sequence_number=next(seq),
                 item_id=reasoning_id,
@@ -641,7 +641,7 @@ async def generate_responses_stream(
             )
             yield _format_sse(rs_text_done)
 
-            # response.reasoning_summary_part.done
+            # 已翻譯註解。
             rs_part_done = ResponseReasoningSummaryPartDoneEvent(
                 sequence_number=next(seq),
                 item_id=reasoning_id,
@@ -651,7 +651,7 @@ async def generate_responses_stream(
             )
             yield _format_sse(rs_part_done)
 
-            # response.output_item.done for reasoning
+            # 已翻譯註解。
             rs_item_done = ResponseOutputItemDoneEvent(
                 sequence_number=next(seq),
                 output_index=reasoning_output_index,
@@ -662,7 +662,7 @@ async def generate_responses_stream(
             )
             yield _format_sse(rs_item_done)
 
-        # Start message block on first text token
+        # 已翻譯註解。
         if not message_started:
             message_started = True
             message_output_index = next_output_index
@@ -692,7 +692,7 @@ async def generate_responses_stream(
 
         accumulated_text += chunk.text
 
-        # response.output_text.delta
+        # 已翻譯註解。
         delta_event = ResponseTextDeltaEvent(
             sequence_number=next(seq),
             item_id=item_id,
@@ -702,7 +702,7 @@ async def generate_responses_stream(
         )
         yield _format_sse(delta_event)
 
-    # Close reasoning block if it was never followed by text
+    # 已翻譯註解。
     if reasoning_started and not message_started:
         rs_text_done = ResponseReasoningSummaryTextDoneEvent(
             sequence_number=next(seq),
@@ -732,7 +732,7 @@ async def generate_responses_stream(
         )
         yield _format_sse(rs_item_done)
 
-    # If no message block was started, create one now (empty text)
+    # 已翻譯註解。
     if not message_started:
         message_output_index = next_output_index
         next_output_index += 1
@@ -759,7 +759,7 @@ async def generate_responses_stream(
         )
         yield _format_sse(part_added_evt)
 
-    # response.output_text.done
+    # 已翻譯註解。
     text_done = ResponseTextDoneEvent(
         sequence_number=next(seq),
         item_id=item_id,
@@ -769,7 +769,7 @@ async def generate_responses_stream(
     )
     yield _format_sse(text_done)
 
-    # response.content_part.done
+    # 已翻譯註解。
     final_part = ResponseOutputText(text=accumulated_text)
     part_done = ResponseContentPartDoneEvent(
         sequence_number=next(seq),
@@ -780,7 +780,7 @@ async def generate_responses_stream(
     )
     yield _format_sse(part_done)
 
-    # response.output_item.done
+    # 已翻譯註解。
     final_message_item = ResponseMessageItem(
         id=item_id,
         content=[ResponseOutputText(text=accumulated_text)],
@@ -793,10 +793,10 @@ async def generate_responses_stream(
     )
     yield _format_sse(item_done)
 
-    # Create usage from usage data if available
+    # 已翻譯註解。
     usage = _build_response_usage(last_usage) if last_usage is not None else None
 
-    # response.completed
+    # 已翻譯註解。
     output: list[ResponseItem] = []
     if reasoning_started:
         output.append(

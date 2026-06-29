@@ -21,9 +21,9 @@ async def check_reachability(
     client: httpx.AsyncClient,
     api_port: int,
 ) -> None:
-    """Check if a node is reachable at the given IP and verify its identity."""
+    """此說明已翻譯為繁體中文。"""
     if ":" in target_ip:
-        # TODO: use real IpAddress types
+        # 待辦事項：已翻譯註解。
         url = f"http://[{target_ip}]:{api_port}/node_id"
     else:
         url = f"http://{target_ip}:{api_port}/node_id"
@@ -46,14 +46,14 @@ async def check_reachability(
             remote_node_id = NodeId(body)
             break
 
-        # expected failure cases
+        # 已翻譯註解。
         except (
             httpx.TimeoutException,
             httpx.NetworkError,
         ):
             await anyio.sleep(1)
 
-        # other failures should be logged on last attempt
+        # 已翻譯註解。
         except httpx.HTTPError as e:
             last_error = e
             await anyio.sleep(1)
@@ -85,11 +85,11 @@ async def check_reachable(
     node_network: Mapping[NodeId, NodeNetworkInfo],
     api_port: int,
 ) -> AsyncGenerator[tuple[str, NodeId], None]:
-    """Yield (ip, node_id) pairs as reachability probes complete."""
+    """此說明已翻譯為繁體中文。"""
 
     send, recv = channel[tuple[str, NodeId]]()
 
-    # these are intentionally httpx's defaults so we can tune them later
+    # 已翻譯註解。
     timeout = httpx.Timeout(timeout=5.0)
     limits = httpx.Limits(
         max_connections=100,

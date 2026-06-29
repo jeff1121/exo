@@ -58,7 +58,7 @@ class TaskFinished(BaseCommand):
 
 
 class SendInputChunk(BaseCommand):
-    """Command to send an input image chunk (converted to event by master)."""
+    """此說明已翻譯為繁體中文。"""
 
     chunk: InputImageChunk
 

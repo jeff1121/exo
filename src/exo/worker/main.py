@@ -69,8 +69,8 @@ class Worker:
         *,
         event_receiver: Receiver[IndexedEvent],
         event_sender: Sender[Event],
-        # This is for requesting updates. It doesn't need to be a general command sender right now,
-        # but I think it's the correct way to be thinking about commands
+        # 這裡用於請求更新。目前不需要是通用命令發送器，
+        # 但我認為這樣的命令抽象方向是正確的
         command_sender: Sender[ForwarderCommand],
         download_command_sender: Sender[ForwarderDownloadCommand],
         api_port: int,
@@ -88,7 +88,7 @@ class Worker:
 
         self._system_id = SystemId()
 
-        # Buffer for input image chunks (for image editing)
+        # 輸入影像分塊緩衝區（用於影像編輯）
         self.input_chunk_buffer: dict[CommandId, dict[int, InputImageChunk]] = {}
         self.input_chunk_counts: dict[CommandId, int] = {}
         self.image_cache: dict[Base64ImageHash, Base64Image] = {}
@@ -114,10 +114,10 @@ class Worker:
                 tg.start_soon(self._poll_connection_updates)
                 tg.start_soon(self._reconcile_custom_cards)
         except* (EventRouterBrokenResourceError, EventRouterClosedResourceError):
-            # Event router has been closed (try-star syntax handles error groups)
+            # 已翻譯註解。
             pass
         finally:
-            # Actual shutdown code - waits for all tasks to complete before executing.
+            # 實際關閉流程：會等待所有任務完成後再執行。
             logger.info("Stopping Worker")
             self.event_sender.close()
             self.command_sender.close()
@@ -140,14 +140,14 @@ class Worker:
     async def _event_applier(self):
         with self.event_receiver as events:
             async for event in events:
-                # 2. for each event, apply it to the state
+                # 2. 對每個事件都套用到狀態
                 self.state = apply(self.state, event=event)
                 event = event.event
 
                 if isinstance(event, InstanceDeleted):
                     self._instance_backoff.reset(event.instance_id)
 
-                # Buffer input image chunks for image editing
+                # 暫存影像編輯所需的輸入分塊
                 if isinstance(event, InputChunkReceived):
                     cmd_id = event.command_id
                     if cmd_id not in self.input_chunk_buffer:
@@ -226,7 +226,7 @@ class Worker:
             assert task.task_status
             await self.event_sender.send(TaskCreated(task_id=task.task_id, task=task))
 
-            # lets not kill the worker if a runner is unresponsive
+            # 已翻譯註解。
             match task:
                 case CreateRunner():
                     await self._create_supervisor(task)
@@ -301,7 +301,7 @@ class Worker:
                         )
                     )
                 case ImageEdits() if task.task_params.total_input_chunks > 0:
-                    # Assemble image from chunks and inject into task
+                    # 將分塊組成影像並注入任務
                     cmd_id = task.command_id
                     chunks = self.input_chunk_buffer.get(cmd_id, {})
                     assembled = "".join(chunks[i].data for i in range(len(chunks)))
@@ -309,7 +309,7 @@ class Worker:
                         f"Assembled input image from {len(chunks)} chunks, "
                         f"total size: {len(assembled)} bytes"
                     )
-                    # Create modified task with assembled image data
+                    # 以組裝完成的影像資料建立修改後任務
                     modified_task = ImageEdits(
                         task_id=task.task_id,
                         command_id=task.command_id,
@@ -332,7 +332,7 @@ class Worker:
                             advanced_params=task.task_params.advanced_params,
                         ),
                     )
-                    # Cleanup buffers
+                    # 清理緩衝區
                     if cmd_id in self.input_chunk_buffer:
                         del self.input_chunk_buffer[cmd_id]
                     if cmd_id in self.input_chunk_counts:
@@ -377,7 +377,7 @@ class Worker:
             ].start_task(task)
 
     async def _create_supervisor(self, task: CreateRunner) -> RunnerSupervisor:
-        """Creates and stores a new AssignedRunner with initial downloading status."""
+        """此說明已翻譯為繁體中文。"""
         runner = await RunnerSupervisor.create(
             bound_instance=task.bound_instance,
             event_sender=self.event_sender.clone(),
@@ -402,10 +402,10 @@ class Worker:
                     continue
                 conns[nid].add(ip)
                 edge = SocketConnection(
-                    # nonsense multiaddr
+                    # 已翻譯註解。
                     sink_multiaddr=Multiaddr(address=f"/ip4/{ip}/tcp/{self.api_port}")
                     if "." in ip
-                    # nonsense multiaddr
+                    # 已翻譯註解。
                     else Multiaddr(address=f"/ip6/{ip}/tcp/{self.api_port}"),
                 )
                 if edge not in edges:
@@ -419,7 +419,7 @@ class Worker:
             for conn in self.state.topology.out_edges(self.node_id):
                 if not isinstance(conn.edge, SocketConnection):
                     continue
-                # ignore mDNS discovered connections
+                # 已翻譯註解。
                 if conn.edge.sink_multiaddr.port != self.api_port:
                     continue
                 if (

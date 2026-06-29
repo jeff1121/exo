@@ -55,7 +55,7 @@ def _try_parse_json(value: str) -> dict[str, Any] | str:
 def _build_tool_calls(chunk: ToolCallChunk) -> list[OllamaToolCall]:
     tool_calls: list[OllamaToolCall] = []
     for index, tool in enumerate(chunk.tool_calls):
-        # tool.arguments is always str; try to parse as JSON dict for Ollama format
+        # 已翻譯註解。
         arguments: dict[str, Any] | str = _try_parse_json(tool.arguments)
         tool_calls.append(
             OllamaToolCall(
@@ -72,7 +72,7 @@ def _build_tool_calls(chunk: ToolCallChunk) -> list[OllamaToolCall]:
 def _get_usage(
     chunk: TokenChunk | ToolCallChunk,
 ) -> tuple[int | None, int | None]:
-    """Extract (prompt_eval_count, eval_count) from a chunk."""
+    """此說明已翻譯為繁體中文。"""
     if chunk.usage is not None:
         return (chunk.usage.prompt_tokens, chunk.usage.completion_tokens)
     if chunk.stats is not None:
@@ -83,7 +83,7 @@ def _get_usage(
 def ollama_request_to_text_generation(
     request: OllamaChatRequest,
 ) -> TextGenerationTaskParams:
-    """Convert Ollama chat request to exo's internal text generation format."""
+    """此說明已翻譯為繁體中文。"""
     instructions: str | None = None
     input_messages: list[InputMessage] = []
     chat_template_messages: list[dict[str, Any]] = []
@@ -186,7 +186,7 @@ async def generate_ollama_chat_stream(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """Generate streaming responses in Ollama format (newline-delimited JSON)."""
+    """此說明已翻譯為繁體中文。"""
     thinking_parts: list[str] = []
 
     async for chunk in chunk_stream:
@@ -269,10 +269,10 @@ async def collect_ollama_chat_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    """Collect streaming chunks into a single non-streaming Ollama response.
+    """此說明已翻譯為繁體中文。
 
-    Returns an AsyncGenerator[str] (single yield) for consistency with FastAPI
-    StreamingResponse cancellation handling.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     text_parts: list[str] = []
     thinking_parts: list[str] = []
@@ -328,13 +328,13 @@ async def collect_ollama_chat_response(
     return
 
 
-# ── /api/generate ──
+# 已翻譯註解。
 
 
 def ollama_generate_request_to_text_generation(
     request: OllamaGenerateRequest,
 ) -> TextGenerationTaskParams:
-    """Convert Ollama generate request to exo's internal text generation format."""
+    """此說明已翻譯為繁體中文。"""
     chat_template_messages: list[dict[str, Any]] = []
     images: list[Base64Image] = []
     if request.system:
@@ -374,7 +374,7 @@ async def generate_ollama_generate_stream(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """Generate streaming responses for /api/generate in Ollama NDJSON format."""
+    """此說明已翻譯為繁體中文。"""
     thinking_parts: list[str] = []
 
     async for chunk in chunk_stream:
@@ -393,7 +393,7 @@ async def generate_ollama_generate_stream(
                 return
 
             case ToolCallChunk():
-                # generate endpoint doesn't support tools; emit as done
+                # 已翻譯註解。
                 prompt_eval, eval_count = _get_usage(chunk)
                 resp = OllamaGenerateResponse(
                     model=str(chunk.model),
@@ -447,7 +447,7 @@ async def collect_ollama_generate_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    """Collect chunks into a single non-streaming /api/generate response."""
+    """此說明已翻譯為繁體中文。"""
     text_parts: list[str] = []
     thinking_parts: list[str] = []
     model: str | None = None

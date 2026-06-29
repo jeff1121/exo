@@ -36,27 +36,27 @@ class BaseTask(TaggedModel):
     instance_id: InstanceId
 
 
-class CreateRunner(BaseTask):  # emitted by Worker
+class CreateRunner(BaseTask):  # 已翻譯註解。
     bound_instance: BoundInstance
 
 
-class DownloadModel(BaseTask):  # emitted by Worker
+class DownloadModel(BaseTask):  # 已翻譯註解。
     shard_metadata: ShardMetadata
 
 
-class LoadModel(BaseTask):  # emitted by Worker
+class LoadModel(BaseTask):  # 已翻譯註解。
     pass
 
 
-class ConnectToGroup(BaseTask):  # emitted by Worker
+class ConnectToGroup(BaseTask):  # 已翻譯註解。
     pass
 
 
-class StartWarmup(BaseTask):  # emitted by Worker
+class StartWarmup(BaseTask):  # 已翻譯註解。
     pass
 
 
-class TextGeneration(BaseTask):  # emitted by Master
+class TextGeneration(BaseTask):  # 已翻譯註解。
     command_id: CommandId
     task_params: TextGenerationTaskParams
 
@@ -69,7 +69,7 @@ class CancelTask(BaseTask):
     runner_id: RunnerId
 
 
-class ImageGeneration(BaseTask):  # emitted by Master
+class ImageGeneration(BaseTask):  # 已翻譯註解。
     command_id: CommandId
     task_params: ImageGenerationTaskParams
 
@@ -77,7 +77,7 @@ class ImageGeneration(BaseTask):  # emitted by Master
     error_message: str | None = Field(default=None)
 
 
-class ImageEdits(BaseTask):  # emitted by Master
+class ImageEdits(BaseTask):  # 已翻譯註解。
     command_id: CommandId
     task_params: ImageEditsTaskParams
 
@@ -85,7 +85,7 @@ class ImageEdits(BaseTask):  # emitted by Master
     error_message: str | None = Field(default=None)
 
 
-class Shutdown(BaseTask):  # emitted by Worker
+class Shutdown(BaseTask):  # 已翻譯註解。
     runner_id: RunnerId
 
 

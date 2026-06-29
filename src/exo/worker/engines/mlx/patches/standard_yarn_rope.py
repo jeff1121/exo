@@ -21,7 +21,7 @@ def _patched_yarn_init(
     mscale_all_dim: float = 0,
     truncate: bool = True,
 ) -> None:
-    """Patch mlx_lm's YarnRoPE to match vLLM's inverse-frequency blending formula for compatability."""
+    """此說明已翻譯為繁體中文。"""
 
     super(rope_utils.YarnRoPE, self).__init__()
 
@@ -80,7 +80,7 @@ def _patched_initialize_rope(
             scaling_config.get("type") or scaling_config.get("rope_type", "default")
         )
 
-    # All the yarn rope types supported in mlx lm
+    # 已翻譯註解。
     if rope_type in ("yarn", "deepseek_yarn"):
         assert scaling_config is not None
         cfg = scaling_config

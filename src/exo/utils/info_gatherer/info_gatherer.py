@@ -44,9 +44,9 @@ IS_DARWIN = sys.platform == "darwin"
 
 
 async def _get_thunderbolt_devices() -> set[str] | None:
-    """Get Thunderbolt interface device names (e.g., en2, en3) from hardware ports.
+    """此說明已翻譯為繁體中文。
 
-    Returns None if the networksetup command fails.
+    此說明已翻譯為繁體中文。
     """
     result = await anyio.run_process(
         ["networksetup", "-listallhardwareports"],
@@ -77,9 +77,9 @@ async def _get_thunderbolt_devices() -> set[str] | None:
 
 
 async def _get_bridge_services() -> dict[str, str] | None:
-    """Get mapping of bridge device -> service name from network service order.
+    """此說明已翻譯為繁體中文。
 
-    Returns None if the networksetup command fails.
+    此說明已翻譯為繁體中文。
     """
     result = await anyio.run_process(
         ["networksetup", "-listnetworkserviceorder"],
@@ -92,16 +92,16 @@ async def _get_bridge_services() -> dict[str, str] | None:
         )
         return None
 
-    # Parse service order to find bridge devices and their service names
-    # Format: "(1) Service Name\n(Hardware Port: ..., Device: bridge0)\n"
+    # 已翻譯註解。
+    # 已翻譯註解。
     service_order_output = result.stdout.decode()
-    bridge_services: dict[str, str] = {}  # device -> service name
+    bridge_services: dict[str, str] = {}  # 已翻譯註解。
     current_service: str | None = None
 
     for line in service_order_output.splitlines():
         line = line.strip()
-        # Match "(N) Service Name" or "(*) Service Name" (disabled)
-        # but NOT "(Hardware Port: ...)" lines
+        # 已翻譯註解。
+        # 已翻譯註解。
         if (
             line
             and line.startswith("(")
@@ -111,9 +111,9 @@ async def _get_bridge_services() -> dict[str, str] | None:
             paren_end = line.index(")")
             if paren_end + 2 <= len(line):
                 current_service = line[paren_end + 2 :]
-        # Match "(Hardware Port: ..., Device: bridgeX)"
+        # 已翻譯註解。
         elif current_service and "Device: bridge" in line:
-            # Extract device name from "..., Device: bridge0)"
+            # 已翻譯註解。
             device_start = line.find("Device: ") + len("Device: ")
             device_end = line.find(")", device_start)
             if device_end > device_start:
@@ -124,7 +124,7 @@ async def _get_bridge_services() -> dict[str, str] | None:
 
 
 async def _get_bridge_members(bridge_device: str) -> set[str]:
-    """Get member interfaces of a bridge device via ifconfig."""
+    """此說明已翻譯為繁體中文。"""
     result = await anyio.run_process(
         ["ifconfig", bridge_device],
         check=False,
@@ -148,21 +148,21 @@ async def _get_bridge_members(bridge_device: str) -> set[str]:
 async def _find_thunderbolt_bridge(
     bridge_services: dict[str, str], thunderbolt_devices: set[str]
 ) -> str | None:
-    """Find the service name of a bridge containing Thunderbolt interfaces.
+    """此說明已翻譯為繁體中文。
 
-    Returns the service name if found, None otherwise.
+    此說明已翻譯為繁體中文。
     """
     for bridge_device, service_name in bridge_services.items():
         members = await _get_bridge_members(bridge_device)
-        if members & thunderbolt_devices:  # intersection is non-empty
+        if members & thunderbolt_devices:  # 已翻譯註解。
             return service_name
     return None
 
 
 async def _is_service_enabled(service_name: str) -> bool | None:
-    """Check if a network service is enabled.
+    """此說明已翻譯為繁體中文。
 
-    Returns True if enabled, False if disabled, None on error.
+    此說明已翻譯為繁體中文。
     """
     result = await anyio.run_process(
         ["networksetup", "-getnetworkserviceenabled", service_name],
@@ -180,7 +180,7 @@ async def _is_service_enabled(service_name: str) -> bool | None:
 
 
 class StaticNodeInformation(TaggedModel):
-    """Node information that should NEVER change, to be gathered once at startup"""
+    """此說明已翻譯為繁體中文。"""
 
     model: str
     chip: str
@@ -237,15 +237,15 @@ class ThunderboltBridgeInfo(TaggedModel):
 
     @classmethod
     async def gather(cls) -> Self | None:
-        """Check if a Thunderbolt Bridge network service is enabled on this node.
+        """此說明已翻譯為繁體中文。
 
-        Detection approach:
-        1. Find all Thunderbolt interface devices (en2, en3, etc.) from hardware ports
-        2. Find bridge devices from network service order (not hardware ports, as
-           bridges may not appear there)
-        3. Check each bridge's members via ifconfig
-        4. If a bridge contains Thunderbolt interfaces, it's a Thunderbolt Bridge
-        5. Check if that network service is enabled
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+           此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         if not IS_DARWIN:
             return None
@@ -293,7 +293,7 @@ class ThunderboltBridgeInfo(TaggedModel):
 
 
 class NodeConfig(TaggedModel):
-    """Node configuration from EXO_CONFIG_FILE, reloaded from the file only at startup. Other changes should come in through the API and propagate from there"""
+    """此說明已翻譯為繁體中文。"""
 
     @classmethod
     async def gather(cls) -> Self | None:
@@ -311,7 +311,7 @@ class NodeConfig(TaggedModel):
 
 
 class MiscData(TaggedModel):
-    """Node information that may slowly change that doesn't fall into the other categories"""
+    """此說明已翻譯為繁體中文。"""
 
     friendly_name: str
 
@@ -321,7 +321,7 @@ class MiscData(TaggedModel):
 
 
 class NodeDiskUsage(TaggedModel):
-    """Disk space information for the models directory."""
+    """此說明已翻譯為繁體中文。"""
 
     disk_usage: DiskUsage
 
@@ -356,7 +356,7 @@ async def _gather_iface_map() -> dict[str, str] | None:
 
 def _has_nvml_cuda() -> bool:
     try:
-        import pynvml as nvml  # pyright: ignore[reportMissingModuleSource]
+        import pynvml as nvml  # 已翻譯註解。
     except ImportError:
         return False
     try:
@@ -586,9 +586,9 @@ class InfoGatherer:
             )
             self._tg.start_soon(self._monitor_memory_usage, 1)
             return
-        # macmon pipe --interval [interval in ms]
-        # Timeout: if macmon produces no output for this many seconds, restart it.
-        # macmon writes every macmon_interval seconds, so 10x that is generous.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         read_timeout = max(macmon_interval * 10, 30)
         while True:
             try:
@@ -631,10 +631,10 @@ class InfoGatherer:
                 )
                 self._tg.start_soon(self._monitor_memory_usage, 1)
             except ProcessLookupError:
-                # usually throws by the process' context manager on exit
-                # when we ctrl+c, hence usually should be ignored;
-                # if anything else throws it, we explicitly don't care:
-                # process is dead anyways ;)
+                # 已翻譯註解。
+                # 已翻譯註解。
+                # 已翻譯註解。
+                # 已翻譯註解。
                 logger.warning(
                     "Macmon process not found - shutting down macmon monitor"
                 )

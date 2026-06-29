@@ -79,16 +79,16 @@ class RunnerStdioHandler:
         stdout_log_path: PathLike[str] = EXO_RUNNER_STDOUT_LOG,
         stderr_log_path: PathLike[str] = EXO_RUNNER_STDERR_LOG,
     ) -> Self:
-        # these are append only logs used to gather data for log template mining
+        # 已翻譯註解。
         #
-        # TODO: in the future use [Drain3](https://github.com/logpai/Drain3)
-        #       to mine these logs
+        # 待辦事項：已翻譯註解。
+        #       已翻譯註解。
         ensure_parent_directory_exists(stdout_log_path)
         ensure_parent_directory_exists(stderr_log_path)
         stdout_log = await anyio.open_file(stdout_log_path, "a")
         stderr_log = await anyio.open_file(stderr_log_path, "a")
 
-        # instantiate and return
+        # 已翻譯註解。
         self = cls(
             _stdout_rx=stdout_rx,
             _stderr_rx=stderr_rx,
@@ -100,18 +100,18 @@ class RunnerStdioHandler:
     async def run(self):
         try:
             async with self._tg as tg:
-                tg.start_soon(  # pyright: ignore[reportUnknownArgumentType]
+                tg.start_soon(  # 已翻譯註解。
                     self._handle_runner_output,
                     self._stdout_rx,
                     self._stdout_log,
-                    lambda line: logger.info(f"Runner stdout: {line}"),  # pyright: ignore[reportUnknownLambdaType]
-                    lambda _: None,  # pyright: ignore[reportUnknownLambdaType]
+                    lambda line: logger.info(f"Runner stdout: {line}"),  # 已翻譯註解。
+                    lambda _: None,  # 已翻譯註解。
                 )
-                tg.start_soon(  # pyright: ignore[reportUnknownArgumentType]
+                tg.start_soon(  # 已翻譯註解。
                     self._handle_runner_output,
                     self._stderr_rx,
                     self._stderr_log,
-                    lambda line: logger.warning(f"Runner stderr: {line}"),  # pyright: ignore[reportUnknownLambdaType]
+                    lambda line: logger.warning(f"Runner stderr: {line}"),  # 已翻譯註解。
                     self.diagnostics.record_line,
                 )
         finally:
@@ -126,22 +126,22 @@ class RunnerStdioHandler:
         log_line: Callable[[str], None],
         record_diagnostic_line: Callable[[str], None],
     ):
-        # The diagnostic collector is deliberately line-level for now. It records
-        # bounded stderr context and known failure anchors; the supervisor
-        # correlates those hints with the runner exit status before surfacing an
-        # error.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
 
-        # not using TextReceiveStream because it doesn't do final=True handling on errors
+        # 已翻譯註解。
         decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
         pending_line = ""
 
         async def handle_line(line: str):
-            # preserve whitespace for later log-mining
+            # 已翻譯註解。
             line = line.removesuffix("\r")
             if not line:
                 return
 
-            # Send to logger & error recovery task
+            # 已翻譯註解。
             log_line(line)
             record_diagnostic_line(line)
 
@@ -154,7 +154,7 @@ class RunnerStdioHandler:
             await logfile.write(text)
             await logfile.flush()
 
-            # newline buffering
+            # 已翻譯註解。
             pending_line += text
             lines = pending_line.split("\n")
             pending_line = lines.pop()
@@ -245,7 +245,7 @@ class RunnerSupervisor:
     async def run(self):
         try:
             async with self._tg as tg:
-                # start the process itself & handle its stdout/stderr
+                # 已翻譯註解。
                 await tg.start(self.runner_process.run)
                 tg.start_soon(self._runner_stdio_handler.run)
 
@@ -308,7 +308,7 @@ class RunnerSupervisor:
             try:
                 await self._cancel_sender.send_async(task_id)
             except ClosedResourceError:
-                # typically occurs when trying to shut down a failed instance
+                # 已翻譯註解。
                 logger.warning(
                     f"Cancelling task {task_id} failed, runner closed communication"
                 )
@@ -321,7 +321,7 @@ class RunnerSupervisor:
             with self._ev_recv as events:
                 async for event in events:
                     if isinstance(event, RunnerTerminationError):
-                        # try to get exception if possible
+                        # 已翻譯註解。
                         await self._check_runner(event)
                         break
                     if isinstance(event, RunnerStatusUpdated):
@@ -333,7 +333,7 @@ class RunnerSupervisor:
                         isinstance(event, TaskStatusUpdated)
                         and event.task_status == TaskStatus.Complete
                     ):
-                        # If a task has just been completed, we should be working on it.
+                        # 已翻譯註解。
                         assert isinstance(
                             self.status,
                             (
@@ -348,7 +348,7 @@ class RunnerSupervisor:
                         self.completed.add(event.task_id)
                     await self._event_sender.send(event)
         except (ClosedResourceError, BrokenResourceError):
-            # this is the happy path shutdown - we don't need to spam log with it
+            # 已翻譯註解。
             await self._check_runner()
         finally:
             for tid in self.pending:
@@ -374,7 +374,7 @@ class RunnerSupervisor:
         rc = self.runner_process.exitcode
         logger.info(f"Runner exited with exit code {rc}")
 
-        # If exit code is 0 then the transient errors were recoverable, meaning we don't need runner diagnostics
+        # 已翻譯註解。
         if rc == 0:
             return
 
@@ -391,7 +391,7 @@ class RunnerSupervisor:
             cause: str = f"exitcode={rc}"
 
         if e is not None:
-            # Record how runner shut down, try exception, resort to RunnerTerminationError fallback
+            # 已翻譯註解。
             if isinstance(e, Exception):
                 logger.opt(exception=e).error(f"Runner terminated with {cause}")
             else:

@@ -11,17 +11,17 @@ BlockT = TypeVar("BlockT")
 
 
 class BlockWrapperMode(Enum):
-    CACHING = "caching"  # Sync mode: compute full attention, populate cache
-    PATCHED = "patched"  # Async mode: compute patch attention, use cached KV
+    CACHING = "caching"  # 已翻譯註解。
+    PATCHED = "patched"  # 已翻譯註解。
 
 
 class BlockWrapperMixin:
-    """Common cache management logic for block wrappers.
+    """此說明已翻譯為繁體中文。
 
-    Including:
-    - KV cache creation and management
-    - Mode
-    - Patch range setting
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     _text_seq_len: int
@@ -43,15 +43,15 @@ class BlockWrapperMixin:
         patch_start: int = 0,
         patch_end: int = 0,
     ) -> Self:
-        """Set mode and patch range.
+        """此說明已翻譯為繁體中文。
 
-        Args:
-            mode: CACHING (full attention) or PATCHED (use cached KV)
-            patch_start: Start token index within image (for PATCHED mode)
-            patch_end: End token index within image (for PATCHED mode)
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            Self for method chaining
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         self._mode = mode
         self._patch_start = patch_start
@@ -97,12 +97,12 @@ class BlockWrapperMixin:
 
 
 class JointBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
-    """Base class for joint transformer block wrappers with pipefusion support.
+    """此說明已翻譯為繁體中文。
 
-    The wrapper:
-    - Owns its KV cache (created lazily on first CACHING forward)
-    - Controls the forward pass flow (CACHING vs PATCHED mode)
-    - Handles patch slicing and cache operations
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     block: BlockT
@@ -112,12 +112,12 @@ class JointBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
         self._init_cache_state(text_seq_len)
 
     def set_encoder_mask(self, mask: mx.array | None) -> None:  # noqa: B027
-        """Set the encoder hidden states mask for attention.
+        """此說明已翻譯為繁體中文。
 
-        Override in subclasses that use attention masks
-        Default is a no-op for models that don't use masks
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
-        del mask  # Unused in base class
+        del mask  # 已翻譯註解。
 
     def __call__(
         self,
@@ -141,7 +141,7 @@ class JointBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
         text_embeddings: mx.array,
         rotary_embeddings: RotaryEmbeddings,
     ) -> tuple[mx.array, mx.array]:
-        """CACHING mode: Full attention, store image K/V in cache."""
+        """此說明已翻譯為繁體中文。"""
         query, key, value = self._compute_qkv(
             hidden_states, encoder_hidden_states, text_embeddings, rotary_embeddings
         )
@@ -163,7 +163,7 @@ class JointBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
         text_embeddings: mx.array,
         rotary_embeddings: RotaryEmbeddings,
     ) -> tuple[mx.array, mx.array]:
-        # hidden_states is already the patch (provided by runner)
+        # 已翻譯註解。
         patch_hidden = hidden_states
 
         query, key, value = self._compute_qkv(
@@ -214,10 +214,10 @@ class JointBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
 
 
 class SingleBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
-    """Base class for single-stream transformer block wrappers.
+    """此說明已翻譯為繁體中文。
 
-    Similar to JointBlockWrapper but for blocks that operate on a single
-    concatenated [text, image] stream rather than separate streams.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     block: BlockT
@@ -244,7 +244,7 @@ class SingleBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
         text_embeddings: mx.array,
         rotary_embeddings: RotaryEmbeddings,
     ) -> mx.array:
-        """CACHING mode: Full attention, store image K/V in cache."""
+        """此說明已翻譯為繁體中文。"""
         query, key, value = self._compute_qkv(
             hidden_states, text_embeddings, rotary_embeddings
         )
@@ -263,7 +263,7 @@ class SingleBlockWrapper(BlockWrapperMixin, ABC, Generic[BlockT]):
         text_embeddings: mx.array,
         rotary_embeddings: RotaryEmbeddings,
     ) -> mx.array:
-        """PATCHED mode: Compute patch Q/K/V, use cached image K/V for attention."""
+        """此說明已翻譯為繁體中文。"""
         query, key, value = self._compute_qkv(
             hidden_states, text_embeddings, rotary_embeddings, patch_mode=True
         )

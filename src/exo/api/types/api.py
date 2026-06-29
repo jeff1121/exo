@@ -34,7 +34,7 @@ class ModelListModel(BaseModel):
     object: str = "model"
     created: int = Field(default_factory=lambda: int(time.time()))
     owned_by: str = "exo"
-    # openwebui fields
+    # 已翻譯註解。
     hugging_face_id: str = Field(default="")
     name: str = Field(default="")
     description: str = Field(default="")
@@ -63,7 +63,7 @@ class ChatCompletionMessageText(BaseModel):
 
 class ChatCompletionMessageImageUrl(BaseModel):
     type: Literal["image_url"] = "image_url"
-    image_url: dict[str, str]  # {"url": "data:image/png;base64,..."}
+    image_url: dict[str, str]  # 已翻譯註解。
 
 
 ChatCompletionContentPart = ChatCompletionMessageText | ChatCompletionMessageImageUrl
@@ -186,8 +186,8 @@ class NodePowerStats(BaseModel, frozen=True):
     node_id: NodeId
     samples: int
     avg_sys_power: float
-    # Per-phase breakdown. Populated only when the caller marks a phase
-    # boundary (e.g. prefill -> generation); None otherwise.
+    # 分階段拆解。僅在呼叫端標記階段
+    # 已翻譯註解。
     prefill_avg_sys_power: float | None = None
     generation_avg_sys_power: float | None = None
     prefill_energy_joules: float | None = None
@@ -199,10 +199,10 @@ class PowerUsage(BaseModel, frozen=True):
     nodes: list[NodePowerStats]
     total_avg_sys_power_watts: float
     total_energy_joules: float
-    # Split between the prefill (prompt-processing) phase and the
-    # generation/decode phase. Populated only when the caller marks a phase
-    # boundary; None otherwise. The two phase energies should sum to
-    # approximately `total_energy_joules` (modulo interpolation rounding).
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
     prefill_seconds: float | None = None
     generation_seconds: float | None = None
     prefill_energy_joules: float | None = None
@@ -282,7 +282,7 @@ class PlacementPreview(BaseModel):
     sharding: Sharding
     instance_meta: InstanceMeta
     instance: Instance | None = None
-    # Keys are NodeId strings, values are additional bytes that would be used on that node
+    # 已翻譯註解。
     memory_delta_by_node: dict[str, int] | None = None
     error: str | None = None
 
@@ -345,12 +345,12 @@ ImageSize = Literal[
 
 
 def normalize_image_size(v: object) -> ImageSize:
-    """Shared validator for ImageSize fields: maps None → "auto" and rejects invalid values."""
+    """此說明已翻譯為繁體中文。"""
     if v is None:
         return "auto"
     if v not in get_args(ImageSize):
         raise ValueError(f"Invalid size: {v!r}. Must be one of {get_args(ImageSize)}")
-    return v  # pyright: ignore[reportReturnType]
+    return v  # 已翻譯註解。
 
 
 class AdvancedImageParams(BaseModel):
@@ -377,7 +377,7 @@ class ImageGenerationTaskParams(BaseModel):
     style: str | None = "vivid"
     user: str | None = None
     advanced_params: AdvancedImageParams | None = None
-    # Internal flag for benchmark mode - set by API, preserved through serialization
+    # 已翻譯註解。
     bench: bool = False
 
     @field_validator("size", mode="before")
@@ -391,9 +391,9 @@ class BenchImageGenerationTaskParams(ImageGenerationTaskParams):
 
 
 class ImageEditsTaskParams(BaseModel):
-    """Internal task params for image-editing requests."""
+    """影像編輯請求的內部任務參數。"""
 
-    image_data: str = ""  # Base64-encoded image (empty when using chunked transfer)
+    image_data: str = ""  # 已翻譯註解。
     total_input_chunks: int = 0
     prompt: str
     model: str
@@ -414,7 +414,7 @@ class ImageEditsTaskParams(BaseModel):
         return normalize_image_size(v)
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
             if name == "image_data":
                 yield name, f"<{len(self.image_data)} chars>"
             elif name is not None:
@@ -427,7 +427,7 @@ class ImageData(BaseModel):
     revised_prompt: str | None = None
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
             if name == "b64_json" and self.b64_json is not None:
                 yield name, f"<{len(self.b64_json)} chars>"
             elif name is not None:

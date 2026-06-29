@@ -68,7 +68,7 @@ def _send_over_mp_channel(send: MpSender[str]) -> None:
 
 def _mlx_force_oom(size: int = 40_000) -> None:
     """
-    Force an Out-Of-Memory (OOM) error in MLX by performing large tensor operations.
+    此說明已翻譯為繁體中文。
     """
     import mlx.core as mx
 

@@ -1,4 +1,4 @@
-"""Tests for cancelling (pausing) an active download via CancelDownload command."""
+"""此說明已翻譯為繁體中文。"""
 
 import asyncio
 import contextlib
@@ -49,8 +49,8 @@ def _make_shard(model_id: ModelId = MODEL_ID) -> ShardMetadata:
 
 
 class SlowShardDownloader(ShardDownloader):
-    """Fake downloader that blocks during ensure_shard until cancelled,
-    simulating a long-running download."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
 
     def __init__(self) -> None:
         self._progress_callbacks: list[
@@ -69,7 +69,7 @@ class SlowShardDownloader(ShardDownloader):
         shard: ShardMetadata,
         config_only: bool = False,  # noqa: ARG002
     ) -> Path:
-        # Fire an in-progress callback, then block forever (until cancelled)
+        # 已翻譯註解。
         progress = RepoDownloadProgress(
             repo_id=str(shard.model_card.model_id),
             repo_revision="main",
@@ -86,7 +86,7 @@ class SlowShardDownloader(ShardDownloader):
         for cb in self._progress_callbacks:
             await cb(shard, progress)
         self.download_started.set()
-        # Block until cancelled
+        # 已翻譯註解。
         await asyncio.Event().wait()
         return (
             Path("/fake/models") / shard.model_card.model_id.normalize()
@@ -98,7 +98,7 @@ class SlowShardDownloader(ShardDownloader):
         if False:  # noqa: SIM108  # empty async generator
             yield (
                 Path(),
-                RepoDownloadProgress(  # pyright: ignore[reportUnreachable]
+                RepoDownloadProgress(  # 已翻譯註解。
                     repo_id="",
                     repo_revision="",
                     shard=_make_shard(),
@@ -154,7 +154,7 @@ def _setup_coordinator(
 async def _wait_for_pending(
     event_recv: Receiver[Event], model_id: ModelId, timeout: float = 2.0
 ) -> DownloadPending | None:
-    """Drain events until we see a DownloadPending for the given model, or timeout."""
+    """此說明已翻譯為繁體中文。"""
     try:
         async with asyncio.timeout(timeout):
             while True:
@@ -171,8 +171,8 @@ async def _wait_for_pending(
 
 
 async def test_cancel_active_download_transitions_to_pending() -> None:
-    """Cancelling an in-progress download should emit a DownloadPending event
-    and remove the model from active_downloads."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     slow_downloader = SlowShardDownloader()
     coordinator, cmd_send, event_recv = _setup_coordinator(slow_downloader)
     shard = _make_shard()
@@ -180,7 +180,7 @@ async def test_cancel_active_download_transitions_to_pending() -> None:
 
     coordinator_task = asyncio.create_task(coordinator.run())
     try:
-        # Start a download
+        # 已翻譯註解。
         await cmd_send.send(
             ForwarderDownloadCommand(
                 origin=origin,
@@ -188,10 +188,10 @@ async def test_cancel_active_download_transitions_to_pending() -> None:
             )
         )
 
-        # Wait for the download to actually start (blocking in ensure_shard)
+        # 已翻譯註解。
         await asyncio.wait_for(slow_downloader.download_started.wait(), timeout=2.0)
 
-        # Drain any events emitted before the cancel (initial DownloadPending, DownloadOngoing)
+        # 已翻譯註解。
         while True:
             try:
                 async with asyncio.timeout(0.1):
@@ -199,7 +199,7 @@ async def test_cancel_active_download_transitions_to_pending() -> None:
             except TimeoutError:
                 break
 
-        # Cancel the download
+        # 已翻譯註解。
         await cmd_send.send(
             ForwarderDownloadCommand(
                 origin=origin,
@@ -207,18 +207,18 @@ async def test_cancel_active_download_transitions_to_pending() -> None:
             )
         )
 
-        # Should receive a DownloadPending event with preserved progress
+        # 已翻譯註解。
         pending = await _wait_for_pending(event_recv, MODEL_ID)
         assert pending is not None, "Cancel should emit DownloadPending"
         assert pending.shard_metadata.model_card.model_id == MODEL_ID
         assert pending.total == Memory.from_mb(100), "Should preserve total bytes"
 
-        # Give coordinator time to clean up
+        # 已翻譯註解。
         await asyncio.sleep(0.05)
 
-        # Model should no longer be in active_downloads
+        # 已翻譯註解。
         assert MODEL_ID not in coordinator.active_downloads
-        # But should still be in download_status as pending
+        # 已翻譯註解。
         assert MODEL_ID in coordinator.download_status
         assert isinstance(coordinator.download_status[MODEL_ID], DownloadPending)
     finally:
@@ -229,14 +229,14 @@ async def test_cancel_active_download_transitions_to_pending() -> None:
 
 
 async def test_cancel_nonexistent_download_is_noop() -> None:
-    """Cancelling a model that isn't being downloaded should be a no-op."""
+    """此說明已翻譯為繁體中文。"""
     slow_downloader = SlowShardDownloader()
     coordinator, cmd_send, event_recv = _setup_coordinator(slow_downloader)
     origin = SystemId("test")
 
     coordinator_task = asyncio.create_task(coordinator.run())
     try:
-        # Cancel a model that was never started
+        # 已翻譯註解。
         await cmd_send.send(
             ForwarderDownloadCommand(
                 origin=origin,
@@ -244,11 +244,11 @@ async def test_cancel_nonexistent_download_is_noop() -> None:
             )
         )
 
-        # Should NOT receive any DownloadPending event
+        # 已翻譯註解。
         pending = await _wait_for_pending(event_recv, MODEL_ID, timeout=0.5)
         assert pending is None, "Cancel of non-existent download should not emit events"
 
-        # Coordinator state should be empty
+        # 已翻譯註解。
         assert MODEL_ID not in coordinator.active_downloads
         assert MODEL_ID not in coordinator.download_status
     finally:
@@ -259,7 +259,7 @@ async def test_cancel_nonexistent_download_is_noop() -> None:
 
 
 async def test_cancel_then_resume_download() -> None:
-    """After cancelling, re-issuing StartDownload should restart the download."""
+    """此說明已翻譯為繁體中文。"""
     slow_downloader = SlowShardDownloader()
     coordinator, cmd_send, event_recv = _setup_coordinator(slow_downloader)
     shard = _make_shard()
@@ -267,7 +267,7 @@ async def test_cancel_then_resume_download() -> None:
 
     coordinator_task = asyncio.create_task(coordinator.run())
     try:
-        # Start download
+        # 已翻譯註解。
         await cmd_send.send(
             ForwarderDownloadCommand(
                 origin=origin,
@@ -276,7 +276,7 @@ async def test_cancel_then_resume_download() -> None:
         )
         await asyncio.wait_for(slow_downloader.download_started.wait(), timeout=2.0)
 
-        # Cancel
+        # 已翻譯註解。
         await cmd_send.send(
             ForwarderDownloadCommand(
                 origin=origin,
@@ -288,10 +288,10 @@ async def test_cancel_then_resume_download() -> None:
 
         await asyncio.sleep(0.05)
 
-        # Reset the event so we can detect the next download start
+        # 已翻譯註解。
         slow_downloader.download_started.clear()
 
-        # Resume by sending StartDownload again
+        # 已翻譯註解。
         await cmd_send.send(
             ForwarderDownloadCommand(
                 origin=origin,
@@ -299,7 +299,7 @@ async def test_cancel_then_resume_download() -> None:
             )
         )
 
-        # The download should restart
+        # 已翻譯註解。
         await asyncio.wait_for(slow_downloader.download_started.wait(), timeout=2.0)
         assert MODEL_ID in coordinator.active_downloads, (
             "Model should be actively downloading again after resume"

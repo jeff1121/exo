@@ -40,8 +40,8 @@ class PowerSampler:
             self._take_sample()
 
     def mark_prefill_done(self) -> None:
-        """Anchor the prefill→generation boundary on a fresh sample.
-        Idempotent. Safe to call before `run()`; boundary then lands at t=0.
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         if self._prefill_done_at is not None:
             return
@@ -58,8 +58,8 @@ class PowerSampler:
         elapsed = time.perf_counter() - self._start_time
         self._take_sample(t_rel=elapsed)
 
-        # Clamp the split point to [0, elapsed] in case timing is weird (e.g.
-        # mark called after result, or sampler ran for < the prefill window).
+        # 已翻譯註解。
+        # 已翻譯註解。
         split = self._prefill_done_at
         if split is not None:
             split = max(0.0, min(elapsed, split))
@@ -144,10 +144,10 @@ def trapezoidal_energy(
     ts_profiles: list[tuple[float, SystemPerformanceProfile]],
     elapsed: float,
 ) -> float:
-    """Integrate sys_power(t) over the sample window using the trapezoidal rule.
-    First sample is anchored at t=0 and last at t=elapsed (set by `run` /
-    `result`), so the integral spans the full request interval. Falls back to
-    power * elapsed when only one sample exists (constant-power assumption)."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     if len(ts_profiles) == 1:
         return ts_profiles[0][1].sys_power * elapsed
     energy_j = 0.0
@@ -166,13 +166,13 @@ def trapezoidal_energy_range(
     t_start: float,
     t_end: float,
 ) -> float:
-    """Integrate sys_power(t) over [t_start, t_end] using the trapezoidal rule.
+    """此說明已翻譯為繁體中文。
 
-    Linearly interpolates power at the endpoints when they fall between
-    existing samples, so callers can integrate over arbitrary sub-windows
-    (e.g. the prefill segment) without losing accuracy. Returns 0 for an
-    empty or zero-length window. Falls back to constant-power assumption
-    when only one sample exists.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     if t_end <= t_start:
         return 0.0

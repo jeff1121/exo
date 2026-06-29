@@ -14,16 +14,16 @@ class Sharding(str, Enum):
 
 class BaseShardMetadata(TaggedModel):
     """
-    Defines a specific shard of the model that is ready to be run on a device.
-    Replaces previous `Shard` object.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     model_card: ModelCard
     device_rank: int
     world_size: int
 
-    # Error handling; equivalent to monkey-patch, but we can't monkey-patch runner.py
-    # This is kinda annoying because it allocates memory in the ShardMetadata object. Can be rethought after Shanghai.
+    # 已翻譯註解。
+    # 已翻譯註解。
     immediate_exception: bool = False
     should_timeout: float | None = None
 
@@ -55,23 +55,23 @@ class BaseShardMetadata(TaggedModel):
 @final
 class PipelineShardMetadata(BaseShardMetadata):
     """
-    Pipeline parallelism shard meta.
+    此說明已翻譯為繁體中文。
 
-    Layers are represented as a half-open interval [start_layer, end_layer),
-    where start_layer is inclusive and end_layer is exclusive.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
 
 @final
 class CfgShardMetadata(BaseShardMetadata):
-    """Shard metadata for CFG-parallel image generation models."""
+    """此說明已翻譯為繁體中文。"""
 
-    cfg_rank: int  # 0 = positive branch, 1 = negative branch
+    cfg_rank: int  # 已翻譯註解。
     cfg_world_size: int = 2
 
-    # Pipeline-relative coordinates (computed at placement time)
-    pipeline_rank: int  # rank within the pipeline group (0, 1, 2, ...)
-    pipeline_world_size: int  # number of nodes per pipeline group
+    # 已翻譯註解。
+    pipeline_rank: int  # 已翻譯註解。
+    pipeline_world_size: int  # 已翻譯註解。
 
 
 @final

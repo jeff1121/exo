@@ -1,13 +1,13 @@
-1. EXO_BOOTSTRAP_PEERS is currently broken
+1. EXO_BOOTSTRAP_PEERS 目前有問題
 
-4. I'd like to see profiled network latency / bandwidth.
-5. I'd like to see how much bandwidth each link is using.
-7. Solve the problem of in continuous batching when a new prompt comes in, it will block decode of the current batch until the prefill is complete.
-8. We want people to be able to copy models over to a new device without ever connecting EXO to the internet. Right now EXO require internet connection once to cache some files to check if a download is complete. Instead, we should simply check if there is a non-empty model folder locally with no .partial files. This indicates it's a fully downloaded model that can be loaded.
-13. Memory pressure instead of memory used.
-14. Show the type of each connection (TB5, Ethernet, etc.) in the UI. Refer to old exo: https://github.com/exo-explore/exo/blob/56f783b38dc6b08ce606b07a5386dc40dae00330/exo/helpers.py#L251
-16. Dynamically switch to higher priority connection when it becomes available. Probably bring back InstanceReplacedAtomically.
-17. Faster model loads by streaming model from other devices in cluster.
-18. Add support for specifying the type of network connection to use in a test. Depends on 15/16.
-27. Log cleanup - per-module log filters and default to DEBUG log levels
-28. Validate RDMA connections with ibv_devinfo in the info gatherer
+4. 我想看到已剖析的網路延遲／頻寬。
+5. 我想看到每條連線正在使用多少頻寬。
+7. 解決 continuous batching 的問題：當新 prompt 進來時，會在 prefill 完成前阻塞目前 batch 的 decode。
+8. 我們希望使用者可以在完全不讓 EXO 連上網路的情況下，將模型複製到新裝置。目前 EXO 需要至少一次網路連線來快取一些檔案，以檢查下載是否完成。相反地，我們應該只要檢查本機是否有非空的模型資料夾，且沒有 .partial 檔案。這表示模型已完整下載並可載入。
+13. 記憶體壓力，而不是記憶體使用量。
+14. 在 UI 中顯示每條連線的類型（TB5、Ethernet 等）。參考舊版 exo: https://github.com/exo-explore/exo/blob/56f783b38dc6b08ce606b07a5386dc40dae00330/exo/helpers.py#L251
+16. 當高優先級連線可用時，動態切換過去。可能需要把 InstanceReplacedAtomically 帶回來。
+17. 透過從叢集中其他裝置串流模型來加快模型載入。
+18. 新增支援，在測試中指定要使用的網路連線類型。依賴 15/16。
+27. 日誌清理 - 依模組過濾日誌，並預設為 DEBUG 日誌等級
+28. 在資訊蒐集器中用 ibv_devinfo 驗證 RDMA 連線

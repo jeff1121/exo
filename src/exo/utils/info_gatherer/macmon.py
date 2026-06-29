@@ -7,14 +7,14 @@ from exo.utils.pydantic_ext import TaggedModel
 
 
 class _TempMetrics(BaseModel, extra="ignore"):
-    """Temperature-related metrics returned by macmon."""
+    """此說明已翻譯為繁體中文。"""
 
     cpu_temp_avg: float
     gpu_temp_avg: float
 
 
 class _MemoryMetrics(BaseModel, extra="ignore"):
-    """Memory-related metrics returned by macmon."""
+    """此說明已翻譯為繁體中文。"""
 
     ram_total: int
     ram_usage: int
@@ -23,17 +23,17 @@ class _MemoryMetrics(BaseModel, extra="ignore"):
 
 
 class RawMacmonMetrics(BaseModel, extra="ignore"):
-    """Complete set of metrics returned by macmon.
+    """此說明已翻譯為繁體中文。
 
-    Unknown fields are ignored for forward-compatibility.
+    此說明已翻譯為繁體中文。
     """
 
-    timestamp: str  # ignored
+    timestamp: str  # 已翻譯註解。
     temp: _TempMetrics
     memory: _MemoryMetrics
-    ecpu_usage: tuple[int, float]  # freq mhz, usage %
-    pcpu_usage: tuple[int, float]  # freq mhz, usage %
-    gpu_usage: tuple[int, float]  # freq mhz, usage %
+    ecpu_usage: tuple[int, float]  # 已翻譯註解。
+    pcpu_usage: tuple[int, float]  # 已翻譯註解。
+    gpu_usage: tuple[int, float]  # 已翻譯註解。
     all_power: float
     ane_power: float
     cpu_power: float

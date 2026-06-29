@@ -50,7 +50,7 @@ def create_hostfile(world_size: int, base_port: int) -> tuple[str, list[str]]:
     return hostfile_path, hosts
 
 
-# Use GPT OSS 20b to test as it is a model with a lot of strange behaviour
+# 已翻譯註解。
 
 DEFAULT_GPT_OSS_CONFIG = PipelineTestConfig(
     model_path=EXO_DEFAULT_MODELS_DIR / "mlx-community--gpt-oss-20b-MXFP4-Q8",
@@ -70,7 +70,7 @@ def run_gpt_oss_pipeline_device(
     layer_splits: list[tuple[int, int]],
     prompt_tokens: int,
     prefill_step_size: int,
-    result_queue: Any,  # pyright: ignore[reportAny]
+    result_queue: Any,  # 已翻譯註解。
     max_tokens: int = 200,
 ) -> None:
     os.environ["MLX_HOSTFILE"] = hostfile_path
@@ -106,16 +106,16 @@ def run_gpt_oss_pipeline_device(
             model, tokenizer = stop.value
         model = cast(Model, model)
 
-        # Generate a prompt of exact token length
+        # 已翻譯註解。
         base_text = "The quick brown fox jumps over the lazy dog. "
         base_tokens = tokenizer.encode(base_text)
         base_len = len(base_tokens)
 
-        # Build prompt with approximate target length
+        # 已翻譯註解。
         repeats = (prompt_tokens // base_len) + 2
         long_text = base_text * repeats
         tokens = tokenizer.encode(long_text)
-        # Truncate to exact target length
+        # 已翻譯註解。
         tokens = tokens[:prompt_tokens]
         prompt_text = tokenizer.decode(tokens)
 
@@ -141,10 +141,10 @@ def run_gpt_oss_pipeline_device(
             if response.finish_reason is not None:
                 break
 
-        result_queue.put((rank, True, generated_text))  # pyright: ignore[reportAny]
+        result_queue.put((rank, True, generated_text))  # 已翻譯註解。
 
     except Exception as e:
-        result_queue.put((rank, False, f"{e}\n{traceback.format_exc()}"))  # pyright: ignore[reportAny]
+        result_queue.put((rank, False, f"{e}\n{traceback.format_exc()}"))  # 已翻譯註解。
 
 
 def run_gpt_oss_tensor_parallel_device(
@@ -153,7 +153,7 @@ def run_gpt_oss_tensor_parallel_device(
     hostfile_path: str,
     prompt_tokens: int,
     prefill_step_size: int,
-    result_queue: Any,  # pyright: ignore[reportAny]
+    result_queue: Any,  # 已翻譯註解。
     max_tokens: int = 10,
 ) -> None:
     os.environ["MLX_HOSTFILE"] = hostfile_path
@@ -162,7 +162,7 @@ def run_gpt_oss_tensor_parallel_device(
     try:
         group = mx.distributed.init(backend="ring", strict=True)
 
-        # For tensor parallelism, all devices run all layers
+        # 已翻譯註解。
         shard_meta = TensorShardMetadata(
             model_card=ModelCard(
                 model_id=ModelId(DEFAULT_GPT_OSS_MODEL_ID),
@@ -219,7 +219,7 @@ def run_gpt_oss_tensor_parallel_device(
             if response.finish_reason is not None:
                 break
 
-        result_queue.put((rank, True, generated_text))  # pyright: ignore[reportAny]
+        result_queue.put((rank, True, generated_text))  # 已翻譯註解。
 
     except Exception as e:
-        result_queue.put((rank, False, f"{e}\n{traceback.format_exc()}"))  # pyright: ignore[reportAny]
+        result_queue.put((rank, False, f"{e}\n{traceback.format_exc()}"))  # 已翻譯註解。

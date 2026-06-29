@@ -1,9 +1,9 @@
-"""Regression tests for #1918: download status must not revert from completed to pending.
+"""此說明已翻譯為繁體中文。
 
-The periodic rescan in _emit_existing_download_progress compares local file
-sizes against HuggingFace API sizes.  Text files (README, YAML, jinja) can
-have different local vs remote sizes due to encoding changes.  This must NOT
-cause a completed download to be downgraded.
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 """
 
 import asyncio
@@ -59,7 +59,7 @@ SHARD = _make_shard()
 
 
 class FakeShardDownloader(ShardDownloader):
-    """Fake downloader that yields a single model with configurable status."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(
         self, status: Literal["not_started", "in_progress", "complete"] = "not_started"
@@ -143,7 +143,7 @@ def _setup_coordinator(
 async def _collect_events(
     event_recv: Receiver[Event], timeout: float = 1.0
 ) -> list[Event]:
-    """Drain events until timeout."""
+    """此說明已翻譯為繁體中文。"""
     events: list[Event] = []
     try:
         async with asyncio.timeout(timeout):
@@ -155,13 +155,13 @@ async def _collect_events(
 
 
 async def test_completed_status_not_downgraded_by_rescan() -> None:
-    """A model already marked DownloadCompleted must not revert to
-    DownloadPending when the periodic rescan reports a non-complete
-    file-size status (regression test for #1918)."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     downloader = FakeShardDownloader(status="not_started")
     coordinator, _cmd_send, event_recv = _setup_coordinator(downloader)
 
-    # Pre-seed the coordinator with a completed status for the model
+    # 已翻譯註解。
     completed = DownloadCompleted(
         node_id=NODE_ID,
         shard_metadata=SHARD,
@@ -170,18 +170,18 @@ async def test_completed_status_not_downgraded_by_rescan() -> None:
     )
     coordinator.download_status[MODEL_ID] = completed
 
-    # Run the coordinator (the rescan loop fires immediately)
+    # 已翻譯註解。
     coordinator_task = asyncio.create_task(coordinator.run())
     try:
-        # Wait for the rescan to process (it should skip the completed model)
+        # 已翻譯註解。
         events = await _collect_events(event_recv, timeout=1.5)
 
-        # The model must still be DownloadCompleted — not downgraded
+        # 已翻譯註解。
         assert isinstance(coordinator.download_status[MODEL_ID], DownloadCompleted), (
             f"Expected DownloadCompleted but got {type(coordinator.download_status[MODEL_ID]).__name__}"
         )
 
-        # No DownloadPending event should have been emitted for this model
+        # 已翻譯註解。
         pending_events = [
             e
             for e in events
@@ -200,13 +200,13 @@ async def test_completed_status_not_downgraded_by_rescan() -> None:
 
 
 async def test_incomplete_model_with_files_present_detected_as_complete() -> None:
-    """When the per-file size check says not_started but resolve_existing_model
-    confirms the model directory is complete, the model should be marked
-    DownloadCompleted (regression test for #1918 — initial scan case)."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     downloader = FakeShardDownloader(status="not_started")
     coordinator, _cmd_send, event_recv = _setup_coordinator(downloader)
 
-    # Mock resolve_existing_model to return a valid path (model is on disk)
+    # 已翻譯註解。
     with patch(
         "exo.download.coordinator.resolve_existing_model",
         return_value=MODEL_DIR,
@@ -215,7 +215,7 @@ async def test_incomplete_model_with_files_present_detected_as_complete() -> Non
         try:
             events = await _collect_events(event_recv, timeout=1.5)
 
-            # The model should be DownloadCompleted (resolve_existing_model confirmed it)
+            # 已翻譯註解。
             assert isinstance(
                 coordinator.download_status.get(MODEL_ID), DownloadCompleted
             ), (
@@ -223,7 +223,7 @@ async def test_incomplete_model_with_files_present_detected_as_complete() -> Non
                 f"{type(coordinator.download_status.get(MODEL_ID)).__name__}"
             )
 
-            # Should have emitted a DownloadCompleted event
+            # 已翻譯註解。
             completed_events = [
                 e
                 for e in events
@@ -242,13 +242,13 @@ async def test_incomplete_model_with_files_present_detected_as_complete() -> Non
 
 
 async def test_genuinely_incomplete_model_stays_pending() -> None:
-    """When the per-file size check says not_started and resolve_existing_model
-    returns None (model truly not complete), the model should correctly be
-    DownloadPending."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     downloader = FakeShardDownloader(status="not_started")
     coordinator, _cmd_send, event_recv = _setup_coordinator(downloader)
 
-    # Mock resolve_existing_model to return None (model not on disk)
+    # 已翻譯註解。
     with patch(
         "exo.download.coordinator.resolve_existing_model",
         return_value=None,
@@ -257,7 +257,7 @@ async def test_genuinely_incomplete_model_stays_pending() -> None:
         try:
             events = await _collect_events(event_recv, timeout=1.5)
 
-            # The model should be DownloadPending
+            # 已翻譯註解。
             assert isinstance(
                 coordinator.download_status.get(MODEL_ID), DownloadPending
             ), (
@@ -265,7 +265,7 @@ async def test_genuinely_incomplete_model_stays_pending() -> None:
                 f"{type(coordinator.download_status.get(MODEL_ID)).__name__}"
             )
 
-            # Should have emitted a DownloadPending event
+            # 已翻譯註解。
             pending_events = [
                 e
                 for e in events

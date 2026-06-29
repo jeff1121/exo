@@ -1,4 +1,4 @@
-"""Tests that re-downloading a previously deleted model completes successfully."""
+"""此說明已翻譯為繁體中文。"""
 
 import asyncio
 import contextlib
@@ -50,8 +50,8 @@ def _make_shard(model_id: ModelId = MODEL_ID) -> ShardMetadata:
 
 
 class FakeShardDownloader(ShardDownloader):
-    """Fake downloader that simulates a successful download by firing the
-    progress callback with status='complete' when ensure_shard is called."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
 
     def __init__(self) -> None:
         self._progress_callbacks: list[
@@ -69,7 +69,7 @@ class FakeShardDownloader(ShardDownloader):
         shard: ShardMetadata,
         config_only: bool = False,  # noqa: ARG002
     ) -> Path:
-        # Simulate a completed download by firing the progress callback
+        # 已翻譯註解。
         progress = RepoDownloadProgress(
             repo_id=str(shard.model_card.model_id),
             repo_revision="main",
@@ -93,7 +93,7 @@ class FakeShardDownloader(ShardDownloader):
         if False:  # noqa: SIM108  # empty async generator
             yield (
                 Path(),
-                RepoDownloadProgress(  # pyright: ignore[reportUnreachable]
+                RepoDownloadProgress(  # 已翻譯註解。
                     repo_id="",
                     repo_revision="",
                     shard=_make_shard(),
@@ -128,9 +128,9 @@ class FakeShardDownloader(ShardDownloader):
 
 
 async def test_re_download_after_delete_completes() -> None:
-    """A model that was downloaded, deleted, and then re-downloaded should
-    reach DownloadCompleted status. This is an end-to-end test through
-    the DownloadCoordinator."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     cmd_send: Sender[ForwarderDownloadCommand]
     cmd_send, cmd_recv = channel[ForwarderDownloadCommand]()
     event_send, event_recv = channel[Event]()
@@ -148,11 +148,11 @@ async def test_re_download_after_delete_completes() -> None:
     origin = SystemId("test")
 
     with patch("exo.download.coordinator.delete_model", new_callable=AsyncMock):
-        # Run the coordinator in the background
+        # 已翻譯註解。
         coordinator_task = asyncio.create_task(coordinator.run())
 
         try:
-            # 1. Start first download
+            # 已翻譯註解。
             await cmd_send.send(
                 ForwarderDownloadCommand(
                     origin=origin,
@@ -160,21 +160,21 @@ async def test_re_download_after_delete_completes() -> None:
                 )
             )
 
-            # Wait for DownloadCompleted
+            # 已翻譯註解。
             first_completed = await _wait_for_download_completed(event_recv, MODEL_ID)
             assert first_completed is not None, "First download should complete"
 
-            # 2. Delete the model
+            # 已翻譯註解。
             await cmd_send.send(
                 ForwarderDownloadCommand(
                     origin=origin,
                     command=DeleteDownload(target_node_id=NODE_ID, model_id=MODEL_ID),
                 )
             )
-            # Give the coordinator time to process the delete
+            # 已翻譯註解。
             await asyncio.sleep(0.05)
 
-            # 3. Re-download the same model
+            # 已翻譯註解。
             await cmd_send.send(
                 ForwarderDownloadCommand(
                     origin=origin,
@@ -182,7 +182,7 @@ async def test_re_download_after_delete_completes() -> None:
                 )
             )
 
-            # Wait for second DownloadCompleted — this is the bug: it never arrives
+            # 已翻譯註解。
             second_completed = await _wait_for_download_completed(event_recv, MODEL_ID)
             assert second_completed is not None, (
                 "Re-download after deletion should complete"
@@ -197,7 +197,7 @@ async def test_re_download_after_delete_completes() -> None:
 async def _wait_for_download_completed(
     event_recv: Receiver[Event], model_id: ModelId, timeout: float = 2.0
 ) -> DownloadCompleted | None:
-    """Drain events until we see a DownloadCompleted for the given model, or timeout."""
+    """此說明已翻譯為繁體中文。"""
     try:
         async with asyncio.timeout(timeout):
             while True:

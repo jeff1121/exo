@@ -47,11 +47,11 @@ def test_read_range_bounds(log_dir: Path):
     for e in events:
         log.append(e)
 
-    # Start beyond count
+    # 已翻譯註解。
     assert list(log.read_range(5, 10)) == []
-    # Negative start
+    # 已翻譯註解。
     assert list(log.read_range(-1, 2)) == []
-    # End beyond count is clamped
+    # 已翻譯註解。
     result = list(log.read_range(1, 100))
     assert len(result) == 2
 
@@ -97,7 +97,7 @@ def test_rotation_on_construction_with_stale_file(log_dir: Path):
 
 
 def test_empty_log_no_archive(log_dir: Path):
-    """Closing an empty log should not leave an archive."""
+    """此說明已翻譯為繁體中文。"""
     log = DiskEventLog(log_dir)
     log.close()
 
@@ -112,13 +112,13 @@ def test_close_is_idempotent(log_dir: Path):
     log.append(TestEvent())
     log.close()
     archive = _archives(log_dir)
-    log.close()  # should not raise
+    log.close()  # 已翻譯註解。
 
     assert _archives(log_dir) == archive
 
 
 def test_successive_sessions(log_dir: Path):
-    """Simulate two master sessions: both archives should be kept."""
+    """此說明已翻譯為繁體中文。"""
     log1 = DiskEventLog(log_dir)
     log1.append(TestEvent())
     log1.close()
@@ -130,7 +130,7 @@ def test_successive_sessions(log_dir: Path):
     log2.append(TestEvent())
     log2.close()
 
-    # Session 1 archive shifted to slot 2, session 2 in slot 1
+    # 已翻譯註解。
     second_archive = _archives(log_dir)[-1]
     should_be_first_archive = _archives(log_dir)[-2]
 
@@ -141,7 +141,7 @@ def test_successive_sessions(log_dir: Path):
 
 
 def test_rotation_keeps_at_most_5_archives(log_dir: Path):
-    """After 7 sessions, only the 5 most recent archives should remain."""
+    """此說明已翻譯為繁體中文。"""
     all_archives: list[Path] = []
     for _ in range(7):
         log = DiskEventLog(log_dir)

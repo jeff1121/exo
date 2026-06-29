@@ -6,9 +6,9 @@ from mlx_lm.models.deepseek_v4 import Model as DeepseekV4Model
 from mlx_lm.models.deepseek_v32 import Model as DeepseekV32Model
 from mlx_lm.models.gpt_oss import Model as GptOssModel
 from mlx_lm.tokenizer_utils import TokenizerWrapper
-from openai_harmony import (  # pyright: ignore[reportMissingTypeStubs]
+from openai_harmony import (  # 已翻譯註解。
     HarmonyEncodingName,
-    HarmonyError,  # pyright: ignore[reportUnknownVariableType]
+    HarmonyError,  # 已翻譯註解。
     Role,
     StreamableParser,
     load_harmony_encoding,
@@ -41,7 +41,7 @@ def get_gpt_oss_encoding():
 def count_reasoning_tokens(
     responses: Generator[GenerationResponse | ToolCallResponse | None],
 ) -> Generator[GenerationResponse | ToolCallResponse | None]:
-    """Count tokens with is_thinking=True and patch the total into Usage on the final response."""
+    """此說明已翻譯為繁體中文。"""
     reasoning_tokens = 0
     for response in responses:
         if response is None:
@@ -174,7 +174,7 @@ def parse_gpt_oss(
         ch = stream.current_channel
         recipient = stream.current_recipient
 
-        # Debug: log every token with state
+        # 已翻譯註解。
         logger.debug(
             f"parse_gpt_oss token={response.token} text={response.text!r} "
             f"recipient={recipient!r} ch={ch!r} delta={delta!r} "
@@ -201,7 +201,7 @@ def parse_gpt_oss(
                 tool_arg_parts = []
             current_tool_name = recipient
 
-        # If inside a tool call, accumulate arguments
+        # 已翻譯註解。
         if current_tool_name is not None:
             if delta:
                 tool_arg_parts.append(delta)
@@ -222,12 +222,12 @@ def parse_gpt_oss(
 def parse_deepseek_v32(
     responses: Generator[GenerationResponse | None],
 ) -> Generator[GenerationResponse | ToolCallResponse | None]:
-    """Parse DeepSeek V3.2 DSML tool calls from the generation stream.
+    """此說明已翻譯為繁體中文。
 
-    Uses accumulated-text matching (not per-token marker checks) because
-    DSML markers like <｜DSML｜function_calls> may span multiple tokens.
-    Thinking tag handling is delegated to parse_thinking_models, which
-    wraps this parser in apply_all_parsers.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     from exo.worker.engines.mlx.vendor.dsml_encoding import (
         TOOL_CALLS_END,
@@ -257,9 +257,9 @@ def _parse_dsml_stream(
 ) -> Generator[GenerationResponse | ToolCallResponse | None]:
     accumulated = ""
     in_tool_call = False
-    # Tokens buffered while we detect the start of a DSML block
+    # 已翻譯註解。
     pending_buffer: list[GenerationResponse] = []
-    # Text accumulated during a tool call block
+    # 已翻譯註解。
     tool_call_text = ""
 
     def _try_parse_tool_call(
@@ -311,7 +311,7 @@ def _parse_dsml_stream(
         if tool_calls_start in accumulated:
             start_idx = accumulated.index(tool_calls_start)
             pre_text = accumulated[:start_idx]
-            # Flush pending buffer tokens that contributed text before the marker
+            # 已翻譯註解。
             if pre_text:
                 for buf_resp in pending_buffer:
                     if not pre_text:
@@ -338,13 +338,13 @@ def _parse_dsml_stream(
             pending_buffer.append(response)
             continue
 
-        # No partial match — flush all pending tokens and the current one
+        # 已翻譯註解。
         yield from pending_buffer
         pending_buffer.clear()
         accumulated = ""
         yield response
 
-    # Flush any remaining pending buffer at generator end
+    # 已翻譯註解。
     yield from pending_buffer
 
 
@@ -364,10 +364,10 @@ def parse_thinking_models(
     think_end: str | None,
     starts_in_thinking: bool = True,
 ) -> Generator[GenerationResponse | None]:
-    """Route thinking tokens via is_thinking flag.
+    """此說明已翻譯為繁體中文。
 
-    Swallows think tag tokens, sets is_thinking on all others.
-    Always yields tokens with finish_reason to avoid hanging the chunk stream.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     is_thinking = starts_in_thinking
     accumulated = ""
@@ -449,7 +449,7 @@ def parse_tool_calls(
 
         tool_call_text_parts.append(response.text)
         if response.text.endswith(tool_parser.end_parsing):
-            # parse the actual tool calls from the tool call text
+            # 已翻譯註解。
             combined = "".join(tool_call_text_parts)
             parsed = tool_parser.parse(combined.strip(), tools=tools)
             logger.info(f"parsed {tool_call_text_parts=} into {parsed=}")

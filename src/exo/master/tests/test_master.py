@@ -81,7 +81,7 @@ async def test_master():
             all_events.append(
                 IndexedEvent(
                     event=e.event,
-                    idx=len(all_events),  # origin=e.origin,
+                    idx=len(all_events),  # 已翻譯註解。
                 )
             )
         return all_events
@@ -100,7 +100,7 @@ async def test_master():
         tg.start_soon(master.run)
         tg.start_soon(mock_event_router)
 
-        # inject a NodeGatheredInfo event
+        # 已翻譯註解。
         logger.info("inject a NodeGatheredInfo event")
         await local_event_sender.send(
             LocalForwarderEvent(
@@ -136,7 +136,7 @@ async def test_master():
             )
         )
 
-        # wait for initial topology event
+        # 已翻譯註解。
         logger.info("wait for initial topology event")
         while len(list(master.state.topology.list_nodes())) == 0:
             await anyio.sleep(0.001)
@@ -206,7 +206,7 @@ async def test_master():
         created_instance = events[2].event.instance
         assert isinstance(created_instance, MlxRingInstance)
         runner_id = list(created_instance.shard_assignments.runner_to_shard.keys())[0]
-        # Validate the shard assignments
+        # 已翻譯註解。
         expected_shard_assignments = ShardAssignments(
             model_id=ModelId("llama-3.2-1b"),
             runner_to_shard={
@@ -230,7 +230,7 @@ async def test_master():
             node_to_runner={node_id: runner_id},
         )
         assert created_instance.shard_assignments == expected_shard_assignments
-        # For single-node, hosts_by_node should have one entry with self-binding
+        # 已翻譯註解。
         assert len(created_instance.hosts_by_node) == 1
         assert node_id in created_instance.hosts_by_node
         assert len(created_instance.hosts_by_node[node_id]) == 1

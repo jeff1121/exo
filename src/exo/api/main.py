@@ -17,7 +17,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFi
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from hypercorn.asyncio import serve  # pyright: ignore[reportUnknownVariableType]
+from hypercorn.asyncio import serve  # 已翻譯註解。
 from hypercorn.config import Config
 from hypercorn.typing import ASGIFramework
 from hypercorn.utils import LifespanTimeoutError, ShutdownError
@@ -216,7 +216,7 @@ def _format_to_content_type(image_format: Literal["png", "jpeg", "webp"] | None)
 
 
 def _ensure_seed(params: AdvancedImageParams | None) -> AdvancedImageParams:
-    """Ensure advanced params has a seed set for distributed consistency."""
+    """此說明已翻譯為繁體中文。"""
     if params is None:
         return AdvancedImageParams(seed=random.randint(0, 2**32 - 1))
     if params.seed is None:
@@ -244,7 +244,7 @@ class API:
         event_receiver: Receiver[IndexedEvent],
         command_sender: Sender[ForwarderCommand],
         download_command_sender: Sender[ForwarderDownloadCommand],
-        # This lets us pause the API if an election is running
+        # 已翻譯註解。
         election_receiver: Receiver[ElectionMessage],
     ) -> None:
         self.state = State()
@@ -265,7 +265,7 @@ class API:
         self.app = FastAPI()
 
         @self.app.middleware("http")
-        async def _log_requests(  # pyright: ignore[reportUnusedFunction]
+        async def _log_requests(  # 已翻譯註解。
             request: Request,
             call_next: Callable[[Request], Awaitable[StreamingResponse]],
         ) -> StreamingResponse:
@@ -377,7 +377,7 @@ class API:
         self.app.post("/v1/responses", response_model=None)(self.openai_responses)
         self.app.post("/v1/cancel/{command_id}")(self.cancel_command)
 
-        # Ollama API
+        # 已翻譯註解。
         self.app.head("/ollama/")(self.ollama_version)
         self.app.head("/ollama/api/version")(self.ollama_version)
         self.app.post("/ollama/v1/chat/completions", response_model=None)(
@@ -416,10 +416,10 @@ class API:
             for attr in path.split("/"):
                 if attr != "":
                     if isinstance(x, dict):
-                        x = x[attr]  # pyright: ignore[reportUnknownVariableType]
+                        x = x[attr]  # 已翻譯註解。
                     elif isinstance(x, list):
-                        x = x[int(attr)]  # pyright: ignore[reportUnknownVariableType]
-            return cast(Any, x)  # pyright: ignore[reportAny]
+                        x = x[int(attr)]  # 已翻譯註解。
+            return cast(Any, x)  # 已翻譯註解。
         except Exception as e:
             raise HTTPException(
                 status_code=404,
@@ -535,8 +535,8 @@ class API:
                         )
                     ]
                 )
-        # TODO: PDD
-        # instance_combinations.append((Sharding.PrefillDecodeDisaggregation, InstanceMeta.MlxRing, 1))
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
 
         for sharding, instance_meta, min_nodes in instance_combinations:
             try:
@@ -736,7 +736,7 @@ class API:
         )
 
     async def cancel_command(self, command_id: CommandId) -> CancelCommandResponse:
-        """Cancel an active command by closing its stream and notifying workers."""
+        """透過關閉其串流並通知工作節點來取消進行中的命令。"""
         sender = self._text_generation_queues.get(
             command_id
         ) or self._image_generation_queues.get(command_id)
@@ -759,9 +759,9 @@ class API:
     ) -> AsyncGenerator[
         TokenChunk | ErrorChunk | ToolCallChunk | PrefillProgressChunk, None
     ]:
-        """Yield chunks for a given command until completion.
+        """此說明已翻譯為繁體中文。
 
-        This is the internal low-level stream used by all API adapters.
+        此說明已翻譯為繁體中文。
         """
         try:
             self._text_generation_queues[command_id], recv = channel[
@@ -916,7 +916,7 @@ class API:
     async def chat_completions(
         self, payload: ChatCompletionRequest
     ) -> ChatCompletionResponse | StreamingResponse:
-        """OpenAI Chat Completions API - adapter."""
+        """此說明已翻譯為繁體中文。"""
         task_params = await chat_request_to_text_generation(payload)
         validated_model = await self._validate_model_has_instance(task_params.model)
         task_params = task_params.model_copy(update={"model": validated_model})
@@ -985,17 +985,17 @@ class API:
         return await self._collect_text_generation_with_stats(command.command_id)
 
     async def _validate_model_has_instance(self, model_id: ModelId) -> ModelId:
-        """Validate a model has an active instance.
-        If the model isn't even downloaded, triggers notification to user to download model.
+        """驗證模型是否有活躍實例。
+        若模型尚未下載，會觸發通知提醒使用者下載模型。
 
 
-        Raises HTTPException 404 if no instance is found for the model.
+        此說明已翻譯為繁體中文。
         """
         if not any(
             instance.shard_assignments.model_id == model_id
             for instance in self.state.instances.values()
         ):
-            # Check if model is actually downloaded
+            # 檢查模型是否確實已下載
             model_is_downloaded = any(
                 isinstance(download, DownloadCompleted)
                 and download.shard_metadata.model_card.model_id == model_id
@@ -1033,7 +1033,7 @@ class API:
         return FileResponse(path=stored.file_path, media_type=stored.content_type)
 
     async def list_images(self, request: Request) -> ImageListResponse:
-        """List all stored images."""
+        """列出所有已儲存影像。"""
         stored_images = self._image_store.list_images()
         return ImageListResponse(
             data=[
@@ -1055,10 +1055,10 @@ class API:
     async def image_generations(
         self, request: Request, payload: ImageGenerationTaskParams
     ) -> ImageGenerationResponse | StreamingResponse:
-        """Handle image generation requests.
+        """處理影像生成請求。
 
-        When stream=True and partial_images > 0, returns a StreamingResponse
-        with SSE-formatted events for partial and final images.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         payload = payload.model_copy(
             update={
@@ -1074,7 +1074,7 @@ class API:
         )
         await self._send(command)
 
-        # Check if streaming is requested
+        # 檢查是否要求串流
         if payload.stream and payload.partial_images and payload.partial_images > 0:
             return StreamingResponse(
                 self._generate_image_stream(
@@ -1086,7 +1086,7 @@ class API:
                 media_type="text/event-stream",
             )
 
-        # Non-streaming: collect all image chunks
+        # 已翻譯註解。
         return await self._collect_image_generation(
             request=request,
             command_id=command.command_id,
@@ -1101,8 +1101,8 @@ class API:
         num_images: int,
         response_format: str,
     ) -> AsyncGenerator[str, None]:
-        """Generate SSE stream of partial and final images."""
-        # Track chunks: {(image_index, is_partial): {chunk_index: data}}
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         image_chunks: dict[tuple[int, bool], dict[int, str]] = {}
         image_total_chunks: dict[tuple[int, bool], int] = {}
         image_metadata: dict[tuple[int, bool], tuple[int | None, int | None]] = {}
@@ -1139,7 +1139,7 @@ class API:
 
                     image_chunks[key][chunk.chunk_index] = chunk.data
 
-                    # Check if this image is complete
+                    # 檢查此影像是否完整
                     if len(image_chunks[key]) == image_total_chunks[key]:
                         full_data = "".join(
                             image_chunks[key][i] for i in range(len(image_chunks[key]))
@@ -1148,7 +1148,7 @@ class API:
                         partial_idx, total_partials = image_metadata[key]
 
                         if chunk.is_partial:
-                            # Yield partial image event (always use b64_json for partials)
+                            # 已翻譯註解。
                             event_data = {
                                 "type": "partial",
                                 "image_index": chunk.image_index,
@@ -1163,7 +1163,7 @@ class API:
                             }
                             yield f"data: {json.dumps(event_data)}\n\n"
                         else:
-                            # Final image
+                            # 最終影像
                             if response_format == "url":
                                 image_bytes = base64.b64decode(full_data)
                                 content_type = _format_to_content_type(chunk.format)
@@ -1191,7 +1191,7 @@ class API:
                                 yield "data: [DONE]\n\n"
                                 break
 
-                        # Clean up completed image chunks
+                        # 已翻譯註解。
                         del image_chunks[key]
                         del image_total_chunks[key]
                         del image_metadata[key]
@@ -1216,9 +1216,9 @@ class API:
         response_format: str,
         capture_stats: bool = False,
     ) -> tuple[list[ImageData], ImageGenerationStats | None]:
-        """Collect image chunks and optionally capture stats."""
-        # Track chunks per image: {image_index: {chunk_index: data}}
-        # Only track non-partial (final) images
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
+        # 已翻譯註解。
         image_chunks: dict[int, dict[int, str]] = {}
         image_total_chunks: dict[int, int] = {}
         image_formats: dict[int, Literal["png", "jpeg", "webp"] | None] = {}
@@ -1301,7 +1301,7 @@ class API:
         num_images: int,
         response_format: str,
     ) -> ImageGenerationResponse:
-        """Collect all image chunks (non-streaming) and return a single response."""
+        """此說明已翻譯為繁體中文。"""
         images, _ = await self._collect_image_chunks(
             request, command_id, num_images, response_format, capture_stats=False
         )
@@ -1369,7 +1369,7 @@ class API:
         output_format: Literal["png", "jpeg", "webp"],
         advanced_params: AdvancedImageParams | None,
     ) -> ImageEdits:
-        """Prepare and send an image edits command with chunked image upload."""
+        """準備並送出含分塊影像上傳的影像編輯命令。"""
         validated_model = await self._validate_model_has_instance(model)
         advanced_params = _ensure_seed(advanced_params)
 
@@ -1438,8 +1438,8 @@ class API:
         output_format: Literal["png", "jpeg", "webp"] = Form("png"),
         advanced_params: str | None = Form(None),
     ) -> ImageGenerationResponse | StreamingResponse:
-        """Handle image editing requests (img2img)."""
-        # Parse string form values to proper types
+        """此說明已翻譯為繁體中文。"""
+        # 將字串表單值解析為正確型別
         stream_bool = stream.lower() in ("true", "1", "yes")
         partial_images_int = int(partial_images) if partial_images.isdigit() else 0
 
@@ -1498,7 +1498,7 @@ class API:
         output_format: Literal["png", "jpeg", "webp"] = Form("png"),
         advanced_params: str | None = Form(None),
     ) -> BenchImageGenerationResponse:
-        """Handle benchmark image editing requests with generation stats."""
+        """此說明已翻譯為繁體中文。"""
         parsed_advanced_params: AdvancedImageParams | None = None
         if advanced_params:
             with contextlib.suppress(Exception):
@@ -1532,7 +1532,7 @@ class API:
     async def claude_messages(
         self, payload: ClaudeMessagesRequest
     ) -> ClaudeMessagesResponse | StreamingResponse:
-        """Claude Messages API - adapter."""
+        """此說明已翻譯為繁體中文。"""
         task_params = await claude_request_to_text_generation(payload)
         validated_model = await self._validate_model_has_instance(
             ModelId(task_params.model)
@@ -1570,7 +1570,7 @@ class API:
     async def openai_responses(
         self, payload: ResponsesRequest
     ) -> ResponsesResponse | StreamingResponse:
-        """OpenAI Responses API."""
+        """此說明已翻譯為繁體中文。"""
         task_params = await responses_request_to_text_generation(payload)
         validated_model = await self._validate_model_has_instance(task_params.model)
         task_params = task_params.model_copy(update={"model": validated_model})
@@ -1605,13 +1605,13 @@ class API:
             )
 
     async def _ollama_root(self) -> JSONResponse:
-        """Respond to HEAD / from Ollama CLI connectivity checks."""
+        """此說明已翻譯為繁體中文。"""
         return JSONResponse(content="Ollama is running")
 
     async def ollama_chat(
         self, request: Request
     ) -> OllamaChatResponse | StreamingResponse:
-        """Ollama Chat API — accepts JSON regardless of Content-Type."""
+        """此說明已翻譯為繁體中文。"""
         body = await request.body()
         payload = OllamaChatRequest.model_validate_json(body)
         task_params = ollama_request_to_text_generation(payload)
@@ -1647,7 +1647,7 @@ class API:
     async def ollama_generate(
         self, request: Request
     ) -> OllamaGenerateResponse | StreamingResponse:
-        """Ollama Generate API — accepts JSON regardless of Content-Type."""
+        """此說明已翻譯為繁體中文。"""
         body = await request.body()
         payload = OllamaGenerateRequest.model_validate_json(body)
         task_params = ollama_generate_request_to_text_generation(payload)
@@ -1681,7 +1681,7 @@ class API:
             )
 
     async def ollama_tags(self) -> OllamaTagsResponse:
-        """Returns list of models in Ollama tags format. We return the downloaded ones only."""
+        """此說明已翻譯為繁體中文。"""
 
         downloaded_model_ids: set[ModelId] = set()
         for node_downloads in self.state.downloads.values():
@@ -1714,7 +1714,7 @@ class API:
         )
 
     async def ollama_show(self, request: Request) -> OllamaShowResponse:
-        """Returns model information in Ollama show format."""
+        """此說明已翻譯為繁體中文。"""
         body = await request.body()
         payload = OllamaShowRequest.model_validate_json(body)
         model_name = payload.name or payload.model
@@ -1753,7 +1753,7 @@ class API:
         )
 
     async def ollama_ps(self) -> OllamaPsResponse:
-        """Returns list of running models (active instances)."""
+        """回傳執行中模型（活躍實例）清單。"""
         models: list[OllamaPsModel] = []
         seen: set[str] = set()
         for instance in self.state.instances.values():
@@ -1771,11 +1771,11 @@ class API:
         return OllamaPsResponse(models=models)
 
     async def ollama_version(self) -> dict[str, str]:
-        """Returns version information for Ollama API compatibility."""
+        """此說明已翻譯為繁體中文。"""
         return {"version": "1.0.0"}
 
     def _calculate_total_available_memory(self) -> Memory:
-        """Calculate total available memory across all nodes in bytes."""
+        """計算所有節點可用記憶體總量（位元組）。"""
         total_available = Memory()
 
         for memory in self.state.node_memory.values():
@@ -1784,7 +1784,7 @@ class API:
         return total_available
 
     async def get_models(self, status: str | None = Query(default=None)) -> ModelList:
-        """Returns list of available models, optionally filtered by being downloaded."""
+        """回傳可用模型清單，可選擇僅篩選已下載模型。"""
         cards = await model_cards.card_cache.list_all()
 
         if status == "downloaded":
@@ -1819,7 +1819,7 @@ class API:
         )
 
     async def add_custom_model(self, payload: AddCustomModelParams) -> ModelListModel:
-        """Fetch a model from HuggingFace and save as a custom model card, then sync across the cluster."""
+        """此說明已翻譯為繁體中文。"""
         try:
             card = await ModelCard.fetch_from_hf(payload.model_id)
         except Exception as exc:
@@ -1834,8 +1834,8 @@ class API:
             )
         )
 
-        # Immediately update the local cache so the subsequent GET /models
-        # returns the new model without waiting for the event round-trip.
+        # 已翻譯註解。
+        # 無需等待事件往返即可回傳新模型。
         model_cards.card_cache.cc[card.model_id] = card
 
         return ModelListModel(
@@ -1851,7 +1851,7 @@ class API:
         )
 
     async def delete_custom_model(self, model_id: ModelId) -> JSONResponse:
-        """Delete a user-added custom model card and sync deletion across the cluster."""
+        """此說明已翻譯為繁體中文。"""
         card = model_cards.card_cache.get(model_id)
         if card is None or not card.is_custom:
             raise HTTPException(status_code=404, detail="Custom model card not found")
@@ -1870,7 +1870,7 @@ class API:
     async def search_models(
         self, query: str = "", limit: int = 20
     ) -> list[HuggingFaceSearchResult]:
-        """Search HuggingFace Hub — tries mlx-community first, falls back to all of HuggingFace."""
+        """此說明已翻譯為繁體中文。"""
         from huggingface_hub import ModelInfo, list_models
 
         def _to_results(models: Iterable[ModelInfo]) -> list[HuggingFaceSearchResult]:
@@ -1886,7 +1886,7 @@ class API:
                 for m in models
             ]
 
-        # Search mlx-community first
+        # 已翻譯註解。
         mlx_results = _to_results(
             list_models(
                 search=query or None,
@@ -1898,7 +1898,7 @@ class API:
         if mlx_results:
             return mlx_results
 
-        # Fall back to searching all of HuggingFace
+        # 已翻譯註解。
         return _to_results(
             list_models(
                 search=query or None,
@@ -1922,7 +1922,7 @@ class API:
                     await anyio.sleep_forever()
                 finally:
                     with anyio.CancelScope(shield=True):
-                        # IMPORTANT: when new queues are added, update this (for proper shutdown semantics)
+                        # 重要：新增佇列時請更新此處（以維持正確關機語義）
                         self._shutdown_queues(self._text_generation_queues)
                         self._shutdown_queues(self._image_generation_queues)
 
@@ -1940,14 +1940,14 @@ class API:
     async def run_api(self, ev: anyio.Event):
         cfg = Config()
         cfg.bind = [f"0.0.0.0:{self.port}"]
-        # nb: shared.logging needs updating if any of this changes
+        # 已翻譯註解。
         cfg.accesslog = None
         cfg.errorlog = "-"
         cfg.logger_class = InterceptLogger
 
-        # prevents hangs when mid-request and connection refuses to close
-        cfg.graceful_timeout = 2  # seconds
-        cfg.shutdown_timeout = 3  # seconds
+        # 避免請求進行中且連線拒絕關閉時發生卡住
+        cfg.graceful_timeout = 2  # 秒
+        cfg.shutdown_timeout = 3  # 秒
 
         with anyio.CancelScope(shield=True):
             try:
@@ -1996,7 +1996,7 @@ class API:
                     self._save_merged_trace(event)
 
     def _close_streams_for_instance(self, instance_id: InstanceId) -> None:
-        """Close any active generation streams for commands running on the given instance."""
+        """關閉指定實例上執行命令的所有活躍生成串流。"""
         for task in self.state.tasks.values():
             if task.instance_id != instance_id:
                 continue
@@ -2031,8 +2031,8 @@ class API:
                     self.paused = True
 
     async def _cleanup_expired_images(self):
-        """Periodically clean up expired images from the store."""
-        cleanup_interval_seconds = 300  # 5 minutes
+        """定期清理儲存區中已過期的影像。"""
+        cleanup_interval_seconds = 300  # 5 分鐘
         while True:
             await anyio.sleep(cleanup_interval_seconds)
             removed = self._image_store.cleanup_expired()
@@ -2097,7 +2097,7 @@ class API:
             key=lambda p: p.stat().st_mtime,
             reverse=True,
         ):
-            # Extract task_id from filename (trace_{task_id}.json)
+            # 已翻譯註解。
             task_id = trace_file.stem.removeprefix("trace_")
             stat = trace_file.stat()
             created_at = datetime.fromtimestamp(

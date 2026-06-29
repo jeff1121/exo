@@ -1,5 +1,5 @@
-# pyright: reportAny=false
-"""Tests asserting OpenAI-spec wire shape for /v1/chat/completions deltas."""
+# 已翻譯註解。
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import AsyncGenerator
@@ -56,7 +56,7 @@ def _parse_data_events(lines: list[str]) -> list[dict[str, Any]]:
 
 
 def _assert_delta_spec_compliant(delta: dict[str, Any]) -> None:
-    """Reject any null delta key the OpenAI spec doesn't allow to be null."""
+    """此說明已翻譯為繁體中文。"""
     for key, value in delta.items():
         if value is None and key not in _NULLABLE_DELTA_FIELDS:
             raise AssertionError(

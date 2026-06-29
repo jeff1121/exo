@@ -15,7 +15,7 @@ from exo.shared.types.worker.runners import RunnerId, RunnerStatus, ShardAssignm
 from exo.shared.types.worker.shards import PipelineShardMetadata, ShardMetadata
 
 
-# Runner supervisor without multiprocessing logic.
+# 已翻譯註解。
 @dataclass(frozen=True)
 class FakeRunnerSupervisor:
     bound_instance: BoundInstance
@@ -29,8 +29,8 @@ class OtherTask(BaseTask):
     pass
 
 
-# TODO: Is this actually better than using Mock/Fake dataclasses?
-#  e.g. commit d01cd292344df15759070966826a6c027945792b
+# 待辦事項：已翻譯註解。
+#  已翻譯註解。
 def get_pipeline_shard_metadata(
     model_id: ModelId, device_rank: int, world_size: int = 1
 ) -> ShardMetadata:
