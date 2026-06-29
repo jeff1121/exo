@@ -173,12 +173,15 @@ This plan outlines a phased evolution across six pillars: reliability, performan
 
 | Metric | Current | Phase 1 Target | Phase 3 Target |
 |---|---|---|---|
-| `basedpyright` errors | Unknown | 0 | 0 (enforced) |
-| Test coverage | Partial | +20% | +50% |
-| Time-to-first-token (2-node, 70B) | Baseline | Baseline | −15% (batch sched.) |
-| CI pipeline time | Unknown | < 10 min | < 8 min |
-| Dashboard load time | Unknown | < 2 s | < 1 s |
-| Open TODO/FIXME items in code | ~30 | < 20 | < 10 |
+| `basedpyright` errors | Run `uv run basedpyright` to establish baseline¹ | 0 | 0 (enforced in CI) |
+| Test coverage | Partial (no coverage gate) | +20 pp | +50 pp |
+| Time-to-first-token (2-node, 70B) | Measure with `uv run exo bench` | Baseline | −15% (batch sched.) |
+| CI pipeline time | Measure from Actions run history² | < 10 min | < 8 min |
+| Dashboard load time | Measure with Playwright `page.metrics()`² | < 2 s | < 1 s |
+| Open TODO/FIXME items in code | ~30 (grep count as of 2026-06-29) | < 20 | < 10 |
+
+> ¹ `uv run basedpyright` requires the full uv/Python dev environment on macOS — run locally before starting Phase 1.
+> ² Baseline measurements should be captured in the first sprint of Phase 1 and committed to `docs/baselines.md`.
 
 ---
 
