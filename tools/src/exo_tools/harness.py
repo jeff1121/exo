@@ -1,8 +1,8 @@
 # type: ignore
-"""Instance lifecycle helpers for exo clusters.
+"""exo 叢集的 instance 生命週期輔助工具。
 
-Provides utilities for placing instances, waiting for readiness,
-managing downloads, filtering placements, and common CLI arguments.
+提供 instance 建立、就緒等待、下載管理、placement 篩選，
+以及共用 CLI 參數等工具。
 """
 
 from __future__ import annotations
@@ -20,13 +20,13 @@ from .client import ExoClient, ExoHttpError
 
 
 class Sharding(str, Enum):
-    PIPELINE = "Pipeline"  # layers split across nodes
-    TENSOR = "Tensor"  # layers split within (across nodes)
+    PIPELINE = "Pipeline"  # 將層切分到不同節點
+    TENSOR = "Tensor"  # 在張量維度切分（跨節點）
 
 
 class Comm(str, Enum):
-    RING = "MlxRing"  # ring all-reduce over network
-    JACCL = "MlxJaccl"  # RDMA over Thunderbolt
+    RING = "MlxRing"  # 透過網路進行 ring all-reduce
+    JACCL = "MlxJaccl"  # 透過 Thunderbolt 的 RDMA
 
 
 _SETTLE_INITIAL_BACKOFF_S = 1.0
@@ -228,7 +228,7 @@ def fetch_and_filter_placements(
             continue
 
         n = nodes_used_in_instance(instance)
-        # Skip tensor ring single node as it is pointless when pipeline ring
+        # 略過單節點 tensor+ring，因為相較 pipeline+ring 幾乎沒有意義
         if n == 1 and (
             (args.sharding == "both" and "tensor" in p.get("sharding", "").lower())
             or (
@@ -301,12 +301,11 @@ def run_planning_phase(
     timeout: float,
     settle_deadline: float | None,
 ) -> float | None:
-    """Check disk space and ensure model is downloaded before benchmarking.
+    """在基準測試前檢查磁碟空間並確保模型已下載。
 
-    Returns the wall-clock download duration in seconds if a fresh download
-    was needed, or None if the model was already cached on all nodes.
+    若需要重新下載，回傳實際下載秒數；若所有節點已快取模型則回傳 None。
     """
-    # Get model size from /models
+    # 從 /models 取得模型大小
     models = client.request_json("GET", "/models") or {}
     model_bytes = 0
     for m in models.get("data", []):
@@ -320,7 +319,7 @@ def run_planning_phase(
         )
         return None
 
-    # Get nodes from preview
+    # 從 preview 取得節點資訊
     inner = unwrap_instance(preview["instance"])
     node_ids = list(inner["shardAssignments"]["nodeToRunner"].keys())
     runner_to_shard = inner["shardAssignments"]["runnerToShard"]
@@ -389,7 +388,7 @@ def run_planning_phase(
         if avail < model_bytes:
             raise RuntimeError(f"Could not free enough space on {node_id}")
 
-    # Start downloads (idempotent)
+    # 啟動下載（冪等）
     download_t0 = time.perf_counter() if needs_download else None
     for node_id in node_ids:
         runner_id = inner["shardAssignments"]["nodeToRunner"][node_id]
@@ -404,7 +403,7 @@ def run_planning_phase(
         )
         logger.info(f"Started download on {node_id}")
 
-    # Wait for downloads (no timeout — poll until complete or failed)
+    # 等待下載（不設逾時——持續輪詢直到完成或失敗）
     while True:
         all_done = True
         for node_id in node_ids:
@@ -459,7 +458,7 @@ def run_planning_phase(
 
 
 def find_existing_instance(client: ExoClient, model_id: str) -> str | None:
-    """Find an existing running instance for the given model."""
+    """尋找指定模型目前已存在且運行中的 instance。"""
     try:
         state = client.request_json("GET", "/state")
     except Exception:
@@ -535,12 +534,12 @@ def add_common_instance_args(ap: argparse.ArgumentParser) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Cluster/instance orchestration helpers (used by tests, bench, eval)
+# 叢集／instance 協調輔助函式（供 tests、bench、eval 使用）
 # ---------------------------------------------------------------------------
 
 
 def get_instance_ids(client: ExoClient) -> set[str]:
-    """Return the set of current instance IDs from cluster state."""
+    """從叢集狀態回傳目前 instance ID 集合。"""
     state = client.request_json("GET", "/state") or {}
     result: set[str] = set()
     for instance in state.get("instances", {}).values():
@@ -552,10 +551,9 @@ def get_instance_ids(client: ExoClient) -> set[str]:
 def wait_for_cluster_ready(
     client: ExoClient, expected_nodes: int = 1, timeout: float = 120.0
 ) -> None:
-    """Wait until the cluster has all expected nodes visible and reporting memory.
+    """等待叢集可見節點數與記憶體回報都達到預期。
 
-    Placement requires nodeMemory for all nodes in a cycle. This polls until
-    both nodeIdentities and nodeMemory have at least `expected_nodes` entries.
+    Placement 需要同一輪中所有節點都有 nodeMemory。本函式會輪詢直到 nodeIdentities 與 nodeMemory 均至少有 `expected_nodes` 筆。
     """
     start = time.time()
     while time.time() - start < timeout:
@@ -583,11 +581,9 @@ def place_instance(
     placement_retries: int = 10,
     placement_retry_delay: float = 10.0,
 ) -> str:
-    """Place an instance and wait for it to be ready. Returns the instance_id.
+    """建立 instance 並等待其就緒。回傳 instance_id。
 
-    The /place_instance API returns a command_id, but instances are stored
-    under a separately-generated instance_id. This polls cluster state for the
-    new instance, retrying placement if the cluster is still settling.
+    /place_instance API 回傳的是 command_id，但實際 instance 會用另一個 instance_id 儲存。此函式會輪詢叢集狀態尋找新 instance；若叢集尚未穩定會重試 placement。
     """
     wait_for_cluster_ready(client, expected_nodes=min_nodes)
 
@@ -628,7 +624,7 @@ def place_instance(
 
 
 def cleanup_all_instances(client: ExoClient) -> None:
-    """Remove all running instances from the cluster."""
+    """移除叢集中所有正在運行的 instances。"""
     state = client.request_json("GET", "/state") or {}
     for instance in state.get("instances", {}).values():
         with contextlib.suppress(Exception):

@@ -24,7 +24,7 @@ class ElectionMessage(FrozenModel):
     proposed_session: SessionId
     commands_seen: int
 
-    # Could eventually include a list of neighbour nodes for centrality
+    # 之後可加入鄰近節點清單，用於中心性評估
     def __lt__(self, other: Self) -> bool:
         if self.clock != other.clock:
             return self.clock < other.clock
@@ -58,26 +58,26 @@ class Election:
         is_candidate: bool = True,
         seniority: int = 0,
     ):
-        # If we aren't a candidate, simply don't increment seniority.
-        # For reference: This node can be elected master if all nodes are not master candidates
-        # Any master candidate will automatically win out over this node.
+        # 若不是候選者，就不要提高 seniority。
+        # 參考：若所有節點都不是 master 候選者，此節點仍可能被選為 master
+        # 任何 master 候選者都會自動勝過此節點。
         self.seniority = seniority if is_candidate else -1
         self.clock = 0
         self.node_id = node_id
         self.commands_seen = 0
-        # Every node spawns as master
+        # 每個節點啟動時都先視為 master
         self.current_session: SessionId = SessionId(
             master_node_id=node_id, election_clock=0
         )
 
-        # Senders/Receivers
+        # 發送端/接收端
         self._em_sender = election_message_sender
         self._em_receiver = election_message_receiver
         self._er_sender = election_result_sender
         self._cm_receiver = connection_message_receiver
         self._co_receiver = command_receiver
 
-        # Campaign state
+        # 選舉活動狀態
         self._candidates: list[ElectionMessage] = []
         self._campaign_cancel_scope: CancelScope | None = None
         self._campaign_done: Event | None = None
@@ -91,14 +91,14 @@ class Election:
                 tg.start_soon(self._connection_receiver)
                 tg.start_soon(self._command_counter)
 
-                # And start an election immediately, that instantly resolves
+                # 並立即發起一次可立刻收斂的選舉
                 candidates: list[ElectionMessage] = []
                 logger.debug("Starting initial campaign")
                 self._candidates = candidates
                 await self._campaign(candidates, campaign_timeout=0.0)
                 logger.debug("Initial campaign finished")
         finally:
-            # Cancel and wait for the last election to end
+            # 取消並等待上一輪選舉結束
             if self._campaign_cancel_scope is not None:
                 logger.debug("Cancelling campaign")
                 self._campaign_cancel_scope.cancel()
@@ -130,9 +130,9 @@ class Election:
                 logger.debug(f"Election message received: {message}")
                 if message.proposed_session.master_node_id == self.node_id:
                     logger.debug("Dropping message from ourselves")
-                    # Drop messages from us (See exo.routing.router)
+                    # 丟棄自己送出的訊息（見 exo.routing.router）
                     continue
-                # If a new round is starting, we participate
+                # 若新一輪開始，我們就參與
                 if message.clock > self.clock:
                     self.clock = message.clock
                     logger.debug(f"New clock: {self.clock}")
@@ -148,18 +148,18 @@ class Election:
                     )
                     logger.debug("Campaign started")
                     continue
-                # Dismiss old messages
+                # 忽略舊訊息
                 if message.clock < self.clock:
                     logger.debug(f"Dropping old message: {message}")
                     continue
                 logger.debug(f"Election added candidate {message}")
-                # Now we are processing this rounds messages - including the message that triggered this round.
+                # 現在開始處理這一輪訊息（包含觸發本輪的那則訊息）。
                 self._candidates.append(message)
 
     async def _connection_receiver(self) -> None:
         with self._cm_receiver as connection_messages:
             async for first in connection_messages:
-                # Delay after connection message for time to symmetrically setup
+                # 連線訊息後稍作延遲，給雙方對稱完成設定的時間
                 await anyio.sleep(0.2)
                 rest = connection_messages.collect()
 
@@ -167,7 +167,7 @@ class Election:
                     f"Connection messages received: {first} followed by {rest}"
                 )
                 logger.debug(f"Current clock: {self.clock}")
-                # These messages are strictly peer to peer
+                # 這些訊息是嚴格的點對點
                 self.clock += 1
                 logger.debug(f"New clock: {self.clock}")
                 candidates: list[ElectionMessage] = []
@@ -189,7 +189,7 @@ class Election:
     ) -> None:
         clock = self.clock
 
-        # Kill the old campaign
+        # 終止舊的選舉活動
         if self._campaign_cancel_scope:
             logger.info("Cancelling other campaign")
             self._campaign_cancel_scope.cancel()
@@ -212,13 +212,13 @@ class Election:
 
                 logger.debug(f"Sleeping for {campaign_timeout} seconds")
                 await anyio.sleep(campaign_timeout)
-                # minor hack - rebroadcast status in case anyone has missed it.
+                # 小技巧：重新廣播狀態，避免有人漏收。
                 await self._em_sender.send(status)
                 logger.debug("Woke up from sleep")
-                # add an anyio checkpoint - anyio.lowlevel.chekpoint() or checkpoint_if_cancelled() is preferred, but wasn't typechecking last I checked
+                # 加入 anyio checkpoint：理想上用 anyio.lowlevel.chekpoint() 或 checkpoint_if_cancelled()，但先前型別檢查無法通過
                 await anyio.sleep(0)
 
-                # Election finished!
+                # 選舉完成！
                 elected = max(candidates)
                 logger.debug(f"Election queue {candidates}")
                 logger.debug(f"Elected: {elected}")

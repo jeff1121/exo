@@ -1,26 +1,26 @@
-# EXO API – Technical Reference
+# EXO API – 技術參考
 
-This document describes the REST API exposed by the **EXO** service, as implemented in:
+本文件說明 **EXO** 服務所提供的 REST API，實作位於：
 
 `src/exo/master/api.py`
 
-The API is used to manage model instances in the cluster, inspect cluster state, and perform inference using multiple API-compatible interfaces.
+此 API 用於管理叢集中的模型實例、檢視叢集狀態，並透過多種 API 相容介面執行推論。
 
-Base URL example:
+Base URL 範例：
 
 ```
 http://localhost:52415
 ```
 
-## 1. General / Meta Endpoints
+## 1. 一般 / 中繼端點
 
-### Get Master Node ID
+### 取得主節點 ID
 
 **GET** `/node_id`
 
-Returns the identifier of the current master node.
+回傳目前主節點的識別碼。
 
-**Response (example):**
+**回應（範例）：**
 
 ```json
 {
@@ -28,33 +28,33 @@ Returns the identifier of the current master node.
 }
 ```
 
-### Get Cluster State
+### 取得叢集狀態
 
 **GET** `/state`
 
-Returns the current state of the cluster, including nodes and active instances.
+回傳目前叢集狀態，包含節點與啟用中的實例。
 
-**Response:**
-JSON object describing topology, nodes, and instances.
+**回應：**
+描述拓撲、節點與實例的 JSON 物件。
 
-### Get Events
+### 取得事件
 
 **GET** `/events`
 
-Returns the list of internal events recorded by the master (mainly for debugging and observability).
+回傳主節點記錄的內部事件列表（主要用於除錯與可觀測性）。
 
-**Response:**
-Array of event objects.
+**回應：**
+事件物件陣列。
 
-## 2. Model Instance Management
+## 2. 模型實例管理
 
-### Create Instance
+### 建立實例
 
 **POST** `/instance`
 
-Creates a new model instance in the cluster.
+在叢集中建立新的模型實例。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -65,52 +65,47 @@ Creates a new model instance in the cluster.
 }
 ```
 
-**Response:**
-Command acknowledgement. Instance creation is asynchronous; clients should wait
-for the model to appear through `/instance/await` before sending inference
-requests for that model.
+**回應：**
+指令確認。實例建立為非同步；在對該模型送出推論請求前，客戶端應先透過 `/instance/await` 等待模型出現。
 
-### Delete Instance
+### 刪除實例
 
 **DELETE** `/instance/{instance_id}`
 
-Deletes an existing instance by ID.
+依 ID 刪除既有實例。
 
-**Path parameters:**
+**路徑參數：**
 
-* `instance_id`: string, ID of the instance to delete
+* `instance_id`：string，要刪除的實例 ID
 
-**Response:**
-Status / confirmation JSON.
+**回應：**
+狀態 / 確認 JSON。
 
-### Get Instance
+### 取得實例
 
 **GET** `/instance/{instance_id}`
 
-Returns details of a specific instance.
+回傳特定實例的詳細資訊。
 
-**Path parameters:**
+**路徑參數：**
 
-* `instance_id`: string
+* `instance_id`：string
 
-**Response:**
-JSON description of the instance.
+**回應：**
+實例描述 JSON。
 
-### Await Instance
+### 等待實例
 
 **GET** `/instance/await?model_id=...&timeout_seconds=0`
 
-Waits until API state contains an instance for the requested model. The response
-is an SSE stream so clients receive keep-alive comments while waiting.
+等待 API 狀態中出現請求模型的實例。回應為 SSE 串流，因此客戶端在等待期間會收到 keep-alive 註解。
 
-**Query parameters:**
+**查詢參數：**
 
-* `model_id`: string, required
-* `timeout_seconds`: float, optional, default `0`. `0` waits indefinitely;
-  positive values time out after that many seconds. Maximum positive value:
-  `300`.
+* `model_id`：string，必填
+* `timeout_seconds`：float，選填，預設 `0`。`0` 表示無限等待；正值表示超過該秒數即逾時。正值最大為 `300`。
 
-**Stream messages:**
+**串流訊息：**
 
 ```text
 data: {"type": "ready", "instance": {...}}
@@ -118,74 +113,72 @@ data: {"type": "ready", "instance": {...}}
 data: {"type": "timeout", "message": "No instance found for model ..."}
 ```
 
-The HTTP status is `200` for both messages because the stream starts before the
-final result is known. The `type` field disambiguates the terminal message.
+兩種訊息的 HTTP 狀態皆為 `200`，因為串流在最終結果確定前就已開始。終端訊息可由 `type` 欄位區分。
 
-### Preview Placements
+### 預覽放置結果
 
 **GET** `/instance/previews?model_id=...`
 
-Returns possible placement previews for a given model.
+回傳指定模型的可能放置預覽。
 
-**Query parameters:**
+**查詢參數：**
 
-* `model_id`: string, required
+* `model_id`：string，必填
 
-**Response:**
-Array of placement preview objects.
+**回應：**
+放置預覽物件陣列。
 
-### Compute Placement
+### 計算放置方案
 
 **GET** `/instance/placement`
 
-Computes a placement for a potential instance without creating it.
+針對潛在實例計算放置方案，但不建立實例。
 
-**Query parameters (typical):**
+**查詢參數（常見）：**
 
-* `model_id`: string
-* `sharding`: string or config
-* `instance_meta`: JSON-encoded metadata
-* `min_nodes`: integer
+* `model_id`：string
+* `sharding`：string 或設定
+* `instance_meta`：JSON 編碼中繼資料
+* `min_nodes`：integer
 
-**Response:**
-JSON object describing the proposed placement / instance configuration.
+**回應：**
+描述建議放置 / 實例設定的 JSON 物件。
 
-### Place Instance
+### 放置實例
 
 **POST** `/place_instance`
 
-Places an instance for a model using the server's placement logic.
+使用伺服器放置邏輯為模型放置實例。
 
-**Request body:**
-JSON describing the instance to be placed.
+**請求主體：**
+描述要放置實例的 JSON。
 
-**Response:**
-Command acknowledgement. The instance may not be ready immediately; wait for it
-to appear through `/instance/await` before sending inference requests.
+**回應：**
+指令確認。實例可能不會立即可用；在送出推論請求前，請先透過 `/instance/await` 等待實例出現。
 
-## 3. Models
+## 3. 模型
 
-### List Models
+### 列出模型
 
 **GET** `/models`
-**GET** `/v1/models` (alias)
+**GET** `/v1/models`（別名）
 
-Returns the list of available models and their metadata.
+回傳可用模型及其中繼資料列表。
 
-**Query parameters:**
+**查詢參數：**
 
-* `status`: string (optional) - Filter by `downloaded` to show only downloaded models
+* `status`：string（選填）- 可用 `downloaded` 篩選僅顯示已下載模型
 
-**Response:**
-Array of model descriptors including `is_custom` field for custom HuggingFace models.
+**回應：**
+模型描述子陣列，包含自訂 HuggingFace 模型使用的 `is_custom` 欄位。
 
-### Add Custom Model
+### 新增自訂模型
 
 **POST** `/models/add`
 
-Add a custom model from HuggingFace hub.
+從 HuggingFace hub 新增自訂模型。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -193,48 +186,48 @@ Add a custom model from HuggingFace hub.
 }
 ```
 
-**Response:**
-Model descriptor for the added model.
+**回應：**
+已新增模型的模型描述子。
 
-**Security note:**
-Models with `trust_remote_code` enabled in their configuration require explicit opt-in (default is false) for security.
+**安全性說明：**
+若模型設定啟用 `trust_remote_code`，基於安全性必須明確 opt-in（預設為 false）。
 
-### Delete Custom Model
+### 刪除自訂模型
 
 **DELETE** `/models/custom/{model_id}`
 
-Delete a user-added custom model card.
+刪除使用者新增的自訂模型卡片。
 
-**Path parameters:**
+**路徑參數：**
 
-* `model_id`: string, ID of the custom model to delete
+* `model_id`：string，要刪除的自訂模型 ID
 
-**Response:**
-Confirmation JSON with deleted model ID.
+**回應：**
+包含已刪除模型 ID 的確認 JSON。
 
-### Search Models
+### 搜尋模型
 
 **GET** `/models/search`
 
-Search HuggingFace Hub for mlx-community models.
+在 HuggingFace Hub 搜尋 mlx-community 模型。
 
-**Query parameters:**
+**查詢參數：**
 
-* `query`: string (optional) - Search query
-* `limit`: integer (default: 20) - Maximum number of results
+* `query`：string（選填）- 搜尋關鍵字
+* `limit`：integer（預設：20）- 回傳結果上限
 
-**Response:**
-Array of HuggingFace model search results.
+**回應：**
+HuggingFace 模型搜尋結果陣列。
 
-## 4. Inference / Chat Completions
+## 4. 推論 / Chat Completions
 
-### OpenAI-Compatible Chat Completions
+### OpenAI 相容 Chat Completions
 
 **POST** `/v1/chat/completions`
 
-Executes a chat completion request using an OpenAI-compatible schema. Supports streaming and non-streaming modes.
+使用 OpenAI 相容 schema 執行 chat completion 請求。支援串流與非串流模式。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -247,27 +240,27 @@ Executes a chat completion request using an OpenAI-compatible schema. Supports s
 }
 ```
 
-**Request parameters:**
+**請求參數：**
 
-* `model`: string, required - Model ID to use
-* `messages`: array, required - Conversation messages
-* `stream`: boolean (default: false) - Enable streaming responses
-* `max_tokens`: integer (optional) - Maximum tokens to generate
-* `temperature`: float (optional) - Sampling temperature
-* `top_p`: float (optional) - Nucleus sampling parameter
-* `top_k`: integer (optional) - Top-k sampling parameter
-* `stop`: string or array (optional) - Stop sequences
-* `seed`: integer (optional) - Random seed for reproducibility
-* `enable_thinking`: boolean (optional) - Enable thinking mode for capable models (DeepSeek V3.1, Qwen3, GLM-4.7)
-* `tools`: array (optional) - Tool definitions for function calling
-* `logprobs`: boolean (optional) - Return log probabilities
-* `top_logprobs`: integer (optional) - Number of top log probabilities to return
+* `model`：string，必填 - 要使用的模型 ID
+* `messages`：array，必填 - 對話訊息
+* `stream`：boolean（預設：false）- 啟用串流回應
+* `max_tokens`：integer（選填）- 最大生成 token 數
+* `temperature`：float（選填）- 取樣溫度
+* `top_p`：float（選填）- nucleus sampling 參數
+* `top_k`：integer（選填）- top-k sampling 參數
+* `stop`：string 或 array（選填）- 停止序列
+* `seed`：integer（選填）- 供可重現性的隨機種子
+* `enable_thinking`：boolean（選填）- 為支援模型啟用 thinking mode（DeepSeek V3.1、Qwen3、GLM-4.7）
+* `tools`：array（選填）- function calling 的工具定義
+* `logprobs`：boolean（選填）- 回傳對數機率
+* `top_logprobs`：integer（選填）- 要回傳的最高對數機率數量
 
-**Response:**
-OpenAI-compatible chat completion response.
+**回應：**
+OpenAI 相容的 chat completion 回應。
 
-**Streaming response format:**
-When `stream=true`, returns Server-Sent Events (SSE) with format:
+**串流回應格式：**
+當 `stream=true` 時，回傳格式如下的 Server-Sent Events (SSE)：
 
 ```
 data: {"id":"...","object":"chat.completion","created":...,"model":"...","choices":[...]}
@@ -275,7 +268,7 @@ data: {"id":"...","object":"chat.completion","created":...,"model":"...","choice
 data: [DONE]
 ```
 
-**Non-streaming response includes usage statistics:**
+**非串流回應包含使用量統計：**
 
 ```json
 {
@@ -299,16 +292,16 @@ data: [DONE]
 }
 ```
 
-**Cancellation:**
-You can cancel an active generation by closing the HTTP connection. The server detects the disconnection and stops processing.
+**取消：**
+你可以透過關閉 HTTP 連線取消進行中的生成。伺服器會偵測中斷並停止處理。
 
 ### Claude Messages API
 
 **POST** `/v1/messages`
 
-Executes a chat completion request using the Claude Messages API format. Supports streaming and non-streaming modes.
+使用 Claude Messages API 格式執行 chat completion 請求。支援串流與非串流模式。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -321,26 +314,26 @@ Executes a chat completion request using the Claude Messages API format. Support
 }
 ```
 
-**Streaming response format:**
-When `stream=true`, returns Server-Sent Events with Claude-specific event types:
+**串流回應格式：**
+當 `stream=true` 時，回傳包含 Claude 專用事件類型的 Server-Sent Events：
 
-* `message_start` - Message generation started
-* `content_block_start` - Content block started
-* `content_block_delta` - Incremental content chunk
-* `content_block_stop` - Content block completed
-* `message_delta` - Message metadata updates
-* `message_stop` - Message generation completed
+* `message_start` - 訊息生成開始
+* `content_block_start` - 內容區塊開始
+* `content_block_delta` - 增量內容片段
+* `content_block_stop` - 內容區塊完成
+* `message_delta` - 訊息中繼資料更新
+* `message_stop` - 訊息生成完成
 
-**Response:**
-Claude-compatible messages response.
+**回應：**
+Claude 相容的 messages 回應。
 
 ### OpenAI Responses API
 
 **POST** `/v1/responses`
 
-Executes a chat completion request using the OpenAI Responses API format. Supports streaming and non-streaming modes.
+使用 OpenAI Responses API 格式執行 chat completion 請求。支援串流與非串流模式。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -352,47 +345,47 @@ Executes a chat completion request using the OpenAI Responses API format. Suppor
 }
 ```
 
-**Streaming response format:**
-When `stream=true`, returns Server-Sent Events with response-specific event types:
+**串流回應格式：**
+當 `stream=true` 時，回傳包含 response 專用事件類型的 Server-Sent Events：
 
-* `response.created` - Response generation started
-* `response.in_progress` - Response is being generated
-* `response.output_item.added` - New output item added
-* `response.output_item.done` - Output item completed
-* `response.done` - Response generation completed
+* `response.created` - 回應生成開始
+* `response.in_progress` - 回應生成中
+* `response.output_item.added` - 新增輸出項目
+* `response.output_item.done` - 輸出項目完成
+* `response.done` - 回應生成完成
 
-**Response:**
-OpenAI Responses API-compatible response.
+**回應：**
+OpenAI Responses API 相容回應。
 
-### Benchmarked Chat Completions
+### 基準化 Chat Completions
 
 **POST** `/bench/chat/completions`
 
-Same as `/v1/chat/completions`, but also returns performance and generation statistics.
+與 `/v1/chat/completions` 相同，但會額外回傳效能與生成統計。
 
-**Request body:**
-Same schema as `/v1/chat/completions`.
+**請求主體：**
+與 `/v1/chat/completions` 相同 schema。
 
-**Response:**
-Chat completion plus benchmarking metrics including:
+**回應：**
+chat completion 加上基準指標，包含：
 
-* `prompt_tps` - Tokens per second during prompt processing
-* `generation_tps` - Tokens per second during generation
-* `prompt_tokens` - Number of prompt tokens
-* `generation_tokens` - Number of generated tokens
-* `peak_memory_usage` - Peak memory used during generation
+* `prompt_tps` - 提示處理期間的每秒 token 數
+* `generation_tps` - 生成期間的每秒 token 數
+* `prompt_tokens` - 提示 token 數
+* `generation_tokens` - 已生成 token 數
+* `peak_memory_usage` - 生成期間峰值記憶體使用量
 
-### Cancel Command
+### 取消命令
 
 **POST** `/v1/cancel/{command_id}`
 
-Cancels an active generation command (text or image). Notifies workers and closes the stream.
+取消進行中的生成命令（文字或圖片）。會通知 workers 並關閉串流。
 
-**Path parameters:**
+**路徑參數：**
 
-* `command_id`: string, ID of the command to cancel
+* `command_id`：string，要取消的命令 ID
 
-**Response (example):**
+**回應（範例）：**
 
 ```json
 {
@@ -401,21 +394,21 @@ Cancels an active generation command (text or image). Notifies workers and close
 }
 ```
 
-Returns 404 if the command is not found or already completed.
+若命令不存在或已完成，回傳 404。
 
-## 5. Ollama API Compatibility
+## 5. Ollama API 相容性
 
-EXO provides Ollama API compatibility for tools like OpenWebUI.
+EXO 提供 Ollama API 相容性，可搭配 OpenWebUI 等工具。
 
 ### Ollama Chat
 
 **POST** `/ollama/api/chat`
-**POST** `/ollama/api/api/chat` (alias)
-**POST** `/ollama/api/v1/chat` (alias)
+**POST** `/ollama/api/api/chat`（別名）
+**POST** `/ollama/api/v1/chat`（別名）
 
-Execute a chat request using Ollama API format.
+使用 Ollama API 格式執行聊天請求。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -427,16 +420,16 @@ Execute a chat request using Ollama API format.
 }
 ```
 
-**Response:**
-Ollama-compatible chat response.
+**回應：**
+Ollama 相容的聊天回應。
 
 ### Ollama Generate
 
 **POST** `/ollama/api/generate`
 
-Execute a text generation request using Ollama API format.
+使用 Ollama API 格式執行文字生成請求。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -446,27 +439,27 @@ Execute a text generation request using Ollama API format.
 }
 ```
 
-**Response:**
-Ollama-compatible generation response.
+**回應：**
+Ollama 相容的生成回應。
 
 ### Ollama Tags
 
 **GET** `/ollama/api/tags`
-**GET** `/ollama/api/api/tags` (alias)
-**GET** `/ollama/api/v1/tags` (alias)
+**GET** `/ollama/api/api/tags`（別名）
+**GET** `/ollama/api/v1/tags`（別名）
 
-Returns list of downloaded models in Ollama tags format.
+以 Ollama tags 格式回傳已下載模型列表。
 
-**Response:**
-Array of model tags with metadata.
+**回應：**
+含中繼資料的模型 tags 陣列。
 
 ### Ollama Show
 
 **POST** `/ollama/api/show`
 
-Returns model information in Ollama show format.
+以 Ollama show 格式回傳模型資訊。
 
-**Request body:**
+**請求主體：**
 
 ```json
 {
@@ -474,27 +467,27 @@ Returns model information in Ollama show format.
 }
 ```
 
-**Response:**
-Model details including modelfile and family.
+**回應：**
+包含 modelfile 與 family 的模型詳細資訊。
 
 ### Ollama PS
 
 **GET** `/ollama/api/ps`
 
-Returns list of running models (active instances).
+回傳執行中模型（啟用實例）列表。
 
-**Response:**
-Array of active model instances.
+**回應：**
+啟用中的模型實例陣列。
 
 ### Ollama Version
 
 **GET** `/ollama/api/version`
-**HEAD** `/ollama/` (alias)
-**HEAD** `/ollama/api/version` (alias)
+**HEAD** `/ollama/`（別名）
+**HEAD** `/ollama/api/version`（別名）
 
-Returns version information for Ollama API compatibility.
+回傳 Ollama API 相容性的版本資訊。
 
-**Response:**
+**回應：**
 
 ```json
 {
@@ -502,15 +495,15 @@ Returns version information for Ollama API compatibility.
 }
 ```
 
-## 6. Image Generation & Editing
+## 6. 圖片生成與編輯
 
-### Image Generation
+### 圖片生成
 
 **POST** `/v1/images/generations`
 
-Executes an image generation request using an OpenAI-compatible schema with additional advanced_params. Supports both streaming and non-streaming modes.
+使用 OpenAI 相容 schema（含額外 advanced_params）執行圖片生成請求。支援串流與非串流模式。
 
-**Request body (example):**
+**請求主體（範例）：**
 
 ```json
 {
@@ -523,12 +516,12 @@ Executes an image generation request using an OpenAI-compatible schema with addi
 }
 ```
 
-**Request parameters:**
+**請求參數：**
 
-* `prompt`: string, required - Text description of the image
-* `model`: string, required - Image model ID
-* `n`: integer (default: 1) - Number of images to generate
-* `size`: string (default: "auto") - Image dimensions. Supported sizes:
+* `prompt`：string，必填 - 圖片文字描述
+* `model`：string，必填 - 圖片模型 ID
+* `n`：integer（預設：1）- 生成圖片數量
+* `size`：string（預設："auto"）- 圖片尺寸。支援尺寸：
   - `512x512`
   - `768x768`
   - `1024x768`
@@ -538,23 +531,23 @@ Executes an image generation request using an OpenAI-compatible schema with addi
   - `1536x1024`
   - `1024x1365`
   - `1365x1024`
-* `stream`: boolean (default: false) - Enable streaming for partial images
-* `partial_images`: integer (default: 0) - Number of partial images to stream during generation
-* `response_format`: string (default: "b64_json") - Either `url` or `b64_json`
-* `quality`: string (default: "medium") - Either `high`, `medium`, or `low`
-* `output_format`: string (default: "png") - Either `png`, `jpeg`, or `webp`
-* `advanced_params`: object (optional) - Advanced generation parameters
+* `stream`：boolean（預設：false）- 啟用部分圖片串流
+* `partial_images`：integer（預設：0）- 生成期間要串流的部分圖片數
+* `response_format`：string（預設："b64_json"）- `url` 或 `b64_json`
+* `quality`：string（預設："medium"）- `high`、`medium` 或 `low`
+* `output_format`：string（預設："png"）- `png`、`jpeg` 或 `webp`
+* `advanced_params`：object（選填）- 進階生成參數
 
-**Advanced Parameters (`advanced_params`):**
+**進階參數（`advanced_params`）：**
 
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
-| `seed` | int | >= 0 | Random seed for reproducible generation |
-| `num_inference_steps` | int | 1-100 | Number of denoising steps |
-| `guidance` | float | 1.0-20.0 | Classifier-free guidance scale |
-| `negative_prompt` | string | - | Text describing what to avoid in the image |
+| `seed` | int | >= 0 | 用於可重現生成的隨機種子 |
+| `num_inference_steps` | int | 1-100 | 去噪步數 |
+| `guidance` | float | 1.0-20.0 | classifier-free guidance scale |
+| `negative_prompt` | string | - | 描述圖片中要避免出現內容的文字 |
 
-**Non-streaming response:**
+**非串流回應：**
 
 ```json
 {
@@ -568,8 +561,8 @@ Executes an image generation request using an OpenAI-compatible schema with addi
 }
 ```
 
-**Streaming response format:**
-When `stream=true` and `partial_images > 0`, returns Server-Sent Events:
+**串流回應格式：**
+當 `stream=true` 且 `partial_images > 0` 時，回傳 Server-Sent Events：
 
 ```
 data: {"type":"partial","image_index":0,"partial_index":1,"total_partials":5,"format":"png","data":{"b64_json":"..."}}
@@ -579,85 +572,85 @@ data: {"type":"final","image_index":0,"format":"png","data":{"b64_json":"..."}}
 data: [DONE]
 ```
 
-### Image Editing
+### 圖片編輯
 
 **POST** `/v1/images/edits`
 
-Executes an image editing request (img2img) using FLUX.1-Kontext-dev or similar models.
+使用 FLUX.1-Kontext-dev 或相似模型執行圖片編輯請求（img2img）。
 
-**Request (multipart/form-data):**
+**請求（multipart/form-data）：**
 
-* `image`: file, required - Input image to edit
-* `prompt`: string, required - Text description of desired changes
-* `model`: string, required - Image editing model ID (e.g., `exolabs/FLUX.1-Kontext-dev`)
-* `n`: integer (default: 1) - Number of edited images to generate
-* `size`: string (optional) - Output image dimensions
-* `response_format`: string (default: "b64_json") - Either `url` or `b64_json`
-* `input_fidelity`: string (default: "low") - Either `low` or `high` - Controls how closely the output follows the input image
-* `stream`: string (default: "false") - Enable streaming
-* `partial_images`: string (default: "0") - Number of partial images to stream
-* `quality`: string (default: "medium") - Either `high`, `medium`, or `low`
-* `output_format`: string (default: "png") - Either `png`, `jpeg`, or `webp`
-* `advanced_params`: string (optional) - JSON-encoded advanced parameters
+* `image`：file，必填 - 要編輯的輸入圖片
+* `prompt`：string，必填 - 期望變更的文字描述
+* `model`：string，必填 - 圖片編輯模型 ID（例如 `exolabs/FLUX.1-Kontext-dev`）
+* `n`：integer（預設：1）- 要生成的編輯後圖片數量
+* `size`：string（選填）- 輸出圖片尺寸
+* `response_format`：string（預設："b64_json"）- `url` 或 `b64_json`
+* `input_fidelity`：string（預設："low"）- `low` 或 `high` - 控制輸出與輸入圖片的貼近程度
+* `stream`：string（預設："false"）- 啟用串流
+* `partial_images`：string（預設："0"）- 要串流的部分圖片數
+* `quality`：string（預設："medium"）- `high`、`medium` 或 `low`
+* `output_format`：string（預設："png"）- `png`、`jpeg` 或 `webp`
+* `advanced_params`：string（選填）- JSON 編碼進階參數
 
-**Response:**
-Same format as `/v1/images/generations`.
+**回應：**
+與 `/v1/images/generations` 相同格式。
 
-### Benchmarked Image Generation
+### 基準化圖片生成
 
 **POST** `/bench/images/generations`
 
-Same as `/v1/images/generations`, but also returns generation statistics.
+與 `/v1/images/generations` 相同，但會額外回傳生成統計。
 
-**Request body:**
-Same schema as `/v1/images/generations`.
+**請求主體：**
+與 `/v1/images/generations` 相同 schema。
 
-**Response:**
-Image generation plus benchmarking metrics including:
+**回應：**
+圖片生成加上基準指標，包含：
 
-* `seconds_per_step` - Average time per denoising step
-* `total_generation_time` - Total generation time
-* `num_inference_steps` - Number of inference steps used
-* `num_images` - Number of images generated
-* `image_width` - Output image width
-* `image_height` - Output image height
-* `peak_memory_usage` - Peak memory used during generation
+* `seconds_per_step` - 每個去噪步驟平均耗時
+* `total_generation_time` - 總生成時間
+* `num_inference_steps` - 使用的推論步數
+* `num_images` - 生成圖片數量
+* `image_width` - 輸出圖片寬度
+* `image_height` - 輸出圖片高度
+* `peak_memory_usage` - 生成期間峰值記憶體使用量
 
-### Benchmarked Image Editing
+### 基準化圖片編輯
 
 **POST** `/bench/images/edits`
 
-Same as `/v1/images/edits`, but also returns generation statistics.
+與 `/v1/images/edits` 相同，但會額外回傳生成統計。
 
-**Request:**
-Same schema as `/v1/images/edits`.
+**請求：**
+與 `/v1/images/edits` 相同 schema。
 
-**Response:**
-Same format as `/bench/images/generations`, including `generation_stats`.
+**回應：**
+與 `/bench/images/generations` 相同格式，包含 `generation_stats`。
 
-### List Images
+### 列出圖片
 
 **GET** `/images`
 
-List all stored images.
+列出所有已儲存圖片。
 
-**Response:**
-Array of image metadata including URLs and expiration times.
+**回應：**
+圖片中繼資料陣列，包含 URL 與到期時間。
 
-### Get Image
+### 取得圖片
 
 **GET** `/images/{image_id}`
 
-Retrieve a stored image by ID.
+依 ID 取得已儲存圖片。
 
-**Path parameters:**
+**路徑參數：**
 
-* `image_id`: string, ID of the image
+* `image_id`：string，圖片 ID
 
-**Response:**
-Image file with appropriate content type.
+**回應：**
+具有正確 content type 的圖片檔案。
 
-## 7. Complete Endpoint Summary
+## 7. 完整端點摘要
 
 ```
 # General
@@ -717,46 +710,46 @@ GET     /images
 GET     /images/{image_id}
 ```
 
-## 8. Notes
+## 8. 備註
 
-### API Compatibility
+### API 相容性
 
-EXO provides multiple API-compatible interfaces:
+EXO 提供多種 API 相容介面：
 
-* **OpenAI Chat Completions API** - Compatible with OpenAI clients and tools
-* **Claude Messages API** - Compatible with Anthropic's Claude API format
-* **OpenAI Responses API** - Compatible with OpenAI's Responses API format
-* **Ollama API** - Compatible with Ollama and tools like OpenWebUI
+* **OpenAI Chat Completions API** - 相容 OpenAI 客戶端與工具
+* **Claude Messages API** - 相容 Anthropic Claude API 格式
+* **OpenAI Responses API** - 相容 OpenAI Responses API 格式
+* **Ollama API** - 相容 Ollama 與 OpenWebUI 等工具
 
-Existing OpenAI, Claude, or Ollama clients can be pointed to EXO by changing the base URL.
+既有 OpenAI、Claude 或 Ollama 客戶端只需調整 base URL 即可指向 EXO。
 
-### Custom Models
+### 自訂模型
 
-You can add custom models from HuggingFace using the `/models/add` endpoint. Custom models are identified by the `is_custom` field in model list responses.
+你可以透過 `/models/add` 端點從 HuggingFace 新增自訂模型。模型列表回應中的 `is_custom` 欄位可識別自訂模型。
 
-**Security:** Models requiring `trust_remote_code` must be explicitly enabled (default is false) for security. Only enable this if you trust the model's remote code.
+**安全性：** 若模型需要 `trust_remote_code`，基於安全性必須明確啟用（預設為 false）。僅在你信任該模型遠端程式碼時啟用。
 
-### Usage Statistics
+### 使用量統計
 
-Chat completion responses include usage statistics with:
+chat completion 回應包含以下使用量統計：
 
-* `prompt_tokens` - Number of tokens in the prompt
-* `completion_tokens` - Number of tokens generated
-* `total_tokens` - Sum of prompt and completion tokens
+* `prompt_tokens` - 提示中的 token 數
+* `completion_tokens` - 已生成 token 數
+* `total_tokens` - 提示與生成 token 的總和
 
-### Request Cancellation
+### 請求取消
 
-You can cancel active requests by:
+你可以透過以下方式取消進行中的請求：
 
-1. Closing the HTTP connection (for streaming requests)
-2. Calling `/v1/cancel/{command_id}` (for any request)
+1. 關閉 HTTP 連線（串流請求）
+2. 呼叫 `/v1/cancel/{command_id}`（任意請求）
 
-The server detects cancellation and stops processing immediately.
+伺服器會偵測取消並立即停止處理。
 
-### Instance Placement
+### 實例放置
 
-The instance placement endpoints allow you to plan and preview cluster allocations before creating instances. This helps optimize resource usage across nodes.
+實例放置端點可讓你在建立實例前先規劃與預覽叢集配置，有助於最佳化跨節點資源使用。
 
-### Observability
+### 可觀測性
 
-The `/events` and `/state` endpoints are primarily intended for operational visibility and debugging.
+`/events` 與 `/state` 端點主要用於操作可視性與除錯。

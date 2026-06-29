@@ -1,38 +1,38 @@
-# EXO Platform support (partial roadmap)
+# EXO 平台支援（部分路線圖）
 
-## Tier 1 support - tested and maintained
+## Tier 1 支援 - 已測試且維護中
 
 Apple Silicon MacOS
 - Mac Studio: M3 Ultra
 - Mac Mini: M4 Pro
 - Macbook Pro: M5, M4 Max
 
-## Tier 2 support - checked occasionally, should run without crashing
+## Tier 2 支援 - 偶爾檢查，應可在不當機的情況下執行
 
 
-## Tier 3 support - minimal support and testing, but no theoretical reason it shouldnt work
+## Tier 3 支援 - 最低限度支援與測試，但理論上沒有不能運作的理由
 
 
-# Planned
+# 規劃中
 
 ## Tier 1
 
-Linux CUDA Support
+Linux CUDA 支援
 - Nvidia DGX Spark
 
-Linux CPU Support
+Linux CPU 支援
 
 ## Tier 2
 
-Linux Vulkan Support -- depends heavily on ecosystem
+Linux Vulkan 支援 -- 高度依賴生態系
 - Framework Desktop
 
-Linux CUDA Support -- depends heavily on ecosystem
+Linux CUDA 支援 -- 高度依賴生態系
 - Framework Desktop
 
-## Longer term!
+## 長期規劃！
 
-Windows CUDA Support
+Windows CUDA 支援
 
-Windows CPU Support
+Windows CPU 支援
 

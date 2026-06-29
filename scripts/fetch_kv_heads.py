@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Fetch num_key_value_heads from HuggingFace config.json and update TOML model cards.
+"""從 HuggingFace config.json 取得 num_key_value_heads 並更新 TOML 模型卡。
 
 Usage:
-    # Update only cards missing num_key_value_heads
+    # 只更新缺少 num_key_value_heads 的卡片
     uv run python scripts/fetch_kv_heads.py --missing
 
-    # Update all cards (overwrite existing values)
+    # 更新所有卡片（覆蓋既有值）
     uv run python scripts/fetch_kv_heads.py --all
 """
 
@@ -27,7 +27,7 @@ MAX_WORKERS = 5
 
 
 def fetch_kv_heads(model_id: str) -> int | None:
-    """Fetch num_key_value_heads from HuggingFace config.json."""
+    """從 HuggingFace config.json 取得 num_key_value_heads。"""
     url = f"https://huggingface.co/{model_id}/raw/main/config.json"
     try:
         with urllib.request.urlopen(url, timeout=15) as resp:
@@ -44,14 +44,14 @@ def fetch_kv_heads(model_id: str) -> int | None:
 
 
 def update_toml(path: Path, kv_heads: int) -> bool:
-    """Insert or update num_key_value_heads in a TOML file. Returns True if changed."""
+    """在 TOML 檔案中插入或更新 num_key_value_heads。若有變更回傳 True。"""
     content = path.read_text()
     doc = tomlkit.parse(content)
 
     if doc.get("num_key_value_heads") == kv_heads:
         return False
 
-    # Insert after hidden_size if adding for the first time
+    # 若為首次新增，插在 hidden_size 之後
     if "num_key_value_heads" not in doc:
         new_doc = tomlkit.document()
         for key, value in doc.items():
@@ -67,7 +67,7 @@ def update_toml(path: Path, kv_heads: int) -> bool:
 
 
 def process_card(path: Path) -> tuple[str, str]:
-    """Fetch and update a single card. Returns (filename, status)."""
+    """抓取並更新單一卡片。回傳 (檔名, 狀態)。"""
     content = path.read_text()
     doc = tomlkit.parse(content)
     model_id = doc.get("model_id")

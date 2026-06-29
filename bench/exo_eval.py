@@ -1,6 +1,6 @@
 # type: ignore
 #!/usr/bin/env python3
-"""Quality evaluation for exo — matches Artificial Analysis methodology.
+"""exo 品質評估——對齊 Artificial Analysis 方法論。
 
 Runs LLM benchmarks against exo's OpenAI-compatible API using the same
 prompts, temperature settings, and answer extraction as Artificial Analysis.
@@ -58,17 +58,17 @@ from exo_tools.harness import (
 from loguru import logger
 
 # ---------------------------------------------------------------------------
-# Artificial Analysis constants
+# Artificial Analysis 常數
 # ---------------------------------------------------------------------------
 
 MAX_RETRIES = 30
 INSTANCE_HEALTH_CHECK_AFTER = (
-    3  # Check instance health after this many consecutive failures
+    3  # 連續失敗達此次數後檢查 instance 健康狀態
 )
 
 
 class InstanceFailedError(RuntimeError):
-    """Raised when the exo instance is detected as failed/gone."""
+    """當偵測到 exo instance 失敗或消失時拋出。"""
 
 
 DEFAULT_MAX_TOKENS = 16_384
@@ -76,9 +76,9 @@ REASONING_MAX_TOKENS = 131_072
 TEMPERATURE_NON_REASONING = 0.0
 TEMPERATURE_REASONING = 1.0
 
-# MC answer extraction: 8 fallback regex patterns.
-# All patterns are tried; the match at the latest text position wins
-# (handles models that self-correct during reasoning).
+# 選擇題答案擷取：8 個備援 regex 模式。
+# 會嘗試所有模式；以文字中最晚出現的位置為準
+# （可處理模型在推理過程中自我修正）。
 _MC_PATTERNS: list[re.Pattern[str]] = [
     re.compile(
         r"(?i)[\*\_]{0,2}Answer[\*\_]{0,2}\s*:[\s\*\_]{0,2}\s*([A-Z])(?![a-zA-Z0-9])"
@@ -92,17 +92,17 @@ _MC_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"([A-Z])\s*\."),
 ]
 
-# Code extraction: last ```python ... ``` block (AA regex)
+# 程式碼擷取：最後一個 ```python ... ``` 區塊（AA regex）
 _CODE_BLOCK_RE = re.compile(r"```(?:python|Python)?\s*\n(.*?)```", re.DOTALL)
 
 
 # ---------------------------------------------------------------------------
-# Model config loading
+# 載入模型設定
 # ---------------------------------------------------------------------------
 
 
 def load_model_config(model_id: str) -> dict[str, Any] | None:
-    """Look up model in eval_configs/models.toml. Returns config dict or None."""
+    """在 eval_configs/models.toml 中查找模型。回傳設定 dict 或 None。"""
     config_path = Path(__file__).resolve().parent / "eval_configs" / "models.toml"
     if not config_path.exists():
         return None
@@ -116,12 +116,12 @@ def load_model_config(model_id: str) -> dict[str, Any] | None:
 
 
 # ---------------------------------------------------------------------------
-# Answer extraction
+# 答案擷取
 # ---------------------------------------------------------------------------
 
 
 def extract_mc_answer(text: str, valid_letters: str = "ABCD") -> str | None:
-    """Extract MC answer. Last match by text position wins."""
+    """擷取選擇題答案。以文字中最後匹配的位置為準。"""
     valid_set = set(valid_letters)
     best: tuple[int, str] | None = None
     for pattern in _MC_PATTERNS:
@@ -135,7 +135,7 @@ def extract_mc_answer(text: str, valid_letters: str = "ABCD") -> str | None:
 
 
 def extract_boxed_answer(text: str) -> str | None:
-    r"""Extract content from the last \boxed{...}."""
+    r"""擷取最後一個 \boxed{...} 內的內容。"""
     matches: list[str] = []
     idx = 0
     while True:
@@ -159,16 +159,15 @@ def extract_boxed_answer(text: str) -> str | None:
 
 
 def extract_code_block(text: str, preserve_indent: bool = False) -> str | None:
-    """Extract the last Python code block from markdown response.
+    """從 markdown 回應中擷取最後一個 Python 程式碼區塊。
 
-    If preserve_indent is True, only strip trailing whitespace (keeps leading
-    indentation intact — needed for HumanEval function-body completions).
+    若 preserve_indent 為 True，僅去除尾端空白（保留前導縮排——HumanEval 函式主體補全需要）。
     """
     matches = _CODE_BLOCK_RE.findall(text)
     if matches:
         raw = matches[-1]
         return raw.rstrip() if preserve_indent else raw.strip()
-    # Fallback: try raw code after last ```
+    # 備援：嘗試最後一個 ``` 後的原始程式碼
     lines = text.split("\n")
     backtick_lines = [i for i, line in enumerate(lines) if "```" in line]
     if len(backtick_lines) >= 2:
@@ -177,7 +176,7 @@ def extract_code_block(text: str, preserve_indent: bool = False) -> str | None:
 
 
 def check_aime_answer(extracted: str, gold: int) -> bool:
-    """Check if extracted AIME answer matches gold integer."""
+    """檢查擷取到的 AIME 答案是否等於標準整數答案。"""
     try:
         return int(extracted.strip()) == gold
     except ValueError:
@@ -191,12 +190,12 @@ def check_aime_answer(extracted: str, gold: int) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Code execution — official evaluation harnesses
+# 程式碼執行——官方評測 harness
 # ---------------------------------------------------------------------------
 
-# LiveCodeBench: vendored from https://github.com/LiveCodeBench/LiveCodeBench
-# run_test() must execute in a child process because reliability_guard()
-# permanently disables OS functions (os.kill, subprocess.Popen, etc.).
+# LiveCodeBench：由 https://github.com/LiveCodeBench/LiveCodeBench 匯入
+# run_test() 必須在子行程執行，因為 reliability_guard()
+# 會永久停用作業系統函式（os.kill、subprocess.Popen 等）。
 
 
 def _lcb_worker(
@@ -206,7 +205,7 @@ def _lcb_worker(
     result_holder: list[Any],
     metadata_holder: list[Any],
 ) -> None:
-    """Target for multiprocessing.Process — runs vendored LCB run_test."""
+    """multiprocessing.Process 的目標函式——執行匯入的 LCB run_test。"""
     from vendor.lcb_testing_util import run_test
 
     try:
@@ -223,7 +222,7 @@ def run_livecodebench_test(
     sample: dict,
     timeout: int = 6,
 ) -> tuple[bool, str]:
-    """Run LCB evaluation in a subprocess. Returns (passed, diagnostic_info)."""
+    """在子行程執行 LCB 評測。回傳 (passed, diagnostic_info)。"""
     manager = multiprocessing.Manager()
     result_holder = manager.list()
     metadata_holder = manager.list()
@@ -234,7 +233,7 @@ def run_livecodebench_test(
     )
     proc.start()
 
-    # Global timeout: (per-test timeout + 1) * num_tests + 5
+    # 全域逾時： (每測試逾時 + 1) * 測試數 + 5
     num_tests = len(json.loads(sample["input_output"]).get("inputs", []))
     global_timeout = (timeout + 1) * num_tests + 5
     proc.join(timeout=global_timeout)
@@ -250,7 +249,7 @@ def run_livecodebench_test(
     results = list(result_holder[0])
     metadata = dict(metadata_holder[0]) if metadata_holder else {}
 
-    # LCB convention: True = pass, negative int = failure code
+    # LCB 慣例：True = 通過，負整數 = 失敗代碼
     all_passed = all(r is True or r == 1 for r in results)
     if all_passed:
         return True, ""
@@ -264,7 +263,7 @@ def run_livecodebench_test(
 def run_humaneval_test(
     problem: dict, completion: str, timeout: float = 10.0
 ) -> tuple[bool, str]:
-    """Run HumanEval evaluation using the official human_eval package."""
+    """使用官方 human_eval 套件執行 HumanEval 評測。"""
     from human_eval.execution import check_correctness
 
     result = check_correctness(problem, completion, timeout)
@@ -274,7 +273,7 @@ def run_humaneval_test(
 
 
 # ---------------------------------------------------------------------------
-# Benchmark definitions
+# 基準測試定義
 # ---------------------------------------------------------------------------
 
 
@@ -360,7 +359,7 @@ BENCHMARKS: dict[str, BenchmarkConfig] = {
 
 
 # ---------------------------------------------------------------------------
-# Prompt formatters
+# 提示格式化器
 # ---------------------------------------------------------------------------
 
 _GPQA_INSTRUCTION = (
@@ -386,7 +385,7 @@ _HUMANEVAL_INSTRUCTION = (
     "inside a ```python code block. Do not include the function signature."
 )
 
-# LiveCodeBench: AA uses original prompts without custom system prompts
+# LiveCodeBench：AA 使用原始 prompts，不加自訂 system prompt
 _LCB_SYSTEM = (
     "You are an expert Python programmer. You will be given a question "
     "(problem specification) and will generate a correct Python program "
@@ -448,8 +447,8 @@ def format_aime_question(doc: dict) -> tuple[str, int]:
 def format_humaneval_question(doc: dict) -> tuple[str, dict]:
     """Returns (prompt, metadata_for_execution)."""
     prompt = f"{_HUMANEVAL_INSTRUCTION}\n\n```python\n{doc['prompt']}```"
-    # Pass the full problem dict — check_correctness needs task_id, prompt,
-    # test, entry_point
+    # 傳入完整 problem dict——check_correctness 需要 task_id、prompt、
+    # test、entry_point
     meta = {
         "problem": {
             "task_id": doc["task_id"],
@@ -473,7 +472,7 @@ def format_livecodebench_question(doc: dict) -> tuple[str, str | None, dict]:
     else:
         user_msg = _LCB_WITHOUT_STARTER.format(question=question_content)
 
-    # Parse test cases
+    # 解析測試案例
     public_tests = (
         json.loads(doc["public_test_cases"])
         if isinstance(doc["public_test_cases"], str)
@@ -505,7 +504,7 @@ def format_livecodebench_question(doc: dict) -> tuple[str, str | None, dict]:
         metadata = json.loads(metadata)
     func_name = metadata.get("func_name")
 
-    # Build the sample dict in official LCB format for run_test()
+    # 依官方 LCB 格式建立 run_test() 所需 sample dict
     input_output: dict[str, Any] = {
         "inputs": test_inputs,
         "outputs": test_outputs,
@@ -520,7 +519,7 @@ def format_livecodebench_question(doc: dict) -> tuple[str, str | None, dict]:
 
 
 # ---------------------------------------------------------------------------
-# API client with retries
+# 含重試機制的 API 客戶端
 # ---------------------------------------------------------------------------
 
 
@@ -586,7 +585,7 @@ async def _call_api(
     reasoning_content = message.get("reasoning_content") or ""
     finish_reason = choice.get("finish_reason") or ""
 
-    # For thinking models, empty content is expected when finish_reason is "length"
+    # 對思考型模型而言，finish_reason 為 "length" 時內容為空屬正常
     if not content.strip() and finish_reason != "length" and not reasoning_content:
         raise ValueError("Empty response from model")
     usage = data.get("usage", {})
@@ -681,7 +680,7 @@ async def call_with_retries(
 
 
 # ---------------------------------------------------------------------------
-# Evaluation runners
+# 評測執行器
 # ---------------------------------------------------------------------------
 
 
@@ -739,8 +738,8 @@ async def evaluate_benchmark(
             f"Filtered to {len(ds)} problems with release_version={release_version}"
         )
 
-    # Sort by question_id to match LCB runner ordering (scenario_router.py:60).
-    # This ensures [offset:offset+limit] slices select the same problems as vllm.
+    # 依 question_id 排序以對齊 LCB runner 的順序（scenario_router.py:60）。
+    # 這可確保 [offset:offset+limit] 與 vllm 選到相同題目。
     if "question_id" in ds.column_names:
         ds = ds.sort("question_id")
 
@@ -769,7 +768,7 @@ async def evaluate_benchmark(
             "Code benchmarks execute model-generated code. Use a sandboxed environment."
         )
 
-    # Load checkpoint for resume
+    # 載入 checkpoint 以便續跑
     checkpoint_data: dict[str | int, dict[str, Any]] = {}
     if checkpoint_path and checkpoint_path.exists():
         with open(checkpoint_path) as f:
@@ -785,7 +784,7 @@ async def evaluate_benchmark(
     lock = asyncio.Lock()
 
     def _get_question_id(idx: int, doc: dict) -> str | int:
-        """Get a stable question ID for checkpointing."""
+        """取得可用於 checkpoint 的穩定題目 ID。"""
         if benchmark_name == "livecodebench":
             return doc.get("question_id", idx)
         elif benchmark_name == "humaneval":
@@ -799,11 +798,11 @@ async def evaluate_benchmark(
         system_msg = None
         question_id = _get_question_id(idx, doc)
 
-        # Bail out early if instance is already dead
+        # 若 instance 已失效則提早中止
         if instance_failed.is_set():
             return
 
-        # Check checkpoint
+        # 檢查 checkpoint
         if question_id in checkpoint_data:
             cached = checkpoint_data[question_id]
             results[idx] = QuestionResult(
@@ -851,7 +850,7 @@ async def evaluate_benchmark(
                 return
             t0 = time.monotonic()
             try:
-                # Race the API call against the instance_failed event
+                # 讓 API 呼叫與 instance_failed 事件競速
                 api_task = asyncio.create_task(
                     call_with_retries(
                         http_client,
@@ -1007,8 +1006,8 @@ async def evaluate_benchmark(
 
         results[idx] = result
 
-        # Write checkpoint (skip infra failures so they get retried on resume,
-        # but keep wrong answers — they are legitimate results)
+        # 寫入 checkpoint（基礎設施失敗不寫入，續跑時可重試，
+        # 但錯誤答案仍保留——它們是有效評測結果）
         if checkpoint_path is not None and result.response:
             _write_checkpoint(checkpoint_path, result)
 
@@ -1016,7 +1015,7 @@ async def evaluate_benchmark(
             completed += 1
             n = completed
 
-        # Log progress
+        # 紀錄進度
         thinking_info = ""
         if result.reasoning_content:
             thinking_info = f", {len(result.reasoning_content)} chars thinking"
@@ -1028,12 +1027,12 @@ async def evaluate_benchmark(
         )
 
     async def _health_monitor() -> None:
-        """Periodically check if the instance is still alive."""
-        # Wait a bit before first check to let things start
+        """定期檢查 instance 是否仍存活。"""
+        # 第一次檢查前先稍等，讓流程啟動
         await asyncio.sleep(10)
         while not instance_failed.is_set():
             if not await _check_instance_health(base_url):
-                # Double-check to avoid false positives
+                # 再次確認以避免誤判
                 await asyncio.sleep(2)
                 if not await _check_instance_health(base_url):
                     logger.error("Health monitor: instance is down!")
@@ -1084,7 +1083,7 @@ def _write_checkpoint(path: Path, result: QuestionResult) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Results display
+# 結果顯示
 # ---------------------------------------------------------------------------
 
 
@@ -1194,7 +1193,7 @@ def print_comparison(
 
 
 # ---------------------------------------------------------------------------
-# Interactive task picker
+# 互動式任務選擇器
 # ---------------------------------------------------------------------------
 
 
@@ -1263,7 +1262,7 @@ def pick_tasks_interactive() -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Results persistence
+# 結果持久化
 # ---------------------------------------------------------------------------
 
 

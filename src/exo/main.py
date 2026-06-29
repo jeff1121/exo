@@ -39,7 +39,7 @@ class Node:
     event_router: EventRouter
     download_coordinator: DownloadCoordinator | None
     worker: Worker | None
-    election: Election  # Every node participates in election, as we do want a node to become master even if it isn't a master candidate if no master candidates are present.
+    election: Election  # 每個節點都會參與選舉；即使該節點不是主節點候選者，當沒有候選者存在時仍可成為主節點。
     election_result_receiver: Receiver[ElectionResult]
     master: Master | None
     api: API | None
@@ -74,10 +74,10 @@ class Node:
 
         logger.info(f"Starting node {node_id}")
 
-        # Errors the very first time exo is run as dir doesn't exist
+        # 第一次執行 exo 時目錄不存在，這裡可能會出錯
         EXO_DEFAULT_MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-        # Create DownloadCoordinator (unless --no-downloads)
+        # 建立 DownloadCoordinator（除非使用 --no-downloads）
         if not args.no_downloads:
             download_coordinator = DownloadCoordinator(
                 node_id,
@@ -113,7 +113,7 @@ class Node:
         else:
             worker = None
 
-        # We start every node with a master
+        # 我們讓每個節點一開始都具有 master
         master = Master(
             node_id,
             session_id,
@@ -127,10 +127,10 @@ class Node:
         er_send, er_recv = channel[ElectionResult]()
         election = Election(
             node_id,
-            # If someone manages to assemble 1 MILLION devices into an exo cluster then. well done. good job champ.
+            # 如果真的有人把一百萬台裝置組成 exo 叢集，那真是太厲害了。
             seniority=1_000_000 if args.force_master else 0,
-            # nb: this DOES feedback right now. i have thoughts on how to address this,
-            # but ultimately it seems not worth the complexity
+            # 註：目前這裡確實會產生回饋循環，我有一些想法可改善，
+            # 但整體而言似乎不值得增加那麼多複雜度
             election_message_sender=router.sender(topics.ELECTION_MESSAGES),
             election_message_receiver=router.receiver(topics.ELECTION_MESSAGES),
             connection_message_receiver=router.receiver(topics.CONNECTION_MESSAGES),
@@ -170,7 +170,7 @@ class Node:
             tg.start_soon(self._elect_loop)
 
     def shutdown(self):
-        # if this is our second call to shutdown, just sys.exit
+        # 如果這是第二次呼叫 shutdown，就直接 sys.exit
         if self._tg.cancel_called():
             import sys
 
@@ -180,17 +180,17 @@ class Node:
     async def _elect_loop(self):
         with self.election_result_receiver as results:
             async for result in results:
-                # This function continues to have a lot of very specific entangled logic
-                # At least it's somewhat contained
+                # 這個函式仍包含許多高度耦合且特定情境的邏輯
+                # 至少目前還算集中在這裡
 
-                # I don't like this duplication, but it's manageable for now.
-                # TODO: This function needs refactoring generally
+                # 我不喜歡這段重複邏輯，但目前仍可維持。
+                # TODO: 這個函式整體上需要重構
 
-                # Ok:
-                # On new master:
-                # - Elect master locally if necessary
-                # - Shutdown and re-create the worker
-                # - Shut down and re-create the API
+                # 總結：
+                # 當出現新 master 時：
+                # - 必要時在本地選出 master
+                # - 關閉並重新建立 worker
+                # - 關閉並重新建立 API
 
                 if result.is_new_master:
                     await anyio_checkpoint()
@@ -255,7 +255,7 @@ class Node:
                         self._tg.start_soon(self.download_coordinator.run)
                     if self.worker:
                         await self.worker.shutdown()
-                        # TODO: add profiling etc to resource monitor
+                        # TODO: 將 profiling 等資訊加入資源監控
                         self.worker = Worker(
                             self.node_id,
                             event_receiver=self.event_router.receiver(),
@@ -276,10 +276,10 @@ class Node:
 
 
 def main():
-    # Parse args first => --help or bad args don't require PID-locking
+    # 先解析參數 => --help 或錯誤參數不需要 PID 鎖定
     args = Args.parse()
 
-    # Exit early if cannot acquire PID file
+    # 若無法取得 PID 檔，提早結束
     try:
         pidfile = Pidfile(EXO_PID_FILE, 0o0600)
     except PidfileError as e:
@@ -288,8 +288,8 @@ def main():
 
     try:
         if args.legacy_daemon:
-            # keep stdio backed by explicit /dev/null streams. multiprocessing spawn expects
-            # valid stdio FDs; letting DaemonContext close/reopen them can break runner startup.
+            # 讓 stdio 明確綁定到 /dev/null 串流。multiprocessing 的 spawn 需要
+            # 有效的 stdio 檔案描述符；若讓 DaemonContext 關閉/重開它們，可能導致 runner 啟動失敗。
             for stream in (sys.stdout, sys.stderr, sys.__stdout__, sys.__stderr__):
                 if stream is not None:
                     stream.flush()
@@ -304,13 +304,13 @@ def main():
                 stdout=stdout,
                 stderr=stderr,
             ):
-                # cleanup loose file descriptors (as long as they aren't stdio)
+                # 清理未使用的檔案描述符（只要不是 stdio）
                 for f in (
                     f for f in (stdin, stdout, stderr) if f.fileno() not in STDIO_FDS
                 ):
                     f.close()
 
-                # 1) if daemonizing => fork then write PID
+                # 1) 若啟用 daemon 模式 => fork 後再寫入 PID
                 try:
                     pidfile.write()
                 except PidfileError as e:
@@ -318,7 +318,7 @@ def main():
                     raise SystemExit(1) from e
                 main_inner(args)
         else:
-            # 2) otherwise      => just write PID
+            # 2) 否則            => 直接寫入 PID
             try:
                 pidfile.write()
             except PidfileError as e:
@@ -336,7 +336,7 @@ def main_inner(args: "Args"):
 
     mp.set_start_method("spawn", force=True)
 
-    # TODO: Refactor the current verbosity system
+    # TODO: 重構目前的詳細日誌等級系統
     logger_setup(EXO_LOG, args.verbosity)
 
     logger.info(f"pid = {os.getpid()}")
@@ -356,7 +356,7 @@ def main_inner(args: "Args"):
         os.environ["EXO_NO_BATCH"] = "1"
         logger.info("Continuous batching disabled (--no-batch)")
 
-    # Set FAST_SYNCH override env var for runner subprocesses
+    # 為 runner 子程序設定 FAST_SYNCH 覆寫環境變數
     if args.fast_synch is True:
         os.environ["EXO_FAST_SYNCH"] = "true"
         logger.info("FAST_SYNCH forced ON")
@@ -387,7 +387,7 @@ class Args(FrozenModel):
     no_downloads: bool = False
     offline: bool = os.getenv("EXO_OFFLINE", "false").lower() == "true"
     no_batch: bool = False
-    fast_synch: bool | None = None  # None = auto, True = force on, False = force off
+    fast_synch: bool | None = None  # None = 自動，True = 強制開啟，False = 強制關閉
     legacy_daemon: bool = False
     bootstrap_peers: list[str] = []
     namespace: str
@@ -501,4 +501,4 @@ class Args(FrozenModel):
         )
 
         args = parser.parse_args()
-        return cls(**vars(args))  # pyright: ignore[reportAny] - We are intentionally validating here, we can't do it statically
+        return cls(**vars(args))  # pyright: ignore[reportAny] - 這裡是刻意在執行期驗證，無法以靜態方式完成

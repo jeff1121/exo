@@ -1,23 +1,23 @@
-## Motivation
+## 動機
 
-<!-- Why is this change needed? What problem does it solve? -->
-<!-- If it fixes an open issue, please link to the issue here -->
+<!-- 為什麼需要這項變更？它解決了什麼問題？ -->
+<!-- 如果此變更修復了已開啟的 issue，請在此連結該 issue -->
 
-## Changes
+## 變更內容
 
-<!-- Describe what you changed in detail -->
+<!-- 請詳細描述你變更了什麼 -->
 
-## Why It Works
+## 為何可行
 
-<!-- Explain why your approach solves the problem -->
+<!-- 說明你的方法為何能解決問題 -->
 
-## Test Plan
+## 測試計畫
 
-### Manual Testing
-<!-- Hardware: (e.g., MacBook Pro M1 Max 32GB, Mac Mini M2 16GB, connected via Thunderbolt 4) -->
-<!-- What you did: -->
+### 手動測試
+<!-- 硬體： (例如：MacBook Pro M1 Max 32GB、Mac Mini M2 16GB，以 Thunderbolt 4 連接) -->
+<!-- 你做了什麼： -->
 <!-- - -->
 
-### Automated Testing
-<!-- Describe changes to automated tests, or how existing tests cover this change -->
+### 自動化測試
+<!-- 描述自動化測試的變更，或現有測試如何涵蓋此變更 -->
 <!-- - -->

@@ -1,11 +1,11 @@
 ---
 name: Feature Request
-about: Suggest an idea for this project
+about: 提出此專案的新想法
 title: ''
 labels: enhancement
 assignees: ''
 ---
 
-<!-- Please use a clear, descriptive title above -->
+<!-- 請在上方使用清楚且具描述性的標題 -->
 
-Describe what you'd like to see added to EXO.
+請描述你希望在 EXO 中新增的功能。

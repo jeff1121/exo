@@ -1,14 +1,14 @@
 # type: ignore
 #!/usr/bin/env python3
-"""Tool-calling eval for exo's OpenAI-compatible API.
+"""exo OpenAI 相容 API 的工具呼叫評估。
 
-Tests whether models correctly:
-- Trigger tool calls when appropriate
-- Return valid JSON arguments matching function schemas
-- Handle multi-turn tool use (call -> result -> final answer)
-- Avoid calling tools when unnecessary
+測試模型是否能正確：
+- 在適當時機觸發工具呼叫
+- 回傳符合函式 schema 的有效 JSON 參數
+- 處理多輪工具流程（呼叫 -> 結果 -> 最終回答）
+- 在不需要時避免呼叫工具
 
-Start exo with a model first, then run:
+請先啟動含模型的 exo，再執行：
     uv run python tool_call_eval.py --model <model-id>
     uv run python tool_call_eval.py --model <model-id> --host 10.0.0.5 --port 52415
     uv run python tool_call_eval.py --model <model-id> --repeat 3
@@ -47,9 +47,9 @@ from exo_tools.harness import (
 from loguru import logger
 from transformers import AutoTokenizer
 
-# Monkey-patch for transformers 5.x compatibility
-# Kimi's tokenization_kimi.py imports bytes_to_unicode from the old location
-# which was moved in transformers 5.0.0rc2
+# 針對 transformers 5.x 相容性的 monkey-patch
+# Kimi 的 tokenization_kimi.py 會從舊位置匯入 bytes_to_unicode
+# 該符號在 transformers 5.0.0rc2 已搬移
 try:
     import transformers.models.gpt2.tokenization_gpt2 as gpt2_tokenization
     from transformers.convert_slow_tokenizer import bytes_to_unicode
@@ -57,15 +57,15 @@ try:
     if not hasattr(gpt2_tokenization, "bytes_to_unicode"):
         gpt2_tokenization.bytes_to_unicode = bytes_to_unicode  # type: ignore[attr-defined]
 except ImportError:
-    pass  # transformers < 5.0 or bytes_to_unicode not available
+    pass  # transformers < 5.0 或無 bytes_to_unicode
 
 
 def load_tokenizer_for_bench(model_id: str) -> Any:
     """
-    Load tokenizer for benchmarking, with special handling for Kimi models.
+    載入基準測試 tokenizer，並對 Kimi 模型做特殊處理。
 
-    Kimi uses a custom TikTokenTokenizer that transformers 5.x can't load via AutoTokenizer.
-    This function replicates the logic from utils_mlx.py for bench compatibility.
+    Kimi 使用自訂 TikTokenTokenizer，transformers 5.x 無法直接透過 AutoTokenizer 載入。
+    此函式重現 utils_mlx.py 的邏輯以維持 bench 相容性。
     """
     model_id_lower = model_id.lower()
 
@@ -75,7 +75,7 @@ def load_tokenizer_for_bench(model_id: str) -> Any:
 
         from huggingface_hub import snapshot_download
 
-        # Download/get the model path
+        # 下載／取得模型路徑
         model_path = Path(
             snapshot_download(
                 model_id,
@@ -85,7 +85,7 @@ def load_tokenizer_for_bench(model_id: str) -> Any:
 
         sys.path.insert(0, str(model_path))
 
-        # Load tool_declaration_ts first (tokenization_kimi imports it with relative import)
+        # 先載入 tool_declaration_ts（tokenization_kimi 會以相對匯入使用它）
         tool_decl_path = model_path / "tool_declaration_ts.py"
         if tool_decl_path.exists():
             spec = importlib.util.spec_from_file_location(
@@ -96,7 +96,7 @@ def load_tokenizer_for_bench(model_id: str) -> Any:
                 sys.modules["tool_declaration_ts"] = tool_decl_module
                 spec.loader.exec_module(tool_decl_module)
 
-        # Load tokenization_kimi with patched source (convert relative to absolute import)
+        # 以修補後原始碼載入 tokenization_kimi（相對匯入改為絕對匯入）
         tok_path = model_path / "tokenization_kimi.py"
         source = tok_path.read_text()
         source = source.replace("from .tool_declaration_ts", "from tool_declaration_ts")
@@ -112,17 +112,17 @@ def load_tokenizer_for_bench(model_id: str) -> Any:
 
         hf_tokenizer: Any = TikTokenTokenizer.from_pretrained(model_path)
 
-        # Patch encode to use internal tiktoken model directly
-        # transformers 5.x has a bug in the encode->pad path for slow tokenizers
+        # 修補 encode，直接使用內部 tiktoken 模型
+        # transformers 5.x 在 slow tokenizer 的 encode->pad 路徑有 bug
         def _patched_encode(text: str, **kwargs: object) -> list[int]:
-            # Pass allowed_special="all" to handle special tokens like <|im_user|>
+            # 傳入 allowed_special="all" 以處理 <|im_user|> 等特殊 token
             return list(hf_tokenizer.model.encode(text, allowed_special="all"))
 
         hf_tokenizer.encode = _patched_encode
 
         return hf_tokenizer
 
-    # TODO: Change back to using only transformers
+    # TODO: 未來改回僅使用 transformers
     try:
         return AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
     except (AttributeError, ValueError):
@@ -370,15 +370,15 @@ class PromptSizer:
                     messages, tokenize=True, add_generation_prompt=True
                 )
             except ValueError:
-                # Models without a Jinja chat template (e.g. DeepSeek V4 which
-                # ships its own Python encoder). Use the exo-side V4 encoder.
+                # 若模型沒有 Jinja chat template（例如內建自有 Python 編碼器的
+                # DeepSeek V4），改用 exo 端的 V4 編碼器。
                 from exo.worker.engines.mlx.deepseek_v4_encoding import (
                     encode_messages as encode_v4,
                 )
 
                 prompt = encode_v4(messages, thinking_mode="thinking")
                 ids = tokenizer.encode(prompt, add_special_tokens=False)
-            # Fix for transformers 5.x
+            # 修正 transformers 5.x 相容性
             if hasattr(ids, "input_ids"):
                 ids = ids.input_ids
             return int(len(ids))

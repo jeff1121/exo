@@ -1,20 +1,20 @@
 # type: ignore
-# Vendored from LiveCodeBench (https://github.com/LiveCodeBench/LiveCodeBench)
-# File: lcb_runner/evaluation/testing_util.py
-# License: MIT
-# Vendored 2026-03-07 — do not modify without updating from upstream.
+# 由 LiveCodeBench 匯入（https://github.com/LiveCodeBench/LiveCodeBench）
+# 檔案：lcb_runner/evaluation/testing_util.py
+# 授權：MIT
+# 匯入日期 2026-03-07——未同步上游前請勿修改。
 
 import ast
 import faulthandler
 import json
 import platform
 
-# to run the solution files we're using a timing based approach
+# 為了執行解答檔案，這裡採用基於計時的方法
 import signal
 import sys
 import time
 
-# used for debugging to time steps
+# 用於除錯時量測各步驟時間
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
@@ -23,7 +23,7 @@ from io import StringIO
 # from pyext import RuntimeModule
 from types import ModuleType
 
-# used for testing the code that reads from input
+# 用於測試會從輸入讀取的程式碼
 from unittest.mock import mock_open, patch
 
 import_string = "from string import *\nfrom re import *\nfrom datetime import *\nfrom collections import *\nfrom heapq import *\nfrom bisect import *\nfrom copy import *\nfrom math import *\nfrom random import *\nfrom statistics import *\nfrom itertools import *\nfrom functools import *\nfrom operator import *\nfrom io import *\nfrom sys import *\nfrom json import *\nfrom builtins import *\nfrom typing import *\nimport string\nimport re\nimport datetime\nimport collections\nimport heapq\nimport bisect\nimport copy\nimport math\nimport random\nimport statistics\nimport itertools\nimport functools\nimport operator\nimport io\nimport sys\nimport json\nsys.setrecursionlimit(50000)\n"
@@ -45,7 +45,7 @@ class CODE_TYPE(Enum):
     standard_input = 1
 
 
-# stuff for setting up signal timer
+# 設定 signal 計時器所需內容
 class TimeoutException(Exception):
     pass
 
@@ -55,24 +55,24 @@ def timeout_handler(signum, frame):
     raise TimeoutException
 
 
-# used to capture stdout as a list
-# from https://stackoverflow.com/a/16571630/6416660
-# alternative use redirect_stdout() from contextlib
+# 用來把 stdout 擷取成清單
+# 來源：https://stackoverflow.com/a/16571630/6416660
+# 另一個做法是使用 contextlib 的 redirect_stdout()
 class Capturing(list):
     def __enter__(self):
         self._stdout = sys.stdout
         sys.stdout = self._stringio = StringIO()
-        # Make closing the StringIO a no-op
+        # 讓關閉 StringIO 成為 no-op
         self._stringio.close = lambda x: 1
         return self
 
     def __exit__(self, *args):
         self.append(self._stringio.getvalue())
-        del self._stringio  # free up some memory
+        del self._stringio  # 釋放部分記憶體
         sys.stdout = self._stdout
 
 
-# Custom mock for sys.stdin that supports buffer attribute
+# 支援 buffer 屬性的自訂 sys.stdin mock
 class MockStdinWithBuffer:
     def __init__(self, inputs: str):
         self.inputs = inputs
@@ -89,16 +89,16 @@ class MockStdinWithBuffer:
         return self.inputs.split("\n")
 
     def __getattr__(self, name):
-        # Delegate other attributes to StringIO
+        # 其他屬性委派給 StringIO
         return getattr(self._stringio, name)
 
 
 class MockBuffer:
     def __init__(self, inputs: str):
-        self.inputs = inputs.encode("utf-8")  # Convert to bytes
+        self.inputs = inputs.encode("utf-8")  # 轉為位元組
 
     def read(self, *args):
-        # Return as byte strings that can be split
+        # 回傳可被 split 的 bytes 字串
         return self.inputs
 
     def readline(self, *args):
@@ -159,14 +159,14 @@ def call_method(method, inputs):
 
     inputs_line_iterator = iter(inputs.split("\n"))
 
-    # Create custom stdin mock with buffer support
+    # 建立支援 buffer 的自訂 stdin mock
     mock_stdin = MockStdinWithBuffer(inputs)
 
     # sys.setrecursionlimit(10000)
 
     # @patch('builtins.input', side_effect=inputs.split("\n"))
     @patch("builtins.open", mock_open(read_data=inputs))
-    @patch("sys.stdin", mock_stdin)  # Use our custom mock instead of StringIO
+    @patch("sys.stdin", mock_stdin)  # 使用自訂 mock，取代 StringIO
     @patch("sys.stdin.readline", lambda *args: next(inputs_line_iterator))
     @patch("sys.stdin.readlines", lambda *args: inputs.split("\n"))
     @patch("sys.stdin.read", lambda *args: inputs)
@@ -196,10 +196,10 @@ def compile_code(code: str, timeout: int):
         tmp_sol = ModuleType("tmp_sol", "")
         exec(code, tmp_sol.__dict__)
         if "class Solution" in code:
-            # leetcode wraps solutions in `Solution`
-            # this is a hack to check if it is leetcode solution or not
-            # currently livecodebench only supports LeetCode but
-            # else condition allows future extensibility to other platforms
+            # leetcode 會把解答包在 `Solution` 類別中
+            # 這是用來判斷是否為 leetcode 解答的權宜作法
+            # 目前 livecodebench 只支援 LeetCode，但
+            # else 分支保留未來擴充到其他平台的可能
             compiled_sol = tmp_sol.Solution()
         else:
             # do nothing in the other case since function is accesible
@@ -221,7 +221,7 @@ def convert_line_to_decimals(line: str) -> tuple[bool, list[Decimal]]:
 
 
 def get_stripped_lines(val: str):
-    ## you don't want empty lines to add empty list after splitlines!
+    ## 避免空白行在 splitlines 後產生空清單項目！
     val = val.strip()
 
     return [val_line.strip() for val_line in val.split("\n")]
@@ -230,8 +230,8 @@ def get_stripped_lines(val: str):
 def grade_call_based(
     code: str, all_inputs: list, all_outputs: list, fn_name: str, timeout: int
 ):
-    # call-based clean up logic
-    # need to wrap in try-catch logic after to catch the correct errors, but for now this is fine.
+    # call-based 清理邏輯
+    # 後續可再用 try-catch 包裝以捕捉更精準錯誤，目前先這樣即可。
     code = import_string + "\n\n" + code
     compiled_sol = compile_code(code, timeout)
 
@@ -255,20 +255,20 @@ def grade_call_based(
         signal.alarm(timeout)
         faulthandler.enable()
         try:
-            # can lock here so time is useful
+            # 這裡可加鎖，讓時間量測更有意義
             start = time.time()
             prediction = method(*gt_inp)
             total_execution += time.time() - start
             signal.alarm(0)
 
-            # don't penalize model if it produces tuples instead of lists
-            # ground truth sequences are not tuples
+            # 若模型輸出 tuple 而非 list，不應直接懲罰
+            # 標準答案序列不是 tuple
             if isinstance(prediction, tuple):
                 prediction = list(prediction)
 
             tmp_result = prediction == gt_out
 
-            # handle floating point comparisons
+            # 處理浮點數比較
 
             all_results.append(tmp_result)
 
@@ -314,10 +314,10 @@ def grade_stdio(
     all_outputs: list,
     timeout: int,
 ):
-    ## runtime doesn't interact well with __name__ == '__main__'
+    ## 執行環境與 __name__ == '__main__' 的互動不佳
     code = clean_if_name(code)
 
-    ## we wrap the given code inside another function
+    ## 我們將給定程式碼包進另一個函式中
     code = make_function(code)
 
     compiled_sol = compile_code(code, timeout)
@@ -341,7 +341,7 @@ def grade_stdio(
                 start = time.time()
                 call_method(method, gt_inp)
                 total_execution_time += time.time() - start
-                # reset the alarm
+                # 重設 alarm
                 signal.alarm(0)
             except Exception as e:
                 signal.alarm(0)
@@ -373,8 +373,8 @@ def grade_stdio(
         stripped_prediction_lines = get_stripped_lines(prediction)
         stripped_gt_out_lines = get_stripped_lines(gt_out)
 
-        ## WA happens in multiple circumstances
-        ## so cache the return to make it clean!
+        ## WA 會在多種情況下發生
+        ## 因此先整理成共用回傳內容以保持整潔！
         WA_send_args = {
             "output": truncatefn(prediction),
             "inputs": truncatefn(gt_inp),
@@ -395,15 +395,15 @@ def grade_stdio(
                 f"Wrong answer at {output_line_idx=}: {truncatefn(stripped_prediction_line)} != {truncatefn(stripped_gt_out_line)}"
             )
 
-            ## CASE 1: exact match
+            ## 情況 1：完全比對
             if stripped_prediction_line == stripped_gt_out_line:
                 continue
 
-            ## CASE 2: element-wise comparision
-            ## if there are floating elements
-            ## use `decimal` library for good floating point comparision
-            ## otherwise gotcha: np.isclose(50000000000000000, 50000000000000001) = True
-            ## note that we should always be able to convert to decimals
+            ## 情況 2：逐元素比較
+            ## 若包含浮點元素
+            ## 使用 `decimal` 套件以獲得較穩定的浮點比較
+            ## 否則會踩雷：np.isclose(...) 可能回傳 True
+            ## 理論上應該都能轉成 decimal
 
             success, decimal_prediction_line = convert_line_to_decimals(
                 stripped_prediction_line
@@ -428,13 +428,13 @@ def grade_stdio(
 
 def run_test(sample, test=None, debug=False, timeout=6):
     """
-    if test(generated_code) is not None it'll try to run the code.
-    otherwise it'll just return an input and output pair.
+    若 test(generated_code) 不為 None，會嘗試執行程式碼。
+    否則只會回傳輸入/輸出配對。
     """
     signal.signal(signal.SIGALRM, timeout_handler)
 
-    # Disable functionalities that can make destructive changes to the test.
-    # max memory is set to 4GB
+    # 停用可能對測試造成破壞的功能。
+    # 最大記憶體限制設為 4GB
     reliability_guard()
 
     if debug:
@@ -487,7 +487,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
                 signal.alarm(0)
         elif which_type == CODE_TYPE.standard_input:
             # sol
-            # if code has if __name__ == "__main__": then remove it
+            # 若程式碼含 if __name__ == "__main__": 則移除
 
             signal.alarm(timeout)
             try:
@@ -509,7 +509,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
 
 def reliability_guard(maximum_memory_bytes=None):
     """
-    This disables various destructive functions and prevents the generated code
+    此函式會停用多種破壞性功能，避免生成程式碼
     from interfering with the test (e.g. fork bomb, killing other processes,
     removing filesystem files, etc.)
     WARNING

@@ -1,10 +1,10 @@
 # type: ignore
-"""Dashboard end-to-end tests using Playwright (headless Chromium).
+"""使用 Playwright（無頭 Chromium）的 Dashboard 端對端測試。
 
-Prerequisites:
+前置需求：
     uv run playwright install chromium
 
-Run with:
+執行方式：
     uv run pytest tests/test_dashboard.py -v
 """
 
@@ -21,7 +21,7 @@ try:
 except ImportError:
     _HAS_PLAYWRIGHT = False
 
-# Check if Chromium is installed by attempting a quick launch
+# 透過快速啟動來檢查是否已安裝 Chromium
 _HAS_CHROMIUM = False
 if _HAS_PLAYWRIGHT:
     try:
@@ -39,14 +39,14 @@ pytestmark = pytest.mark.skipif(
 
 
 def _mark_onboarding_complete(session) -> None:
-    """Mark onboarding complete on the server so the wizard doesn't auto-launch a model."""
+    """在伺服器端標記 onboarding 完成，避免精靈自動啟動模型。"""
     with contextlib.suppress(Exception):
         session.client.request_json("POST", "/onboarding")
 
 
 @pytest.mark.cluster(count=1)
 def test_dashboard_chat_inference(session):
-    """Full UI flow: open dashboard, pick a model, send a chat, verify response.
+    """完整 UI 流程：開啟 dashboard、選擇模型、送出聊天、驗證回應。
 
     The instance is created via the dashboard UI (model picker → chat send
     triggers the dashboard's auto-launch flow), not via @pytest.mark.instance.
@@ -60,39 +60,39 @@ def test_dashboard_chat_inference(session):
         page.wait_for_timeout(3000)
         page.screenshot(path="/tmp/dashboard_initial.png")
 
-        # Open the model picker by clicking the "SELECT MODEL" button
+        # 點擊「SELECT MODEL」按鈕以開啟模型選擇器
         page.get_by_text("SELECT MODEL", exact=False).first.click()
         page.wait_for_timeout(1000)
         page.screenshot(path="/tmp/dashboard_picker_open.png")
 
-        # Search for the model — uses the model id substring; the picker
-        # matches against name/id so "Llama-3.2-1B" filters to the small Llama.
+        # 搜尋模型——使用 model id 子字串；選擇器
+        # 會比對 name/id，因此「Llama-3.2-1B」會篩到小型 Llama。
         search_input = page.locator('input[placeholder*="Search models"]').first
         search_input.fill("Llama-3.2-1B")
         page.wait_for_timeout(1500)
         page.screenshot(path="/tmp/dashboard_picker_search.png")
 
-        # Click the only matching result. The picker shows the model's
-        # display name (e.g. "Llama 3.2 1B") which differs from the model_id.
-        # We click the first visible button-like row in the result list.
+        # 點擊唯一符合的結果。選擇器顯示模型的
+        # 顯示名稱（例如「Llama 3.2 1B」），可能與 model_id 不同。
+        # 我們點擊結果清單中第一個可見、像按鈕的列。
         page.get_by_text("Llama 3.2 1B", exact=False).first.click()
         page.wait_for_timeout(1500)
         page.screenshot(path="/tmp/dashboard_model_selected.png")
 
-        # Type a chat message — sending triggers the dashboard's auto-launch
-        # flow: it picks an optimal placement for the selected model and POSTs
-        # to /instance, then sends the chat once the runner is ready.
+        # 輸入聊天訊息——送出後會觸發 dashboard 的自動啟動
+        # 流程：它會為選定模型挑選最佳放置並 POST
+        # 到 /instance，接著在 runner 就緒後送出聊天。
         chat_input = page.locator("textarea").first
         chat_input.fill("Say hello")
         chat_input.press("Enter")
         page.screenshot(path="/tmp/dashboard_chat_sent.png")
 
-        # Wait for the instance to launch and respond. Generous timeout
-        # because this includes model placement + load + generation.
+        # 等待 instance 啟動並回應。超時設定較寬裕
+        # 因為包含模型放置 + 載入 + 生成。
         page.wait_for_timeout(60000)
         page.screenshot(path="/tmp/dashboard_after_chat.png")
 
-        # Verify an instance was created and the chat got a response
+        # 驗證已建立 instance，且聊天已收到回應
         instances = session.client.request_json("GET", "/state").get("instances", {})
         assert len(instances) > 0, "Expected the dashboard to have created an instance"
 

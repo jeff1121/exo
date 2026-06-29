@@ -1,7 +1,7 @@
 # type: ignore
-"""Four-node integration tests.
+"""四節點整合測試。
 
-Run with:
+執行方式：
     uv run pytest tests/test_4node.py -v
 """
 

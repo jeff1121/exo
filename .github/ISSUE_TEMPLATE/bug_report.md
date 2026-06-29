@@ -1,43 +1,43 @@
 ---
 name: Bug Report
-about: Create a report to help us improve
+about: 提交問題回報以協助我們改進
 title: '[BUG] '
 labels: bug
 assignees: ''
 ---
 
-## Describe the bug
+## 描述錯誤
 
-A clear and concise description of what the bug is.
+請清楚且簡潔地描述此錯誤是什麼。
 
-## To Reproduce
+## 重現步驟
 
-Steps to reproduce the behavior:
+重現此行為的步驟：
 1.
 2.
 3.
 
-## Expected behavior
+## 預期行為
 
-A clear and concise description of what you expected to happen.
+請清楚且簡潔地描述你預期會發生什麼。
 
-## Actual behavior
+## 實際行為
 
-A clear and concise description of what actually happened.
+請清楚且簡潔地描述實際上發生了什麼。
 
-## Environment
+## 環境資訊
 
-- macOS Version:
-- EXO Version:
-- Hardware:
-  - Device 1: (e.g., MacBook Pro M1 Max, 32GB RAM)
-  - Device 2: (e.g., Mac Mini M2, 16GB RAM)
-  - Additional devices:
-- Interconnection:
-  - (e.g., Thunderbolt 4 cable between Device 1 and 2)
-  - (e.g., WiFi 6 for Device 3)
-  - (e.g., 10GbE Ethernet between all devices)
+- macOS 版本：
+- EXO 版本：
+- 硬體：
+  - 裝置 1：（例如：MacBook Pro M1 Max，32GB RAM）
+  - 裝置 2：（例如：Mac Mini M2，16GB RAM）
+  - 其他裝置：
+- 互連方式：
+  - （例如：裝置 1 與 2 之間使用 Thunderbolt 4 纜線）
+  - （例如：裝置 3 使用 WiFi 6）
+  - （例如：所有裝置之間使用 10GbE 乙太網路）
 
-## Additional context
+## 其他補充
 
-Add any other context about the problem here.
+請在此補充任何與此問題相關的其他資訊。

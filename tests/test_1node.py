@@ -1,7 +1,7 @@
 # type: ignore
-"""Single-node integration tests.
+"""單節點整合測試。
 
-Run with:
+執行方式：
     uv run pytest tests/test_1node.py -v
 """
 
@@ -52,15 +52,13 @@ def test_delete_instance(session):
 
 @pytest.mark.cluster(count=1)
 def test_download_from_scratch(session):
-    """Ensure the model is not on the cluster, then place an instance to
-    trigger a fresh download and verify inference.
-    """
+    """確認叢集中尚未有該模型，接著建立 instance 觸發重新下載並驗證推論。"""
     node_id = next(iter(session.state.get("nodeIdentities", {})))
 
-    # Delete any existing download — the API call is idempotent
+    # 刪除任何既有下載——此 API 呼叫具冪等性
     session.client.request_json("DELETE", f"/download/{node_id}/{DEFAULT_MODEL}")
 
-    # Poll until the model is gone (it may already be gone)
+    # 輪詢直到模型消失（也可能本來就不存在）
     deadline = time.time() + 60.0
     while time.time() < deadline:
         if not is_model_downloaded(session.client, DEFAULT_MODEL):

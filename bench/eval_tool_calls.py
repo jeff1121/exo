@@ -123,9 +123,9 @@ ApiName = Literal["openai", "claude", "responses"]
 
 @dataclass
 class ParsedResponse:
-    finish_reason: str  # "tool_calls" | "stop" | ...
+    finish_reason: str  # 例如 "tool_calls" | "stop" | ...
     has_tool_call: bool
-    tool_call: dict[str, str] | None  # {"id": ..., "name": ..., "arguments": ...}
+    tool_call: dict[str, str] | None  # 例如 {"id": ..., "name": ..., "arguments": ...}
     content: str | None
 
 
@@ -133,7 +133,7 @@ class ParsedResponse:
 class ScenarioResult:
     name: str
     api: str
-    phase: str  # "tool_call" or "follow_up"
+    phase: str  # "tool_call" 或 "follow_up"
     passed: bool
     checks: dict[str, bool] = field(default_factory=dict)
     error: str | None = None
@@ -141,7 +141,7 @@ class ScenarioResult:
 
 
 def validate_args(args_str: str, required_keys: list[str]) -> tuple[bool, str | None]:
-    """Parse JSON arguments and check required keys exist."""
+    """解析 JSON 參數並檢查必要鍵是否存在。"""
     try:
         args = json.loads(args_str)
     except (json.JSONDecodeError, TypeError) as exc:
@@ -159,7 +159,7 @@ def validate_nested_args(
     array_key: str,
     required_item_keys: list[str],
 ) -> tuple[bool, str | None]:
-    """Check that args[array_key] is a list of objects with required keys."""
+    """檢查 args[array_key] 是否為包含必要鍵的物件陣列。"""
     try:
         args = json.loads(args_str)
     except (json.JSONDecodeError, TypeError) as exc:
@@ -191,7 +191,7 @@ def call_api(
     body: dict[str, Any],
     timeout: float,
 ) -> tuple[dict[str, Any], float]:
-    """POST to http://{host}:{port}{path}, return (response_json, latency_ms)."""
+    """對 http://{host}:{port}{path} 發送 POST，回傳 (response_json, latency_ms)。"""
     url = f"http://{host}:{port}{path}"
     t0 = time.monotonic()
     resp = client.post(url, json=body, timeout=timeout)
@@ -205,7 +205,7 @@ def _openai_build_request(
     messages: list[dict[str, Any]],
     tools: list[dict[str, Any]],
 ) -> tuple[str, dict[str, Any]]:
-    """Build request for /v1/chat/completions."""
+    """建立 /v1/chat/completions 的請求。"""
     body: dict[str, Any] = {
         "model": model,
         "messages": messages,
@@ -217,7 +217,7 @@ def _openai_build_request(
 
 
 def _openai_parse_response(data: dict[str, Any]) -> ParsedResponse:
-    """Parse OpenAI Chat Completions response into common format."""
+    """將 OpenAI Chat Completions 回應解析為通用格式。"""
     choice = data["choices"][0]
     finish_reason = choice.get("finish_reason", "")
     message = choice.get("message", {})
@@ -250,7 +250,7 @@ def _openai_build_followup(
     parsed: ParsedResponse,
     tool_result: str,
 ) -> tuple[str, dict[str, Any]]:
-    """Build multi-turn follow-up for OpenAI Chat Completions."""
+    """為 OpenAI Chat Completions 建立多輪後續請求。"""
     assert parsed.tool_call is not None
     tc = parsed.tool_call
     followup_messages: list[dict[str, Any]] = list(messages) + [
@@ -284,7 +284,7 @@ def _openai_build_followup(
 
 
 def _claude_translate_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Translate OpenAI-format tools to Claude format."""
+    """將 OpenAI 格式工具轉為 Claude 格式。"""
     claude_tools: list[dict[str, Any]] = []
     for tool in tools:
         fn = tool["function"]
@@ -299,7 +299,7 @@ def _claude_translate_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]
 
 
 def _claude_translate_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Translate OpenAI-format messages to Claude Messages format."""
+    """將 OpenAI 格式訊息轉為 Claude Messages 格式。"""
     claude_messages: list[dict[str, Any]] = []
 
     for msg in messages:
@@ -366,7 +366,7 @@ def _claude_build_request(
     messages: list[dict[str, Any]],
     tools: list[dict[str, Any]],
 ) -> tuple[str, dict[str, Any]]:
-    """Build request for /v1/messages."""
+    """建立 /v1/messages 的請求。"""
     claude_messages = _claude_translate_messages(messages)
     claude_tools = _claude_translate_tools(tools)
 
@@ -390,7 +390,7 @@ def _claude_build_request(
 
 
 def _claude_parse_response(data: dict[str, Any]) -> ParsedResponse:
-    """Parse Claude Messages response into common format."""
+    """將 Claude Messages 回應解析為通用格式。"""
     stop_reason = data.get("stop_reason", "")
     content_blocks = data.get("content", [])
 
@@ -440,7 +440,7 @@ def _claude_build_followup(
     parsed: ParsedResponse,
     tool_result: str,
 ) -> tuple[str, dict[str, Any]]:
-    """Build multi-turn follow-up for Claude Messages."""
+    """為 Claude Messages 建立多輪後續請求。"""
     assert parsed.tool_call is not None
     tc = parsed.tool_call
 
@@ -500,7 +500,7 @@ def _claude_build_followup(
 
 
 def _responses_translate_input(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Translate OpenAI chat messages to Responses API input items."""
+    """將 OpenAI chat 訊息轉為 Responses API 的 input items。"""
     items: list[dict[str, Any]] = []
 
     for msg in messages:
@@ -553,7 +553,7 @@ def _responses_build_request(
     messages: list[dict[str, Any]],
     tools: list[dict[str, Any]],
 ) -> tuple[str, dict[str, Any]]:
-    """Build request for /v1/responses."""
+    """建立 /v1/responses 的請求。"""
     input_items = _responses_translate_input(messages)
 
     body: dict[str, Any] = {
@@ -567,7 +567,7 @@ def _responses_build_request(
 
 
 def _responses_parse_response(data: dict[str, Any]) -> ParsedResponse:
-    """Parse OpenAI Responses API response into common format."""
+    """將 OpenAI Responses API 回應解析為通用格式。"""
     output = data.get("output", [])
 
     tool_call_info: dict[str, str] | None = None
@@ -618,7 +618,7 @@ def _responses_build_followup(
     parsed: ParsedResponse,
     tool_result: str,
 ) -> tuple[str, dict[str, Any]]:
-    """Build multi-turn follow-up for Responses API."""
+    """為 Responses API 建立多輪後續請求。"""
     assert parsed.tool_call is not None
     tc = parsed.tool_call
 
@@ -680,14 +680,14 @@ def run_scenario(
     timeout: float,
     verbose: bool,
 ) -> list[ScenarioResult]:
-    """Run a single scenario against one API adapter. Returns 1-2 results."""
+    """以單一 API 轉接器執行一個情境。回傳 1-2 筆結果。"""
     adapter = ADAPTERS[api_name]
     build_request = adapter["build_request"]
     parse_response = adapter["parse_response"]
     build_followup = adapter["build_followup"]
     results: list[ScenarioResult] = []
 
-    # --- Phase 1: initial request ---
+    # --- 階段 1：初始請求 ---
     path, body = build_request(model, scenario.messages, scenario.tools)
 
     if verbose:
@@ -780,7 +780,7 @@ def run_scenario(
         )
     )
 
-    # --- Phase 2: multi-turn follow-up ---
+    # --- 階段 2：多輪後續請求 ---
     if (
         scenario.tool_result is not None
         and parsed.has_tool_call
@@ -854,7 +854,7 @@ def run_scenario(
 
 
 def result_to_dict(result: ScenarioResult) -> dict[str, Any]:
-    """Convert a ScenarioResult to a JSON-serializable dict."""
+    """將 ScenarioResult 轉為可 JSON 序列化的 dict。"""
     return {
         "name": result.name,
         "api": result.api,
@@ -1098,7 +1098,7 @@ Examples:
                 raise
         wait_for_instance_gone(exo, instance_id)
 
-    # --- Summary ---
+    # --- 摘要 ---
     print(f"\n{'=' * 72}", file=log)
 
     total = len(all_results)

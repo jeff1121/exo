@@ -1,9 +1,9 @@
 # type: ignore
-"""Cluster lifecycle management via eco.
+"""透過 eco 進行叢集生命週期管理。
 
-Provides subprocess wrappers for eco commands (deploy, stop, start, release,
-logs, exec) and a ClusterInfo dataclass. Reusable by integration tests,
-bench, eval, and CI workflows.
+提供 eco 指令（deploy、stop、start、release、
+logs、exec）的 subprocess 包裝與 ClusterInfo dataclass。可重用於整合測試、
+bench、eval 與 CI 工作流程。
 """
 
 from __future__ import annotations
@@ -23,8 +23,8 @@ from .client import ExoClient
 
 
 class Thunderbolt(str, Enum):
-    A2A = "a2a"  # all-to-all (eco --tb-a2a)
-    RING = "ring"  # ring topology (eco --tb-ring)
+    A2A = "a2a"  # 全互連（eco --tb-a2a）
+    RING = "ring"  # 環狀拓撲（eco --tb-ring）
 
 
 class Chip(str, Enum):
@@ -48,18 +48,18 @@ class Chip(str, Enum):
 
 logger = logging.getLogger("exo_tools.cluster")
 
-# When set, deploy from a GitHub branch/tag instead of local source (rsync).
+# 設定後會從 GitHub branch/tag 部署，而非本地原始碼（rsync）。
 _EXO_REF = os.environ.get("EXO_REF")
 
 
 @dataclass
 class ClusterInfo:
-    """Holds the result of an `eco start --deploy` invocation."""
+    """保存 `eco start --deploy` 執行結果。"""
 
     hosts: list[str]
     namespace: str
-    api_endpoints: dict[str, str]  # host -> url
-    api_url: str  # primary endpoint for ExoClient
+    api_endpoints: dict[str, str]  # host -> url 對應
+    api_url: str  # ExoClient 的主要端點
 
     primary_host: str = ""
     _host: str = field(init=False, repr=False, default="")
@@ -78,17 +78,15 @@ class ClusterInfo:
 
 
 class EcoSession:
-    """Manages an eco session with a unique user and automatic cleanup.
+    """管理具唯一使用者與自動清理機制的 eco session。
 
-    Usage:
+    使用方式：
         session = EcoSession(user_prefix="test")
         cluster = session.start_deploy(count=2, thunderbolt=True)
         ...
         session.stop_all()  # or let atexit handle it
 
-    The session registers atexit and signal handlers to ensure cleanup
-    on normal exit, uncaught exceptions, SIGTERM, and SIGHUP. SIGINT
-    is left unhandled so KeyboardInterrupt propagates normally.
+    此 session 會註冊 atexit 與 signal handlers，確保在正常結束、未捕捉例外、SIGTERM 與 SIGHUP 時都能清理。SIGINT 不會被攔截，讓 KeyboardInterrupt 正常傳遞。
     """
 
     def __init__(self, user_prefix: str = "test") -> None:
@@ -96,7 +94,7 @@ class EcoSession:
         self.user = f"{user_prefix}-{self._session_id}"
         self._env = {**os.environ, "USER": self.user}
 
-        # Register cleanup handlers
+        # 註冊清理處理器
         atexit.register(self.stop_all)
         for sig in (signal.SIGTERM, signal.SIGHUP):
             signal.signal(sig, self._signal_handler)
@@ -106,7 +104,7 @@ class EcoSession:
         raise SystemExit(128 + signum)
 
     def stop_all(self) -> None:
-        """Stop all clusters and release all reservations for this session."""
+        """停止此 session 的所有叢集並釋放所有保留資源。"""
         with contextlib.suppress(Exception):
             subprocess.run(
                 ["eco", "stop"],
@@ -119,10 +117,10 @@ class EcoSession:
     def _run(
         self, args: list[str], *, check: bool = True, timeout: int = 120
     ) -> subprocess.CompletedProcess[str]:
-        """Run an eco command as this session's user.
+        """以此 session 的使用者身分執行 eco 指令。
 
-        stdout is captured (JSON output), stderr is passed through to the
-        console so eco's progress messages are visible.
+        stdout 會被擷取（JSON 輸出），stderr 會直接輸出到
+        主控台，讓 eco 進度訊息可見。
         """
         logger.info(f"eco: {' '.join(args)}")
         return subprocess.run(
@@ -147,10 +145,10 @@ class EcoSession:
         ref: str | None = _EXO_REF,
         timeout: int = 600,
     ) -> ClusterInfo:
-        """Start and deploy exo on a set of hosts via eco.
+        """透過 eco 在一組主機上啟動並部署 exo。
 
-        By default, deploys from local source via rsync. Set EXO_REF
-        or pass ref= to deploy from a GitHub branch/tag instead (for CI).
+        預設會透過 rsync 從本地原始碼部署。設定 EXO_REF
+        或傳入 ref= 可改由 GitHub branch/tag 部署（供 CI 使用）。
         """
         cmd: list[str] = ["eco", "--json", "start", "--deploy"]
         if hosts:
@@ -182,7 +180,7 @@ class EcoSession:
         )
 
     def stop(self, hosts: list[str], *, keep: bool = False, timeout: int = 120) -> None:
-        """Stop exo on the given hosts. If keep=True, keep the reservation."""
+        """停止指定主機上的 exo。若 keep=True，保留資源。"""
         cmd: list[str] = ["eco", "stop"]
         cmd.extend(hosts)
         if keep:
@@ -192,14 +190,14 @@ class EcoSession:
     def start_hosts(
         self, hosts: list[str], *, namespace: str, timeout: int = 300
     ) -> None:
-        """Start (previously stopped) hosts back into an existing namespace."""
+        """將（先前停止的）主機重新加入既有 namespace。"""
         cmd: list[str] = ["eco", "--json", "start"]
         cmd.extend(hosts)
         cmd.extend(["--namespace", namespace])
         self._run(cmd, timeout=timeout)
 
     def release(self, hosts: list[str], timeout: int = 120) -> None:
-        """Release hosts from the reservation."""
+        """釋放已保留的主機。"""
         cmd: list[str] = ["eco", "release"]
         cmd.extend(hosts)
         self._run(cmd, timeout=timeout)
@@ -207,7 +205,7 @@ class EcoSession:
     def logs(
         self, hosts: list[str], lines: int = 500, timeout: int = 60
     ) -> dict[str, list[str]]:
-        """Fetch recent logs from cluster hosts."""
+        """取得叢集主機最近的日誌。"""
         cmd: list[str] = ["eco", "--json", "logs"]
         cmd.extend(hosts)
         cmd.extend(["-n", str(lines), "--raw"])
@@ -220,7 +218,7 @@ class EcoSession:
             return {"_raw": result.stdout.splitlines()}
 
     def exec(self, hosts: list[str], command: str, timeout: int = 120) -> str:
-        """Run an arbitrary command on the given hosts via eco."""
+        """透過 eco 在指定主機上執行任意指令。"""
         cmd: list[str] = ["eco", "exec"]
         cmd.extend(hosts)
         cmd.append("--")
@@ -230,12 +228,12 @@ class EcoSession:
 
 
 def make_client(cluster: ClusterInfo, timeout_s: float = 7200.0) -> ExoClient:
-    """Create an ExoClient from a ClusterInfo."""
+    """由 ClusterInfo 建立 ExoClient。"""
     return cluster.make_client(timeout_s=timeout_s)
 
 
 def make_client_from_url(url: str, timeout_s: float = 7200.0) -> ExoClient:
-    """Create an ExoClient from a URL string like 'http://host:port'."""
+    """由 URL 字串（如 `http://host:port`）建立 ExoClient。"""
     url_clean = url.replace("http://", "").replace("https://", "")
     parts = url_clean.split(":")
     host = parts[0]

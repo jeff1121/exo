@@ -46,18 +46,18 @@ from exo.worker.runner.supervisor import RunnerSupervisor
 
 def plan(
     node_id: NodeId,
-    # Runners is expected to be FRESH and so should not come from state
+    # runners 預期是最新狀態，因此不應直接來自 state
     runners: Mapping[RunnerId, RunnerSupervisor],
     global_download_status: Mapping[NodeId, Sequence[DownloadProgress]],
     instances: Mapping[InstanceId, Instance],
-    all_runners: Mapping[RunnerId, RunnerStatus],  # all global
+    all_runners: Mapping[RunnerId, RunnerStatus],  # 全域 runner 狀態
     tasks: Mapping[TaskId, Task],
     input_chunk_buffer: Mapping[CommandId, Mapping[int, InputImageChunk]],
     image_cache: Mapping[Base64ImageHash, Base64Image],
     instance_backoff: KeyedBackoff[InstanceId],
     download_backoff: KeyedBackoff[ModelId],
 ) -> Task | None:
-    # Python short circuiting OR logic should evaluate these sequentially.
+    # Python 的 OR 短路邏輯會依序評估這些步驟。
     return (
         _cancel_tasks(runners, tasks)
         or _kill_runner(runners, all_runners, instances)
@@ -115,7 +115,7 @@ def _create_runner(
         if runner_id in runners:
             continue
 
-        # don't create runners if any other nodes have runners that have failed - wait for them to fix themselves first.
+        # 若其他節點有 runner 失敗，先不要建立 runner，等待其先恢復。
         instance_has_failed_runner = any(
             isinstance(all_runners.get(remote_runner_id), RunnerFailed)
             for remote_runner_id in instance.shard_assignments.node_to_runner.values()
@@ -160,7 +160,7 @@ def _model_needs_download(
             )
             and download_backoff.should_proceed(model_id)
         ):
-            # We don't invalidate download_status randomly in case a file gets deleted on disk
+            # 我們不會隨意使 download_status 失效，以免磁碟檔案被刪除時狀態混亂
             return DownloadModel(
                 instance_id=runner.bound_instance.instance.instance_id,
                 shard_metadata=runner.bound_instance.bound_shard,
@@ -305,8 +305,8 @@ def _pending_tasks(
     image_cache: Mapping[Base64ImageHash, Base64Image],
 ) -> Task | None:
     for task in tasks.values():
-        # for now, just forward chat completions
-        # TODO(ciaran): do this better!
+        # 目前先只轉送聊天補全任務
+        # TODO(ciaran): 這裡需要更好的做法！
         if not isinstance(task, (TextGeneration, ImageGeneration, ImageEdits)):
             continue
         if task.task_status not in (TaskStatus.Pending, TaskStatus.Running):
@@ -315,7 +315,7 @@ def _pending_tasks(
         if isinstance(task, ImageEdits) and task.task_params.total_input_chunks > 0:
             received = len(input_chunk_buffer.get(task.command_id, {}))
             if received < task.task_params.total_input_chunks:
-                continue  # Wait for all chunks to arrive
+                continue  # 等待所有分塊到齊
 
         if (
             isinstance(task, TextGeneration)
@@ -324,15 +324,15 @@ def _pending_tasks(
                 h in image_cache for h in task.task_params.image_hashes.values()
             )
         ):
-            continue  # Wait for all images to be assembled into the cache
+            continue  # 等待所有影像都組裝並寫入快取
 
         for runner in runners.values():
             if task.instance_id != runner.bound_instance.instance.instance_id:
                 continue
 
-            # the task status _should_ be set to completed by the LAST runner
-            # it is currently set by the first
-            # this is definitely a hack
+            # 任務狀態理論上應由最後一個 runner 設為 completed
+            # 目前卻是由第一個設定
+            # 這確實是權宜作法
             if task.task_id in runner.completed or task.task_id in runner.in_progress:
                 continue
 
