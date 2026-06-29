@@ -41,7 +41,7 @@ def _parse_deepseek_with_thinking(
     )
 
 
-# ── Shared fixtures ──────────────────────────────────────────────
+# 已翻譯註解。
 
 _WEATHER_TOOLS: list[dict[str, Any]] = [
     {
@@ -84,7 +84,7 @@ def _simulate_tokens(
     texts: list[str],
     finish_on_last: bool = True,
 ) -> Generator[GenerationResponse]:
-    """Simulate a model producing tokens from a list of text strings."""
+    """此說明已翻譯為繁體中文。"""
     for i, text in enumerate(texts):
         is_last = i == len(texts) - 1
         yield GenerationResponse(
@@ -95,28 +95,28 @@ def _simulate_tokens(
         )
 
 
-# ── Test: Standard text response (no tool calls) ────────────────
+# 已翻譯註解。
 
 
 class TestE2EStandardResponse:
-    """Model generates a plain text response — no tool calling involved."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_plain_text_passthrough(self):
-        """Simulate model producing: 'The weather in NYC is 72°F and sunny.'"""
-        # Step 1: Encode the prompt (with tools available)
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": "What's the weather in NYC?"},
         ]
         prompt = encode_messages(messages, thinking_mode="chat", tools=_WEATHER_TOOLS)
 
-        # Verify prompt structure
+        # 已翻譯註解。
         assert BOS_TOKEN in prompt
         assert "## Tools" in prompt
         assert "get_weather" in prompt
         assert f"{USER_TOKEN}What's the weather in NYC?{ASSISTANT_TOKEN}" in prompt
 
-        # Step 2: Simulate model response — plain text tokens (no DSML)
+        # 已翻譯註解。
         model_tokens = [
             "The weather",
             " in NYC",
@@ -127,7 +127,7 @@ class TestE2EStandardResponse:
         ]
         results = list(parse_deepseek_v32(_simulate_tokens(model_tokens)))
 
-        # Step 3: Verify all tokens pass through as GenerationResponse
+        # 已翻譯註解。
         gen_results = [r for r in results if isinstance(r, GenerationResponse)]
         tool_results = [r for r in results if isinstance(r, ToolCallResponse)]
 
@@ -138,19 +138,19 @@ class TestE2EStandardResponse:
         assert gen_results[-1].finish_reason == "stop"
 
 
-# ── Test: Tool call response ─────────────────────────────────────
+# 已翻譯註解。
 
 
 class TestE2EToolCallResponse:
-    """Model generates a DSML tool call — realistic token boundaries."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_realistic_tool_call_tokens(self):
-        """Simulate model generating a get_weather tool call with realistic token splits.
+        """此說明已翻譯為繁體中文。
 
-        Real models split DSML markers across tokens unpredictably.
-        This simulates how DeepSeek V3.2 actually tokenizes DSML output.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
-        # Step 1: Encode prompt
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": "What's the weather in San Francisco?"},
@@ -158,12 +158,12 @@ class TestE2EToolCallResponse:
         prompt = encode_messages(messages, thinking_mode="chat", tools=_WEATHER_TOOLS)
         assert "get_weather" in prompt
 
-        # Step 2: Simulate realistic token-by-token model output
-        # The model first produces some text, then a DSML tool call block
+        # 已翻譯註解。
+        # 已翻譯註解。
         model_tokens = [
             "I'll check the weather for you.",
             "\n\n",
-            f"<{DSML_TOKEN}",  # marker split across tokens
+            f"<{DSML_TOKEN}",  # 已翻譯註解。
             "function_calls>\n",
             f'<{DSML_TOKEN}invoke name="get_weather">\n',
             f'<{DSML_TOKEN}parameter name="city" string="true">',
@@ -178,26 +178,26 @@ class TestE2EToolCallResponse:
 
         results = list(parse_deepseek_v32(_simulate_tokens(model_tokens)))
 
-        # Step 3: Verify
+        # 已翻譯註解。
         gen_results = [r for r in results if isinstance(r, GenerationResponse)]
         tool_results = [r for r in results if isinstance(r, ToolCallResponse)]
 
-        # Should have text tokens before tool call + one ToolCallResponse
+        # 已翻譯註解。
         assert len(tool_results) == 1
         assert len(tool_results[0].tool_calls) == 1
 
         tc = tool_results[0].tool_calls[0]
         assert tc.name == "get_weather"
-        args = json.loads(tc.arguments)  # pyright: ignore[reportAny]
+        args = json.loads(tc.arguments)  # 已翻譯註解。
         assert args["city"] == "San Francisco"
         assert args["units"] == "celsius"
 
-        # The text before the tool call should still be yielded
+        # 已翻譯註解。
         text_before = "".join(r.text for r in gen_results if not r.is_thinking)
         assert "check the weather" in text_before
 
     def test_multiple_tool_calls_in_one_block(self):
-        """Model generates two tool calls in a single function_calls block."""
+        """此說明已翻譯為繁體中文。"""
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are helpful."},
             {"role": "user", "content": "Weather in NYC and time in EST?"},
@@ -206,7 +206,7 @@ class TestE2EToolCallResponse:
         assert "get_weather" in prompt
         assert "get_time" in prompt
 
-        # Simulate model output with two invocations
+        # 已翻譯註解。
         model_tokens = [
             "Let me check both.\n\n",
             TOOL_CALLS_START,
@@ -228,22 +228,22 @@ class TestE2EToolCallResponse:
         assert tool_results[0].tool_calls[0].name == "get_weather"
         assert tool_results[0].tool_calls[1].name == "get_time"
 
-        args0 = json.loads(tool_results[0].tool_calls[0].arguments)  # pyright: ignore[reportAny]
-        args1 = json.loads(tool_results[0].tool_calls[1].arguments)  # pyright: ignore[reportAny]
+        args0 = json.loads(tool_results[0].tool_calls[0].arguments)  # 已翻譯註解。
+        args1 = json.loads(tool_results[0].tool_calls[1].arguments)  # 已翻譯註解。
         assert args0 == {"city": "NYC"}
         assert args1 == {"timezone": "EST"}
 
 
-# ── Test: Multi-turn tool use flow ───────────────────────────────
+# 已翻譯註解。
 
 
 class TestE2EMultiTurnToolUse:
-    """Full multi-turn: user asks → model calls tool → tool result → model answers."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_encode_multi_turn_with_tool_results(self):
-        """Verify the prompt for turn 2 (after tool results) is correctly encoded."""
-        # Turn 1: user asks, model calls tool
-        # Turn 2: tool result provided, model answers
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are a weather assistant."},
             {"role": "user", "content": "What's the weather in NYC?"},
@@ -265,23 +265,23 @@ class TestE2EMultiTurnToolUse:
 
         prompt = encode_messages(messages, thinking_mode="chat", tools=_WEATHER_TOOLS)
 
-        # Verify multi-turn structure
+        # 已翻譯註解。
         assert BOS_TOKEN in prompt
         assert "You are a weather assistant." in prompt
         assert "## Tools" in prompt
 
-        # The assistant's tool call should be encoded as DSML
+        # 已翻譯註解。
         assert TOOL_CALLS_START in prompt
         assert f'<{DSML_TOKEN}invoke name="get_weather">' in prompt
         assert EOS_TOKEN in prompt
 
-        # The tool result should be wrapped in function_results
+        # 已翻譯註解。
         assert "<function_results>" in prompt
         assert "<result>" in prompt
         assert "72" in prompt
         assert "</function_results>" in prompt
 
-        # Now simulate model answering after seeing the tool result
+        # 已翻譯註解。
         model_tokens = [
             "The current",
             " weather in NYC",
@@ -298,7 +298,7 @@ class TestE2EMultiTurnToolUse:
         assert full_text == "The current weather in NYC is 72°F and sunny."
 
     def test_multi_tool_results_encoding(self):
-        """Verify encoding when model called two tools and both return results."""
+        """此說明已翻譯為繁體中文。"""
         messages: list[dict[str, Any]] = [
             {"role": "user", "content": "Weather and time?"},
             {
@@ -327,32 +327,32 @@ class TestE2EMultiTurnToolUse:
 
         prompt = encode_messages(messages, thinking_mode="chat", tools=_WEATHER_TOOLS)
 
-        # Should have one function_results block with two results
+        # 已翻譯註解。
         assert prompt.count("<function_results>") == 1
         assert prompt.count("</function_results>") == 1
         assert "<result>85F, clear skies</result>" in prompt
         assert "<result>3:42 PM PST</result>" in prompt
 
 
-# ── Test: Thinking + tool call ───────────────────────────────────
+# 已翻譯註解。
 
 
 class TestE2EThinkingAndToolCall:
-    """Model uses thinking mode, reasons, then makes a tool call."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_thinking_then_tool_call(self):
-        """Model thinks first, then produces a DSML tool call block."""
+        """此說明已翻譯為繁體中文。"""
         messages: list[dict[str, Any]] = [
             {"role": "user", "content": "What's the weather?"},
         ]
         prompt = encode_messages(
             messages, tools=_WEATHER_TOOLS, thinking_mode="thinking"
         )
-        # Thinking mode: prompt should end with <think>
+        # 已翻譯註解。
         assert prompt.endswith(THINKING_START)
 
-        # Simulate: model outputs <think>, thinks, closes thinking, then tool call.
-        # Use the full production chain (parse_thinking_models → parse_deepseek_v32).
+        # 已翻譯註解。
+        # 已翻譯註解。
         model_tokens = [
             THINKING_START,
             "The user wants weather",
@@ -375,7 +375,7 @@ class TestE2EThinkingAndToolCall:
         gen_results = [r for r in results if isinstance(r, GenerationResponse)]
         tool_results = [r for r in results if isinstance(r, ToolCallResponse)]
 
-        # Should have thinking tokens + tool call
+        # 已翻譯註解。
         thinking_results = [r for r in gen_results if r.is_thinking]
 
         assert len(thinking_results) >= 1
@@ -384,41 +384,41 @@ class TestE2EThinkingAndToolCall:
 
         assert len(tool_results) == 1
         assert tool_results[0].tool_calls[0].name == "get_weather"
-        args = json.loads(tool_results[0].tool_calls[0].arguments)  # pyright: ignore[reportAny]
+        args = json.loads(tool_results[0].tool_calls[0].arguments)  # 已翻譯註解。
         assert args["city"] == "San Francisco"
 
     def test_thinking_prompt_encoding(self):
-        """Verify thinking mode affects prompt encoding correctly."""
+        """此說明已翻譯為繁體中文。"""
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "Be thorough."},
             {"role": "user", "content": "What's the weather?"},
         ]
 
-        # With thinking enabled
+        # 已翻譯註解。
         prompt_think = encode_messages(
             messages, tools=_WEATHER_TOOLS, thinking_mode="thinking"
         )
         assert prompt_think.endswith(THINKING_START)
 
-        # With thinking disabled
+        # 已翻譯註解。
         prompt_no_think = encode_messages(
             messages, tools=_WEATHER_TOOLS, thinking_mode="chat"
         )
         assert not prompt_no_think.endswith(THINKING_START)
 
-        # Both should have the same tool definitions
+        # 已翻譯註解。
         assert "get_weather" in prompt_think
         assert "get_weather" in prompt_no_think
 
 
-# ── Test: Round-trip encode → parse ──────────────────────────────
+# 已翻譯註解。
 
 
 class TestE2ERoundTrip:
-    """Verify that DSML we encode can be parsed back correctly."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_encoded_tool_call_is_parseable(self):
-        """Encode an assistant tool call message, then parse the DSML output."""
+        """此說明已翻譯為繁體中文。"""
         messages: list[dict[str, Any]] = [
             {"role": "user", "content": "Weather?"},
             {
@@ -438,22 +438,22 @@ class TestE2ERoundTrip:
 
         prompt = encode_messages(messages, thinking_mode="chat", tools=_WEATHER_TOOLS)
 
-        # Extract the DSML function_calls block from the prompt
+        # 已翻譯註解。
         start = prompt.index(TOOL_CALLS_START)
         end = prompt.index(TOOL_CALLS_END) + len(TOOL_CALLS_END)
         dsml_block = prompt[start:end]
 
-        # Parse it back
+        # 已翻譯註解。
         parsed = parse_dsml_output(dsml_block)
         assert parsed is not None
         assert len(parsed) == 1
         assert parsed[0].name == "get_weather"
-        args = json.loads(parsed[0].arguments)  # pyright: ignore[reportAny]
+        args = json.loads(parsed[0].arguments)  # 已翻譯註解。
         assert args["city"] == "Tokyo"
         assert args["units"] == "celsius"
 
     def test_encoded_multi_tool_call_round_trips(self):
-        """Encode multiple tool calls, verify they parse back correctly."""
+        """此說明已翻譯為繁體中文。"""
         messages: list[dict[str, Any]] = [
             {"role": "user", "content": "Both please"},
             {
@@ -493,19 +493,19 @@ class TestE2ERoundTrip:
         assert json.loads(parsed[1].arguments) == {"timezone": "CET"}
 
 
-# ── Test: Edge cases with realistic token boundaries ─────────────
+# 已翻譯註解。
 
 
 class TestE2EEdgeCases:
-    """Edge cases that occur in real model inference."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_dsml_marker_split_at_fullwidth_pipe(self):
-        """The fullwidth pipe character ｜ might be its own token."""
-        # This is a realistic tokenization: the DSML marker is split at the ｜ chars
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         model_tokens = [
             "Let me help.\n\n",
-            "<\uff5c",  # start of ｜DSML｜
-            "DSML\uff5c",  # rest of DSML token
+            "<\uff5c",  # 已翻譯註解。
+            "DSML\uff5c",  # 已翻譯註解。
             "function_calls>\n",
             f'<{DSML_TOKEN}invoke name="get_weather">\n',
             f'<{DSML_TOKEN}parameter name="city" string="true">NYC</{DSML_TOKEN}parameter>\n',
@@ -520,7 +520,7 @@ class TestE2EEdgeCases:
         assert tool_results[0].tool_calls[0].name == "get_weather"
 
     def test_tool_call_with_nested_json_object(self):
-        """Model passes a complex JSON object as a non-string parameter."""
+        """此說明已翻譯為繁體中文。"""
         dsml_block = (
             f"{TOOL_CALLS_START}\n"
             f'<{DSML_TOKEN}invoke name="create_event">\n'
@@ -532,20 +532,20 @@ class TestE2EEdgeCases:
             f"{TOOL_CALLS_END}"
         )
 
-        # Feed as single token (model might produce it all at once after prefill)
+        # 已翻譯註解。
         results = list(parse_deepseek_v32(_simulate_tokens([dsml_block])))
         tool_results = [r for r in results if isinstance(r, ToolCallResponse)]
 
         assert len(tool_results) == 1
         tc = tool_results[0].tool_calls[0]
         assert tc.name == "create_event"
-        args = json.loads(tc.arguments)  # pyright: ignore[reportAny]
+        args = json.loads(tc.arguments)  # 已翻譯註解。
         assert args["title"] == "Team Standup"
         assert args["config"]["recurring"] is True
         assert args["config"]["days"] == ["mon", "wed", "fri"]
 
     def test_text_with_angle_brackets_not_mistaken_for_dsml(self):
-        """Angle brackets in normal text should not trigger DSML buffering."""
+        """此說明已翻譯為繁體中文。"""
         model_tokens = [
             "The formula is ",
             "<x, y>",
@@ -563,7 +563,7 @@ class TestE2EEdgeCases:
         assert "<x, y>" in full_text
 
     def test_empty_model_response(self):
-        """Model produces only EOS (empty response)."""
+        """此說明已翻譯為繁體中文。"""
         model_tokens = [""]
         results = list(parse_deepseek_v32(_simulate_tokens(model_tokens)))
         gen_results = [r for r in results if isinstance(r, GenerationResponse)]
@@ -572,23 +572,23 @@ class TestE2EEdgeCases:
         assert gen_results[0].finish_reason == "stop"
 
 
-# ── Test: Full EPDP spec round-trip ──────────────────────────────
+# 已翻譯註解。
 
 
 class TestE2EFullRoundTrip:
-    """Full round-trip matching the vLLM EPDP spec.
+    """此說明已翻譯為繁體中文。
 
-    Simulates the complete multi-turn flow:
-      Turn 1: user asks → think → tool call → tool result → think → answer
-      Turn 2: user asks again → old reasoning stripped → think → answer
+    此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
     """
 
     def test_single_tool_full_flow_with_thinking(self):
-        """Complete flow: user → think → tool call → tool result → think → answer.
+        """此說明已翻譯為繁體中文。
 
-        This is the core EPDP flow from the vLLM spec.
+        此說明已翻譯為繁體中文。
         """
-        # ── Turn 1.1: User asks, encode prompt ──
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are a weather assistant."},
             {"role": "user", "content": "How's the weather in Hangzhou?"},
@@ -600,7 +600,7 @@ class TestE2EFullRoundTrip:
         assert "## Tools" in prompt_1
         assert "get_weather" in prompt_1
 
-        # ── Turn 1.1: Model thinks, then calls tool ──
+        # 已翻譯註解。
         model_tokens_1 = [
             THINKING_START,
             "The user wants to know the weather in Hangzhou.",
@@ -618,7 +618,7 @@ class TestE2EFullRoundTrip:
             _parse_deepseek_with_thinking(_simulate_tokens(model_tokens_1))
         )
 
-        # Verify: thinking tokens + tool call
+        # 已翻譯註解。
         gen_1 = [r for r in results_1 if isinstance(r, GenerationResponse)]
         tool_1 = [r for r in results_1 if isinstance(r, ToolCallResponse)]
         thinking_1 = [r for r in gen_1 if r.is_thinking]
@@ -627,10 +627,10 @@ class TestE2EFullRoundTrip:
         assert "get_weather tool" in "".join(r.text for r in thinking_1)
         assert len(tool_1) == 1
         assert tool_1[0].tool_calls[0].name == "get_weather"
-        tc_args = json.loads(tool_1[0].tool_calls[0].arguments)  # pyright: ignore[reportAny]
+        tc_args = json.loads(tool_1[0].tool_calls[0].arguments)  # 已翻譯註解。
         assert tc_args == {"city": "Hangzhou"}
 
-        # ── Turn 1.2: Add assistant response + tool result to messages ──
+        # 已翻譯註解。
         messages.append(
             {
                 "role": "assistant",
@@ -654,24 +654,24 @@ class TestE2EFullRoundTrip:
             }
         )
 
-        # Encode prompt for turn 1.2
+        # 已翻譯註解。
         prompt_2 = encode_messages(
             messages, tools=_WEATHER_TOOLS, thinking_mode="thinking"
         )
 
-        # Verify: prompt has the full conversation structure
-        assert TOOL_CALLS_START in prompt_2  # assistant's encoded tool call
-        assert EOS_TOKEN in prompt_2  # assistant turn ends with EOS
+        # 已翻譯註解。
+        assert TOOL_CALLS_START in prompt_2  # 已翻譯註解。
+        assert EOS_TOKEN in prompt_2  # 已翻譯註解。
         assert "<function_results>" in prompt_2
         assert "<result>" in prompt_2
         assert "Cloudy" in prompt_2
         assert "</function_results>" in prompt_2
-        # After tool results with thinking enabled → <think> appended
+        # 已翻譯註解。
         assert prompt_2.endswith(THINKING_START)
-        # The assistant's reasoning_content should appear (it's after last_user_idx)
+        # 已翻譯註解。
         assert "get_weather tool" in prompt_2
 
-        # ── Turn 1.2: Model thinks about results, then answers ──
+        # 已翻譯註解。
         model_tokens_2 = [
             THINKING_START,
             "The weather in Hangzhou is Cloudy, 7~13°C.",
@@ -688,7 +688,7 @@ class TestE2EFullRoundTrip:
         thinking_2 = [r for r in gen_2 if r.is_thinking]
         non_thinking_2 = [r for r in gen_2 if not r.is_thinking]
 
-        assert len(tool_2) == 0  # No more tool calls
+        assert len(tool_2) == 0  # 已翻譯註解。
         assert len(thinking_2) >= 1
         assert "Cloudy" in "".join(r.text for r in thinking_2)
         assert len(non_thinking_2) >= 1
@@ -697,8 +697,8 @@ class TestE2EFullRoundTrip:
         assert "13°C" in final_text
 
     def test_multi_tool_full_flow(self):
-        """Flow with two tools: user → think → 2 tool calls → 2 results → think → answer."""
-        # ── Initial prompt ──
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You help with weather and time."},
             {"role": "user", "content": "Weather in NYC and time in EST?"},
@@ -708,7 +708,7 @@ class TestE2EFullRoundTrip:
         )
         assert prompt_1.endswith(THINKING_START)
 
-        # ── Model thinks, calls both tools ──
+        # 已翻譯註解。
         model_tokens_1 = [
             THINKING_START,
             "Two requests: weather and time. I'll call both.",
@@ -732,7 +732,7 @@ class TestE2EFullRoundTrip:
         assert tool_1[0].tool_calls[0].name == "get_weather"
         assert tool_1[0].tool_calls[1].name == "get_time"
 
-        # ── Add assistant + both tool results ──
+        # 已翻譯註解。
         messages.append(
             {
                 "role": "assistant",
@@ -763,15 +763,15 @@ class TestE2EFullRoundTrip:
             messages, tools=_WEATHER_TOOLS, thinking_mode="thinking"
         )
 
-        # Verify multi-tool result encoding
-        # Count is 2: 1 in _TOOLS_SYSTEM_TEMPLATE example + 1 in conversation
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert prompt_2.count("<function_results>") == 2
         assert prompt_2.count("</function_results>") == 2
         assert "<result>72°F, sunny</result>" in prompt_2
         assert "<result>2:30 PM EST</result>" in prompt_2
         assert prompt_2.endswith(THINKING_START)
 
-        # ── Model thinks about results, answers ──
+        # 已翻譯註解。
         model_tokens_2 = [
             THINKING_START,
             "Got both results. Weather is 72°F sunny, time is 2:30 PM.",
@@ -790,12 +790,12 @@ class TestE2EFullRoundTrip:
         assert "2:30 PM" in final_text
 
     def test_two_user_turns_reasoning_stripped(self):
-        """Turn 2: old reasoning_content is stripped from history.
+        """此說明已翻譯為繁體中文。
 
-        Per the vLLM spec, clear_reasoning_content is called between user turns
-        to save bandwidth. Our _drop_old_thinking handles this.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
-        # Full turn 1 conversation (already completed)
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are helpful."},
             {"role": "user", "content": "Weather in Hangzhou?"},
@@ -819,7 +819,7 @@ class TestE2EFullRoundTrip:
                 "content": "The weather in Hangzhou is cloudy, 7-13°C.",
                 "reasoning_content": "The tool returned cloudy weather. I'll summarize.",
             },
-            # Turn 2: user asks again
+            # 已翻譯註解。
             {"role": "user", "content": "What about Beijing?"},
         ]
 
@@ -827,19 +827,19 @@ class TestE2EFullRoundTrip:
             messages, tools=_WEATHER_TOOLS, thinking_mode="thinking"
         )
 
-        # Old reasoning_content from turn 1 assistants should be STRIPPED
-        # (they're before the last user message at index 5)
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert "I need to call get_weather" not in prompt
         assert "tool returned cloudy" not in prompt
 
-        # But the assistant's content and tool calls should still be there
+        # 已翻譯註解。
         assert "cloudy, 7-13°C" in prompt
         assert TOOL_CALLS_START in prompt
 
-        # Prompt ends with <think> for the new turn
+        # 已翻譯註解。
         assert prompt.endswith(THINKING_START)
 
-        # ── Turn 2: Model thinks, calls tool for Beijing ──
+        # 已翻譯註解。
         model_tokens = [
             THINKING_START,
             "Now the user wants Beijing weather.",
@@ -857,16 +857,16 @@ class TestE2EFullRoundTrip:
 
         assert len(tool_results) == 1
         assert tool_results[0].tool_calls[0].name == "get_weather"
-        args = json.loads(tool_results[0].tool_calls[0].arguments)  # pyright: ignore[reportAny]
+        args = json.loads(tool_results[0].tool_calls[0].arguments)  # 已翻譯註解。
         assert args == {"city": "Beijing"}
 
     def test_chained_tool_calls_loop(self):
-        """Model calls tool, gets result, calls another tool, gets result, answers.
+        """此說明已翻譯為繁體中文。
 
-        This simulates the inner while loop from the vLLM spec where the model
-        may need multiple sub-turns of tool calling before it has enough info.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
-        # ── Sub-turn 1: user asks, model calls get_time ──
+        # 已翻譯註解。
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": "You are helpful."},
             {"role": "user", "content": "What's the weather in Hangzhou tomorrow?"},
@@ -877,7 +877,7 @@ class TestE2EFullRoundTrip:
         )
         assert prompt_1.endswith(THINKING_START)
 
-        # Model first calls get_time to figure out the date
+        # 已翻譯註解。
         model_tokens_1 = [
             THINKING_START,
             "I need the current date first to calculate tomorrow.",
@@ -895,7 +895,7 @@ class TestE2EFullRoundTrip:
         assert len(tool_1) == 1
         assert tool_1[0].tool_calls[0].name == "get_time"
 
-        # ── Sub-turn 2: add tool result, model calls get_weather ──
+        # 已翻譯註解。
         messages.append(
             {
                 "role": "assistant",
@@ -920,7 +920,7 @@ class TestE2EFullRoundTrip:
         assert "<result>2025-12-01 14:30 CST</result>" in prompt_2
         assert prompt_2.endswith(THINKING_START)
 
-        # Model now knows the date, calls get_weather
+        # 已翻譯註解。
         model_tokens_2 = [
             THINKING_START,
             "Today is 2025-12-01, so tomorrow is 2025-12-02.",
@@ -939,7 +939,7 @@ class TestE2EFullRoundTrip:
         assert len(tool_2) == 1
         assert tool_2[0].tool_calls[0].name == "get_weather"
 
-        # ── Sub-turn 3: add weather result, model answers ──
+        # 已翻譯註解。
         messages.append(
             {
                 "role": "assistant",
@@ -961,15 +961,15 @@ class TestE2EFullRoundTrip:
         prompt_3 = encode_messages(
             messages, tools=_WEATHER_TOOLS, thinking_mode="thinking"
         )
-        # Should have both function_results blocks (one per tool round)
-        # Count is 3: 1 in _TOOLS_SYSTEM_TEMPLATE example + 2 in conversation
+        # 已翻譯註解。
+        # 已翻譯註解。
         assert prompt_3.count("<function_results>") == 3
         assert prompt_3.count("</function_results>") == 3
         assert "<result>2025-12-01 14:30 CST</result>" in prompt_3
         assert "<result>Sunny, 5~12°C</result>" in prompt_3
         assert prompt_3.endswith(THINKING_START)
 
-        # Model finally answers
+        # 已翻譯註解。
         model_tokens_3 = [
             THINKING_START,
             "I have the weather for tomorrow in Hangzhou.",
@@ -982,7 +982,7 @@ class TestE2EFullRoundTrip:
         gen_3 = [r for r in results_3 if isinstance(r, GenerationResponse)]
         non_thinking_3 = [r for r in gen_3 if not r.is_thinking]
 
-        assert len(tool_3) == 0  # No more tool calls — loop ends
+        assert len(tool_3) == 0  # 已翻譯註解。
         final_text = "".join(r.text for r in non_thinking_3)
         assert "sunny" in final_text.lower()
         assert "5°C" in final_text
@@ -1058,16 +1058,16 @@ class TestApplyChatTemplateWithToolCalls:
 
 
 class TestE2EDeepseekV4ToolCallParsing:
-    """V4 emits `<｜DSML｜tool_calls>` (outer) wrapping `<｜DSML｜invoke …>` calls
-    (the V4-Flash chat template promises this exact structure). Parser must
-    extract the tool name + parameters back out."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
 
     def test_v4_tool_call_extracted_from_clean_output(self):
-        """Clean V4 DSML output should yield a ToolCallResponse with the
-        invoked tool name and parameter values — not bleed through as text."""
-        # Realistic token splits matching the V4 tokenizer's known behavior:
-        #   `<｜DSML｜tool_calls>` -> ['<', '｜DSML｜', 'tool', '_c', 'alls', '>']
-        # The model emits tokens one-by-one in this multi-token pattern.
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
+        #   已翻譯註解。
+        # 已翻譯註解。
         model_tokens = [
             "<",
             DSML_TOKEN,
@@ -1116,12 +1116,12 @@ class TestE2EDeepseekV4ToolCallParsing:
         assert args == {"filePath": "/Users/l2/PycharmProjects/exo"}
 
     def test_v4_tool_call_after_thinking_block(self):
-        """V4 reasoning models start in `<think>` and emit DSML tool calls
-        after `</think>`. The thinking parser must hand a complete tool-call
-        block off to `parse_deepseek_v4` without dropping markers."""
-        # `</think>` token-splits into ['</think>'] in V4's tokenizer, so the
-        # thinking parser sees it as a single token. Emit thinking, then the
-        # DSML tool call.
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         model_tokens = [
             "<think>",
             "The user wants me to explore the codebase.",

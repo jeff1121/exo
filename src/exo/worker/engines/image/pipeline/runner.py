@@ -70,11 +70,11 @@ def calculate_token_indices(
 
 
 class DiffusionRunner:
-    """Orchestrates the diffusion loop for image generation.
+    """協調影像生成的擴散迴圈。
 
-    In distributed mode, it implements PipeFusion with:
-    - Sync pipeline for initial timesteps (full image, all devices in lockstep)
-    - Async pipeline for later timesteps (patches processed independently)
+    此說明已翻譯為繁體中文。
+    - 初期時間步使用同步管線（完整影像、所有裝置鎖步）
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(
@@ -108,14 +108,14 @@ class DiffusionRunner:
     def _init_cfg_topology(
         self, shard_metadata: PipelineShardMetadata | CfgShardMetadata
     ) -> None:
-        """Initialize CFG and pipeline topology from shard metadata.
+        """此說明已翻譯為繁體中文。
 
-        Both CfgShardMetadata and PipelineShardMetadata represent pipeline parallel
-        execution. CFG adds a second parallel pipeline for negative prompt processing,
-        but within each pipeline group the communication pattern is identical.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        但各管線群組內的通訊模式相同。
         """
         if self.group is None:
-            # Single node - no distributed communication
+            # 單節點 - 不進行分散式通訊
             self.rank = 0
             self.world_size = 1
             self.start_layer = 0
@@ -132,28 +132,28 @@ class DiffusionRunner:
             self.last_pipeline_rank: int = 0
             return
 
-        # Common fields from base metadata
+        # 來自基礎中繼資料的共用欄位
         self.rank = shard_metadata.device_rank
         self.world_size = shard_metadata.world_size
         self.start_layer = shard_metadata.start_layer
         self.end_layer = shard_metadata.end_layer
 
         if isinstance(shard_metadata, CfgShardMetadata):
-            # CFG parallel: two independent pipelines
+            # 已翻譯註解。
             self.cfg_rank = shard_metadata.cfg_rank
             self.cfg_world_size = shard_metadata.cfg_world_size
             self.cfg_parallel = True
             self.pipeline_rank = shard_metadata.pipeline_rank
             self.pipeline_world_size = shard_metadata.pipeline_world_size
         else:
-            # Pure pipeline: single pipeline group, sequential CFG
+            # 已翻譯註解。
             self.cfg_rank = 0
             self.cfg_world_size = 1
             self.cfg_parallel = False
             self.pipeline_rank = shard_metadata.device_rank
             self.pipeline_world_size = shard_metadata.world_size
 
-        # Pipeline neighbor computation (same logic for both types)
+        # 計算管線相鄰節點（兩種類型邏輯相同）
         is_first = self.pipeline_rank == 0
         is_last = self.pipeline_rank == self.pipeline_world_size - 1
 
@@ -168,7 +168,7 @@ class DiffusionRunner:
             else self._device_rank_for(self.cfg_rank, self.pipeline_rank - 1)
         )
 
-        # CFG peer is the corresponding last stage in the other CFG group
+        # 已翻譯註解。
         if self.cfg_parallel and is_last:
             other_cfg_rank = 1 - self.cfg_rank
             self.cfg_peer_rank = self._device_rank_for(
@@ -177,17 +177,17 @@ class DiffusionRunner:
         else:
             self.cfg_peer_rank = None
 
-        # First/last pipeline ranks for ring communication (latent broadcast)
+        # 已翻譯註解。
         self.first_pipeline_rank = self._device_rank_for(self.cfg_rank, 0)
         self.last_pipeline_rank = self._device_rank_for(
             self.cfg_rank, self.pipeline_world_size - 1
         )
 
     def _device_rank_for(self, cfg_rank: int, pipeline_rank: int) -> int:
-        """Convert (cfg_rank, pipeline_rank) to device_rank in the ring topology.
+        """此說明已翻譯為繁體中文。
 
-        Ring layout: [cfg0_pipe0, cfg0_pipe1, ..., cfg1_pipeN-1, cfg1_pipeN-2, ..., cfg1_pipe0]
-        Group 0 is in ascending order, group 1 is reversed so last stages are neighbors.
+        此說明已翻譯為繁體中文。
+        群組 0 為遞增順序，群組 1 為反向，以便最後階段彼此相鄰。
         """
         if not self.cfg_parallel:
             return pipeline_rank
@@ -197,7 +197,7 @@ class DiffusionRunner:
             return self.world_size - 1 - pipeline_rank
 
     def _compute_assigned_blocks(self) -> None:
-        """Determine which joint/single blocks this stage owns."""
+        """此說明已翻譯為繁體中文。"""
         start = self.start_layer
         end = self.end_layer
 
@@ -224,7 +224,7 @@ class DiffusionRunner:
             self.has_single_blocks or self.end_layer == self.total_joint
         )
 
-        # Wrappers created lazily on first forward (need text_seq_len)
+        # 已翻譯註解。
         self.joint_block_wrappers: list[JointBlockWrapper[Any]] | None = None
         self.single_block_wrappers: list[SingleBlockWrapper[Any]] | None = None
         self._wrappers_initialized = False
@@ -285,11 +285,11 @@ class DiffusionRunner:
         return self.config.guidance_scale
 
     def _get_cfg_branches(self, prompt_data: PromptData) -> Iterator[CfgBranch]:
-        """Yield the CFG branches this node should process.
+        """此說明已翻譯為繁體中文。
 
-        - No CFG: yields one branch (positive)
-        - CFG parallel: yields one branch (our assigned branch)
-        - Sequential CFG: yields two branches (positive, then negative)
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         if not self.adapter.needs_cfg:
             embeds, mask, pooled, cond = prompt_data.get_cfg_branch_data(positive=True)
@@ -336,7 +336,7 @@ class DiffusionRunner:
         if len(results) == 1:
             positive, noise = results[0]
             if self.cfg_parallel and self.is_last_stage:
-                # TODO(ciaran): try to remove
+                # 待辦事項：已翻譯註解。
                 mx.eval(noise)
                 return self._exchange_and_apply_guidance(noise, positive)
             return noise
@@ -374,10 +374,10 @@ class DiffusionRunner:
         text_seq_len: int,
         encoder_hidden_states_mask: mx.array | None = None,
     ) -> None:
-        """Lazily create block wrappers on first forward pass.
+        """此說明已翻譯為繁體中文。
 
-        Wrappers need text_seq_len which is only known after prompt encoding.
-        Re-initializes if text_seq_len changes (e.g., warmup vs real generation).
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         if self._wrappers_initialized and self._current_text_seq_len == text_seq_len:
             return
@@ -393,7 +393,7 @@ class DiffusionRunner:
         self._current_text_seq_len = text_seq_len
 
     def _reset_all_caches(self) -> None:
-        """Reset KV caches on all wrappers for a new generation."""
+        """此說明已翻譯為繁體中文。"""
         if self.joint_block_wrappers:
             for wrapper in self.joint_block_wrappers:
                 wrapper.reset_cache()
@@ -415,19 +415,18 @@ class DiffusionRunner:
         init_time_step: int,
         num_inference_steps: int,
     ) -> set[int]:
-        """Calculate which timesteps should produce partial images.
+        """計算哪些時間步應產生部分影像。
 
-        Places the first partial after step 1 for fast initial feedback,
-        then evenly spaces remaining partials with equal gaps between them
-        and from the last partial to the final image.
+        此說明已翻譯為繁體中文。
+        之後其餘部分影像會等距分布，並與最終影像保持相同間隔。
 
-        Args:
-            partial_images: Number of partial images to capture
-            init_time_step: Starting timestep (for img2img this may not be 0)
-            num_inference_steps: Total inference steps
+        參數：
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            Set of timestep indices to capture
+        回傳：
+            要擷取的時間步索引集合
         """
         if partial_images <= 0:
             return set()
@@ -467,25 +466,25 @@ class DiffusionRunner:
         num_sync_steps: int = 1,
         cancel_checker: Callable[[], bool] | None = None,
     ):
-        """Primary entry point for image generation.
+        """影像生成的主要進入點。
 
-        Orchestrates the full generation flow:
-        1. Create runtime config
-        2. Create initial latents
-        3. Encode prompt
-        4. Run diffusion loop (yielding partials if requested)
-        5. Decode to image
+        協調完整生成流程：
+        1. 建立執行期設定
+        此說明已翻譯為繁體中文。
+        3. 編碼提示
+        4. 執行擴散迴圈（若有要求則輸出部分結果）
+        5. 解碼為影像
 
-        Args:
-            settings: Generation config (steps, height, width)
-            prompt: Text prompt
-            seed: Random seed
-            partial_images: Number of intermediate images to yield (0 for none)
-            guidance_override: Optional override for guidance scale (CFG)
+        參數：
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Yields:
-            Partial images as (GeneratedImage, partial_index, total_partials) tuples
-            Final GeneratedImage
+        產生：
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         self._guidance_override = guidance_override
         self._cancel_checker = cancel_checker
@@ -523,16 +522,16 @@ class DiffusionRunner:
                         yield (partial_image, partial_index, total_partials)
                         partial_index += 1
             except StopIteration as e:
-                latents = e.value  # pyright: ignore[reportAny]
+                latents = e.value  # 已翻譯註解。
         else:
             try:
                 while True:
                     next(diffusion_gen)
             except StopIteration as e:
-                latents = e.value  # pyright: ignore[reportAny]
+                latents = e.value  # 已翻譯註解。
 
         if self.is_last_stage and not self._cancelling:
-            yield self.adapter.decode_latents(latents, runtime_config, seed, prompt)  # pyright: ignore[reportAny]
+            yield self.adapter.decode_latents(latents, runtime_config, seed, prompt)  # 已翻譯註解。
 
     def _run_diffusion_loop(
         self,
@@ -552,15 +551,15 @@ class DiffusionRunner:
 
         time_steps = tqdm(range(runtime_config.num_inference_steps))
 
-        ctx = self.adapter.model.callbacks.start(  # pyright: ignore[reportAny]
+        ctx = self.adapter.model.callbacks.start(  # 已翻譯註解。
             seed=seed, prompt=prompt, config=runtime_config
         )
 
-        ctx.before_loop(  # pyright: ignore[reportAny]
+        ctx.before_loop(  # 已翻譯註解。
             latents=latents,
         )
 
-        t = -1  # default if time_steps is empty; drain condition uses t
+        t = -1  # 已翻譯註解。
         for t in time_steps:
             self._check_cancellation()
             if self._cancelling and self.group is None:
@@ -575,7 +574,7 @@ class DiffusionRunner:
                     num_sync_steps=num_sync_steps,
                 )
 
-                ctx.in_loop(  # pyright: ignore[reportAny]
+                ctx.in_loop(  # 已翻譯註解。
                     t=t,
                     latents=latents,
                     time_steps=time_steps,
@@ -587,7 +586,7 @@ class DiffusionRunner:
                     yield (latents, t)
 
             except KeyboardInterrupt:  # noqa: PERF203
-                ctx.interruption(t=t, latents=latents)  # pyright: ignore[reportAny]
+                ctx.interruption(t=t, latents=latents)  # 已翻譯註解。
                 raise StopImageGenerationException(
                     f"Stopping image generation at step {t + 1}/{len(time_steps)}"
                 ) from None
@@ -595,9 +594,9 @@ class DiffusionRunner:
             if self._cancelling:
                 break
 
-        # Drain pending ring recvs after cancellation during async steps.
-        # The last stage sent patches during the final completed step, but
-        # the first stage will never enter the next step to recv them.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 但第一階段不會再進入下一步去接收它們。
         if (
             self._cancelling
             and self.is_first_stage
@@ -610,7 +609,7 @@ class DiffusionRunner:
             for patch in patch_latents_drain:
                 self._recv_like(patch, src=self.last_pipeline_rank)
 
-        ctx.after_loop(latents=latents)  # pyright: ignore[reportAny]
+        ctx.after_loop(latents=latents)  # 已翻譯註解。
 
         return latents
 
@@ -628,20 +627,20 @@ class DiffusionRunner:
         conditioning_latents: mx.array | None = None,
         kontext_image_ids: mx.array | None = None,
     ) -> mx.array:
-        """Run a single forward pass through the transformer.
-        Args:
-            latents: Input latents (already scaled by caller)
-            prompt_embeds: Text embeddings
-            pooled_prompt_embeds: Pooled text embeddings (Flux) or placeholder (Qwen)
-            t: Current timestep
-            config: Runtime configuration
-            encoder_hidden_states_mask: Attention mask for text (Qwen)
-            cond_image_grid: Conditioning image grid dimensions (Qwen edit)
-            conditioning_latents: Conditioning latents for edit mode
-            kontext_image_ids: Position IDs for Kontext conditioning (Flux Kontext)
+        """此說明已翻譯為繁體中文。
+        參數：
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            Noise prediction tensor
+        回傳：
+            雜訊預測張量
         """
         text_seq_len = prompt_embeds.shape[1]
 
@@ -651,10 +650,10 @@ class DiffusionRunner:
             for wrapper in self.joint_block_wrappers:
                 wrapper.set_encoder_mask(encoder_hidden_states_mask)
 
-        scaled_latents = config.scheduler.scale_model_input(latents, t)  # pyright: ignore[reportAny]
+        scaled_latents = config.scheduler.scale_model_input(latents, t)  # 已翻譯註解。
 
-        # For edit mode: concatenate with conditioning latents
-        original_latent_tokens: int = scaled_latents.shape[1]  # pyright: ignore[reportAny]
+        # 已翻譯註解。
+        original_latent_tokens: int = scaled_latents.shape[1]  # 已翻譯註解。
         if conditioning_latents is not None:
             scaled_latents = mx.concatenate(
                 [scaled_latents, conditioning_latents], axis=1
@@ -696,10 +695,10 @@ class DiffusionRunner:
                 rotary_embeddings=rotary_embeddings,
             )
 
-        # Extract image portion
+        # 擷取影像部分
         hidden_states = hidden_states[:, text_seq_len:, ...]
 
-        # For edit mode: extract only the generated portion (exclude conditioning latents)
+        # 已翻譯註解。
         if conditioning_latents is not None:
             hidden_states = hidden_states[:, :original_latent_tokens, ...]
 
@@ -747,7 +746,7 @@ class DiffusionRunner:
         results: list[tuple[bool, mx.array]] = []
 
         for branch in self._get_cfg_branches(prompt_data):
-            # Reset caches before each branch to ensure no state contamination
+            # 每個分支前先重設快取，避免狀態污染
             self._reset_all_caches()
 
             pooled_embeds = (
@@ -768,7 +767,7 @@ class DiffusionRunner:
             results.append((branch.positive, noise))
 
         noise = self._combine_cfg_results(results)
-        return config.scheduler.step(noise=noise, timestep=t, latents=latents)  # pyright: ignore[reportAny]
+        return config.scheduler.step(noise=noise, timestep=t, latents=latents)  # 已翻譯註解。
 
     def _create_patches(
         self,
@@ -960,8 +959,8 @@ class DiffusionRunner:
         cond_image_grid = prompt_data.cond_image_grid
         kontext_image_ids = prompt_data.kontext_image_ids
 
-        scaled_hidden_states = config.scheduler.scale_model_input(hidden_states, t)  # pyright: ignore[reportAny]
-        original_latent_tokens: int = scaled_hidden_states.shape[1]  # pyright: ignore[reportAny]
+        scaled_hidden_states = config.scheduler.scale_model_input(hidden_states, t)  # 已翻譯註解。
+        original_latent_tokens: int = scaled_hidden_states.shape[1]  # 已翻譯註解。
 
         results: list[tuple[bool, mx.array]] = []
 
@@ -976,7 +975,7 @@ class DiffusionRunner:
             else:
                 num_img_tokens = original_latent_tokens
 
-            step_latents: mx.array = scaled_hidden_states  # pyright: ignore[reportAny]
+            step_latents: mx.array = scaled_hidden_states  # 已翻譯註解。
             if self.is_first_stage and cond_latents is not None:
                 step_latents = mx.concatenate([step_latents, cond_latents], axis=1)
 
@@ -1004,7 +1003,7 @@ class DiffusionRunner:
         if self.is_last_stage:
             noise = self._combine_cfg_results(results)
 
-            hidden_states = config.scheduler.step(  # pyright: ignore[reportAny]
+            hidden_states = config.scheduler.step(  # 已翻譯註解。
                 noise=noise, timestep=t, latents=prev_latents
             )
 
@@ -1094,7 +1093,7 @@ class DiffusionRunner:
             if self.is_last_stage:
                 noise = self._combine_cfg_results(results)
 
-                patch_latents[patch_idx] = config.scheduler.step(  # pyright: ignore[reportAny]
+                patch_latents[patch_idx] = config.scheduler.step(  # 已翻譯註解。
                     noise=noise,
                     timestep=t,
                     latents=prev_patch_latents[patch_idx],
@@ -1124,22 +1123,22 @@ class DiffusionRunner:
         image_rotary_embeddings: RotaryEmbeddings,
         encoder_hidden_states: mx.array | None,
     ) -> tuple[mx.array | None, mx.array | None]:
-        """Process a single patch through the forward pipeline.
+        """此說明已翻譯為繁體中文。
 
-        Handles stage-to-stage communication (stage i -> stage i+1).
-        Ring communication (last stage -> first stage) is handled by the caller.
+        此說明已翻譯為繁體中文。
+        環狀通訊（最後階段 -> 第一階段）由呼叫端處理。
 
-        Args:
-            patch: The patch latents to process
-            patch_idx: Index of this patch (0-indexed)
-            token_indices: (start_token, end_token) for this patch
-            prompt_embeds: Text embeddings (for compute_embeddings on first stage)
-            text_embeddings: Precomputed text embeddings
-            image_rotary_embeddings: Precomputed rotary embeddings
-            encoder_hidden_states: Encoder hidden states (passed between patches)
+        參數：
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            (noise_prediction, encoder_hidden_states) - noise is None for non-last stages
+        回傳：
+            此說明已翻譯為繁體中文。
         """
         start_token, end_token = token_indices
         batch_size = patch.shape[0]

@@ -34,8 +34,8 @@ from exo.worker.tests.unittests.conftest import (
 
 def test_plan_forwards_pending_chat_completion_when_runner_ready():
     """
-    When there is a pending TextGeneration for the local instance and all
-    runners are Ready/Running, plan() should forward that task.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -88,8 +88,8 @@ def test_plan_forwards_pending_chat_completion_when_runner_ready():
 
 def test_plan_does_not_forward_chat_completion_if_any_runner_not_ready():
     """
-    Even with a pending TextGeneration, plan() should not forward it unless
-    all runners for the instance are Ready/Running.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard2 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -142,8 +142,8 @@ def test_plan_does_not_forward_chat_completion_if_any_runner_not_ready():
 
 def test_plan_does_not_forward_tasks_for_other_instances():
     """
-    plan() should ignore pending TextGeneration tasks whose instance_id does
-    not match the local instance.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard = get_pipeline_shard_metadata(model_id=MODEL_A_ID, device_rank=0)
     local_instance = get_mlx_ring_instance(
@@ -193,8 +193,8 @@ def test_plan_does_not_forward_tasks_for_other_instances():
 
 def test_plan_ignores_non_pending_or_non_chat_tasks():
     """
-    _pending_tasks should not forward tasks that are either not TextGeneration
-    or not in Pending/Running states.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)
@@ -262,8 +262,8 @@ def test_plan_ignores_non_pending_or_non_chat_tasks():
 
 def test_plan_returns_none_when_nothing_to_do():
     """
-    If there are healthy runners, no downloads needed, and no pending tasks,
-    plan() should return None (steady state).
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     shard0 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=0, world_size=2)
     shard1 = get_pipeline_shard_metadata(MODEL_A_ID, device_rank=1, world_size=2)

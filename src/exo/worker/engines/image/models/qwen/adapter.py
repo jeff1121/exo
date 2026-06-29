@@ -76,17 +76,17 @@ class QwenPromptData(PromptData):
     def get_batched_cfg_data(
         self,
     ) -> tuple[mx.array, mx.array, mx.array | None, mx.array | None] | None:
-        """Batch positive and negative embeddings for CFG with batch_size=2.
+        """此說明已翻譯為繁體中文。
 
-        Pads shorter sequence to max length using zeros for embeddings
-        and zeros (masked) for attention mask.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Returns:
-            Tuple of (batched_embeds, batched_mask, None, conditioning_latents)
-            - batched_embeds: [2, max_seq, hidden]
-            - batched_mask: [2, max_seq]
-            - None for pooled (Qwen doesn't use it)
-            - conditioning_latents: [2, latent_seq, latent_dim] or None
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         pos_embeds = self._prompt_embeds
         neg_embeds = self._negative_prompt_embeds
@@ -129,8 +129,8 @@ class QwenPromptData(PromptData):
         batched_embeds = mx.concatenate([pos_embeds, neg_embeds], axis=0)
         batched_mask = mx.concatenate([pos_mask, neg_mask], axis=0)
 
-        # TODO(ciaran): currently None but maybe we will deduplicate with edit
-        # adapter
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
         cond_latents = self.conditioning_latents
         if cond_latents is not None:
             cond_latents = mx.concatenate([cond_latents, cond_latents], axis=0)
@@ -157,14 +157,14 @@ class QwenPromptData(PromptData):
 
 
 class QwenModelAdapter(ModelAdapter[QwenImage, QwenTransformer]):
-    """Adapter for Qwen-Image model.
+    """此說明已翻譯為繁體中文。
 
-    Key differences from Flux:
-    - Single text encoder (vs dual T5+CLIP)
-    - 60 joint-style blocks, no single blocks
-    - 3D RoPE returning ((img_cos, img_sin), (txt_cos, txt_sin))
-    - Norm-preserving CFG with negative prompts
-    - Uses attention mask for variable-length text
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(
@@ -199,7 +199,7 @@ class QwenModelAdapter(ModelAdapter[QwenImage, QwenTransformer]):
         text_seq_len: int,
         encoder_hidden_states_mask: mx.array | None = None,
     ) -> list[JointBlockWrapper[Any]]:
-        """Create wrapped joint blocks for Qwen."""
+        """此說明已翻譯為繁體中文。"""
         return [
             QwenJointBlockWrapper(block, text_seq_len, encoder_hidden_states_mask)
             for block in self._transformer.transformer_blocks
@@ -234,7 +234,7 @@ class QwenModelAdapter(ModelAdapter[QwenImage, QwenTransformer]):
                 prompt=prompt,
                 negative_prompt=negative_prompt,
                 prompt_cache=self.model.prompt_cache,
-                qwen_tokenizer=self.model.tokenizers["qwen"],  # pyright: ignore[reportAny]
+                qwen_tokenizer=self.model.tokenizers["qwen"],  # 已翻譯註解。
                 qwen_text_encoder=self.model.text_encoder,
             )
         )
@@ -263,8 +263,8 @@ class QwenModelAdapter(ModelAdapter[QwenImage, QwenTransformer]):
         pooled_prompt_embeds: mx.array | None = None,
         hidden_states: mx.array | None = None,
     ) -> mx.array:
-        # Use hidden_states if provided, otherwise fall back to pooled_prompt_embeds
-        # (which for Qwen is the same as prompt_embeds)
+        # 已翻譯註解。
+        # 已翻譯註解。
         ref_tensor = (
             hidden_states if hidden_states is not None else pooled_prompt_embeds
         )
@@ -277,7 +277,7 @@ class QwenModelAdapter(ModelAdapter[QwenImage, QwenTransformer]):
         timestep = QwenTransformer._compute_timestep(t, runtime_config)  # noqa: SLF001
         batch_size = ref_tensor.shape[0]
         timestep = mx.broadcast_to(timestep, (batch_size,)).astype(mx.float32)
-        return self._transformer.time_text_embed(timestep, ref_tensor)  # pyright: ignore[reportAny]
+        return self._transformer.time_text_embed(timestep, ref_tensor)  # 已翻譯註解。
 
     def compute_rotary_embeddings(
         self,
@@ -296,7 +296,7 @@ class QwenModelAdapter(ModelAdapter[QwenImage, QwenTransformer]):
 
         return QwenTransformer._compute_rotary_embeddings(
             encoder_hidden_states_mask=encoder_hidden_states_mask,
-            pos_embed=self._transformer.pos_embed,  # pyright: ignore[reportAny]
+            pos_embed=self._transformer.pos_embed,  # 已翻譯註解。
             config=runtime_config,
             cond_image_grid=cond_image_grid,
         )

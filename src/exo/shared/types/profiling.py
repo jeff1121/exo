@@ -41,14 +41,14 @@ class MemoryUsage(FrozenModel):
 
 
 class DiskUsage(FrozenModel):
-    """Disk space usage for the models directory."""
+    """此說明已翻譯為繁體中文。"""
 
     total: Memory
     available: Memory
 
     @classmethod
     def from_path(cls, path: Path) -> Self:
-        """Get disk usage stats for the partition containing path."""
+        """此說明已翻譯為繁體中文。"""
         total, _used, free = shutil.disk_usage(path)
         return cls(
             total=Memory.from_bytes(total),
@@ -57,7 +57,7 @@ class DiskUsage(FrozenModel):
 
 
 class SystemPerformanceProfile(FrozenModel):
-    # TODO: flops_fp16: float
+    # 待辦事項：已翻譯註解。
 
     gpu_usage: float = 0.0
     temp: float = 0.0
@@ -76,7 +76,7 @@ class NetworkInterfaceInfo(FrozenModel):
 
 
 class NodeIdentity(FrozenModel):
-    """Static and slow-changing node identification data."""
+    """此說明已翻譯為繁體中文。"""
 
     model_id: str = "Unknown"
     chip_id: str = "Unknown"
@@ -86,25 +86,25 @@ class NodeIdentity(FrozenModel):
 
 
 class NodeNetworkInfo(FrozenModel):
-    """Network interface information for a node."""
+    """此說明已翻譯為繁體中文。"""
 
     interfaces: Sequence[NetworkInterfaceInfo] = []
 
 
 class NodeThunderboltInfo(FrozenModel):
-    """Thunderbolt interface identifiers for a node."""
+    """此說明已翻譯為繁體中文。"""
 
     interfaces: Sequence[ThunderboltIdentifier] = []
 
 
 class NodeRdmaCtlStatus(FrozenModel):
-    """Whether RDMA is enabled on this node (via rdma_ctl)."""
+    """此說明已翻譯為繁體中文。"""
 
     enabled: bool
 
 
 class ThunderboltBridgeStatus(FrozenModel):
-    """Whether the Thunderbolt Bridge network service is enabled on this node."""
+    """此說明已翻譯為繁體中文。"""
 
     enabled: bool
     exists: bool

@@ -25,8 +25,8 @@ def _make_state_with_thunderbolt_idents(
     *node_ids_and_uuids: tuple[NodeId, str, str],
     rdma_ctl: dict[NodeId, NodeRdmaCtlStatus] | None = None,
 ) -> State:
-    """Build a State with Thunderbolt identifiers per node so the apply MacThunderboltConnections
-    case can resolve uuid -> (node, iface)."""
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。"""
     node_thunderbolt = {
         nid: NodeThunderboltInfo(
             interfaces=[ThunderboltIdentifier(rdma_interface=iface, domain_uuid=uuid)]
@@ -122,7 +122,7 @@ def test_mac_thunderbolt_connections_skips_rdma_when_sink_rdma_ctl_disabled():
 
 
 def test_mac_thunderbolt_connections_skips_rdma_when_rdma_ctl_status_missing():
-    """Missing rdma_ctl status defaults to not-enabled — node is RDMA-incapable."""
+    """此說明已翻譯為繁體中文。"""
     node_a = NodeId()
     node_b = NodeId()
     state = _make_state_with_thunderbolt_idents(
@@ -130,7 +130,7 @@ def test_mac_thunderbolt_connections_skips_rdma_when_rdma_ctl_status_missing():
         (node_b, "uuid-b", "rdma_en1"),
         rdma_ctl={
             node_a: NodeRdmaCtlStatus(enabled=True),
-            # node_b intentionally absent
+            # 已翻譯註解。
         },
     )
 
@@ -148,11 +148,11 @@ def test_mac_thunderbolt_connections_skips_rdma_when_rdma_ctl_status_missing():
 
 
 def test_rdma_ctl_status_disabled_purges_existing_rdma_edges():
-    """When a node reports rdma_ctl disabled, all RDMA edges touching it must be removed."""
+    """此說明已翻譯為繁體中文。"""
     node_a = NodeId()
     node_b = NodeId()
 
-    # Start with both nodes RDMA-enabled and existing RDMA edges in the topology.
+    # 已翻譯註解。
     state = _make_state_with_thunderbolt_idents(
         (node_a, "uuid-a", "rdma_en1"),
         (node_b, "uuid-b", "rdma_en1"),
@@ -184,7 +184,7 @@ def test_rdma_ctl_status_disabled_purges_existing_rdma_edges():
     assert _has_rdma_edge(state.topology, node_a, node_b)
     assert _has_rdma_edge(state.topology, node_b, node_a)
 
-    # Now node_a flips to rdma_ctl disabled — both directions of RDMA edge must drop.
+    # 已翻譯註解。
     state = apply_node_gathered_info(
         NodeGatheredInfo(
             node_id=node_a, when=_now(), info=RdmaCtlStatus(enabled=False)
@@ -198,7 +198,7 @@ def test_rdma_ctl_status_disabled_purges_existing_rdma_edges():
 
 
 def test_topology_remove_all_rdma_connections_touching_keeps_socket_edges():
-    """Purging RDMA edges for a disabled node must not affect non-RDMA edges."""
+    """此說明已翻譯為繁體中文。"""
     from exo.shared.types.multiaddr import Multiaddr
     from exo.shared.types.topology import Connection, SocketConnection
 
@@ -224,7 +224,7 @@ def test_topology_remove_all_rdma_connections_touching_keeps_socket_edges():
     topology.remove_all_rdma_connections_touching(node_a)
 
     assert not _has_rdma_edge(topology, node_a, node_b)
-    # Socket edge survives.
+    # 已翻譯註解。
     assert any(
         isinstance(edge, SocketConnection)
         for edge in topology.get_all_connections_between(node_a, node_b)

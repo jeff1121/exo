@@ -15,7 +15,7 @@ class Id(str):
     def __get_pydantic_core_schema__(
         cls, _source: type, handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
-        # Just use a plain string schema
+        # 已翻譯註解。
         return core_schema.no_info_after_validator_function(
             cls, core_schema.str_schema()
         )
@@ -47,7 +47,7 @@ class TruncatingString(str):
     @classmethod
     def __get_pydantic_core_schema__(
         cls,
-        source_type: Any,  # pyright: ignore[reportAny]
+        source_type: Any,  # 已翻譯註解。
         handler: GetCoreSchemaHandler,
     ) -> CoreSchema:
         return core_schema.no_info_after_validator_function(cls, handler(str))

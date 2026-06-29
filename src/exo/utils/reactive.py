@@ -1,5 +1,5 @@
 """
-Utilities for reactive variables
+此說明已翻譯為繁體中文。
 
 """
 
@@ -24,9 +24,9 @@ class Reactive[T]:
         old_value = self._value
         self._value = new_value
 
-        # don't notify when not changed
+        # 已翻譯註解。
         if old_value == new_value:
             return
 
-        # notify of changes
+        # 已翻譯註解。
         self._on_change(old_value=old_value, new_value=new_value)

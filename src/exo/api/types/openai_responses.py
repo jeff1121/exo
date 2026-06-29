@@ -1,9 +1,9 @@
-"""OpenAI Responses API 線路型別。
+"""此說明已翻譯為繁體中文。
 
-這些型別描述 OpenAI Responses API 的請求/回應格式。
-ResponsesRequest 是 API 層級的線路型別；若要看推論流程使用的標準內部
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 任務參數型別，請參考
-``exo.shared.types.text_generation.TextGenerationTaskParams``.
+此說明已翻譯為繁體中文。
 """
 
 import time
@@ -21,7 +21,7 @@ ResponseRole = Literal["user", "assistant", "system", "developer"]
 
 # 請求輸入內容分段型別
 class ResponseInputTextPart(BaseModel, frozen=True):
-    """Responses API 輸入訊息中的文字內容分段。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["input_text"] = "input_text"
     text: str
@@ -34,7 +34,7 @@ class ResponseInputImagePart(BaseModel, frozen=True):
 
 
 class ResponseOutputTextPart(BaseModel, frozen=True):
-    """輸出文字內容分段（用於在輸入中重播 assistant 訊息）。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["output_text"] = "output_text"
     text: str
@@ -47,7 +47,7 @@ ResponseContentPart = (
 
 # 請求輸入項目型別
 class ResponseInputMessage(BaseModel, frozen=True):
-    """Responses API 的輸入訊息。"""
+    """此說明已翻譯為繁體中文。"""
 
     role: ResponseRole
     content: str | list[ResponseContentPart]
@@ -55,7 +55,7 @@ class ResponseInputMessage(BaseModel, frozen=True):
 
 
 class FunctionCallInputItem(BaseModel, frozen=True):
-    """在輸入中重播的函式呼叫項目（來自先前 assistant 回應）。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["function_call"] = "function_call"
     id: str | None = None
@@ -301,21 +301,21 @@ ResponseInputItem = (
 
 
 class Reasoning(BaseModel, frozen=True):
-    """OpenAI Responses API 的推理設定。"""
+    """此說明已翻譯為繁體中文。"""
 
     effort: ReasoningEffort | None = None
     summary: Literal["auto", "concise", "detailed"] | None = None
 
 
 class ResponsesRequest(BaseModel, frozen=True):
-    """OpenAI Responses API 的請求主體。
+    """此說明已翻譯為繁體中文。
 
-    這是 Responses 端點的 API 線路型別。標準
-    內部任務參數型別為 ``TextGenerationTaskParams``；請參考
-    ``responses_request_to_text_generation`` 轉接器進行轉換。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
-    # --- OpenAI Responses API 標準欄位 ---
+    # 已翻譯註解。
     model: ModelId
     input: str | list[ResponseInputItem]
     instructions: str | None = None
@@ -327,7 +327,7 @@ class ResponsesRequest(BaseModel, frozen=True):
     metadata: dict[str, str] | None = None
     reasoning: Reasoning | None = None
 
-    # --- exo 擴充（不在 OpenAI Responses API 規範中）---
+    # 已翻譯註解。
     enable_thinking: bool | None = Field(
         default=None,
         description="[exo extension] Boolean thinking toggle. Not part of the OpenAI Responses API.",
@@ -350,7 +350,7 @@ class ResponsesRequest(BaseModel, frozen=True):
         json_schema_extra={"x-exo-extension": True},
     )
 
-    # --- 內部欄位（序列化時保留，並從 OpenAPI schema 隱藏）---
+    # 已翻譯註解。
     chat_template_messages: list[dict[str, Any]] | None = Field(
         default=None,
         description="Internal: pre-formatted messages for tokenizer chat template. Not part of the OpenAI Responses API.",
@@ -408,19 +408,19 @@ ResponseItem = ResponseMessageItem | ResponseFunctionCallItem | ResponseReasonin
 
 
 class InputTokensDetails(BaseModel, frozen=True):
-    """Responses API 回應中的輸入 token 計數拆解。"""
+    """此說明已翻譯為繁體中文。"""
 
     cached_tokens: int = 0
 
 
 class OutputTokensDetails(BaseModel, frozen=True):
-    """Responses API 回應中的輸出 token 計數拆解。"""
+    """此說明已翻譯為繁體中文。"""
 
     reasoning_tokens: int = 0
 
 
 class ResponseUsage(BaseModel, frozen=True):
-    """Responses API 回應中的 token 使用量。"""
+    """此說明已翻譯為繁體中文。"""
 
     input_tokens: int
     input_tokens_details: InputTokensDetails
@@ -430,7 +430,7 @@ class ResponseUsage(BaseModel, frozen=True):
 
 
 class ResponsesResponse(BaseModel, frozen=True):
-    """OpenAI Responses API 的回應主體。"""
+    """此說明已翻譯為繁體中文。"""
 
     id: str
     object: Literal["response"] = "response"

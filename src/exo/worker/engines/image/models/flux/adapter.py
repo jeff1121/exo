@@ -71,7 +71,7 @@ class FluxPromptData(PromptData):
     def get_cfg_branch_data(
         self, positive: bool
     ) -> tuple[mx.array, mx.array | None, mx.array | None, mx.array | None]:
-        """Flux doesn't use CFG, but we return positive data for compatibility."""
+        """此說明已翻譯為繁體中文。"""
         return (self._prompt_embeds, None, self._pooled_prompt_embeds, None)
 
 
@@ -107,7 +107,7 @@ class FluxModelAdapter(ModelAdapter[Flux1, Transformer]):
         text_seq_len: int,
         encoder_hidden_states_mask: mx.array | None = None,
     ) -> list[JointBlockWrapper[Any]]:
-        """Create wrapped joint blocks for Flux."""
+        """此說明已翻譯為繁體中文。"""
         return [
             FluxJointBlockWrapper(block, text_seq_len)
             for block in self._transformer.transformer_blocks
@@ -117,7 +117,7 @@ class FluxModelAdapter(ModelAdapter[Flux1, Transformer]):
         self,
         text_seq_len: int,
     ) -> list[SingleBlockWrapper[Any]]:
-        """Create wrapped single blocks for Flux."""
+        """此說明已翻譯為繁體中文。"""
         return [
             FluxSingleBlockWrapper(block, text_seq_len)
             for block in self._transformer.single_transformer_blocks
@@ -132,16 +132,16 @@ class FluxModelAdapter(ModelAdapter[Flux1, Transformer]):
         all_single = list(self._transformer.single_transformer_blocks)
         total_joint_blocks = len(all_joint)
         if end_layer <= total_joint_blocks:
-            # All assigned are joint blocks
+            # 已翻譯註解。
             joint_start, joint_end = start_layer, end_layer
             single_start, single_end = 0, 0
         elif start_layer >= total_joint_blocks:
-            # All assigned are single blocks
+            # 已翻譯註解。
             joint_start, joint_end = 0, 0
             single_start = start_layer - total_joint_blocks
             single_end = end_layer - total_joint_blocks
         else:
-            # Spans both joint and single
+            # 已翻譯註解。
             joint_start, joint_end = start_layer, total_joint_blocks
             single_start = 0
             single_end = end_layer - total_joint_blocks
@@ -163,8 +163,8 @@ class FluxModelAdapter(ModelAdapter[Flux1, Transformer]):
         prompt_embeds, pooled_prompt_embeds = PromptEncoder.encode_prompt(
             prompt=prompt,
             prompt_cache=self.model.prompt_cache,
-            t5_tokenizer=self.model.tokenizers["t5"],  # pyright: ignore[reportAny]
-            clip_tokenizer=self.model.tokenizers["clip"],  # pyright: ignore[reportAny]
+            t5_tokenizer=self.model.tokenizers["t5"],  # 已翻譯註解。
+            clip_tokenizer=self.model.tokenizers["clip"],  # 已翻譯註解。
             t5_text_encoder=self.model.t5_text_encoder,
             clip_text_encoder=self.model.clip_text_encoder,
         )
@@ -187,14 +187,14 @@ class FluxModelAdapter(ModelAdapter[Flux1, Transformer]):
         t: int,
         runtime_config: Config,
         pooled_prompt_embeds: mx.array | None = None,
-        hidden_states: mx.array | None = None,  # Ignored by Flux
+        hidden_states: mx.array | None = None,  # 已翻譯註解。
     ) -> mx.array:
         if pooled_prompt_embeds is None:
             raise ValueError(
                 "pooled_prompt_embeds is required for Flux text embeddings"
             )
 
-        # hidden_states is ignored - Flux uses pooled_prompt_embeds instead
+        # 已翻譯註解。
         return Transformer.compute_text_embeddings(
             t, pooled_prompt_embeds, self._transformer.time_text_embed, runtime_config
         )

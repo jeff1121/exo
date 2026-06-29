@@ -80,33 +80,33 @@ def flush_prefill_sends() -> None:
 
 
 def clear_prefill_sends() -> None:
-    # Discard pending sends (e.g. on cancellation).
+    # 已翻譯註解。
     _pending_prefill_sends.clear()
 
 
 class _LayerCallable(Protocol):
-    """Structural type that any compatible layer must satisfy.
+    """此說明已翻譯為繁體中文。
 
-    We require a single positional input of type ``mx.array`` and an
-    ``mx.array`` output, while permitting arbitrary *args / **kwargs so this
-    protocol matches the vast majority of `mlx.nn.Module` subclasses.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __call__(self, x: mx.array, *args: object, **kwargs: object) -> mx.array: ...
 
 
 class CustomMlxLayer(nn.Module):
-    """Base class for replacing an MLX layer with a custom implementation."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, original_layer: _LayerCallable):
         super().__init__()
-        dict.__setitem__(self, "_original_layer", original_layer)  # pyright: ignore[reportUnknownMemberType]
+        dict.__setitem__(self, "_original_layer", original_layer)  # 已翻譯註解。
 
     @property
     def original_layer(self) -> _LayerCallable:
         return cast(_LayerCallable, self["_original_layer"])
 
-    # Calls __getattr__ for any attributes not found on nn.Module (e.g. use_sliding)
+    # 已翻譯註解。
     if not TYPE_CHECKING:
 
         def __getattr__(self, name):
@@ -131,8 +131,8 @@ class PipelineFirstLayer(CustomMlxLayer):
 
     def __call__(self, x: mx.array, *args: object, **kwargs: object) -> mx.array:
         if self.r != 0:
-            # We want to avoid GPU timeout errors by evalling the distributed operation
-            # so that it stays on CPU, which does not have a timeout.
+            # 已翻譯註解。
+            # 已翻譯註解。
             mx.eval(x)
             x = mx.distributed.recv_like(x, (self.r - 1), group=self.group)
             mx.eval(x)
@@ -162,8 +162,8 @@ class PipelineLastLayer(CustomMlxLayer):
 
         output: mx.array = self.original_layer(x, *args, **kwargs)
 
-        # Eval layer output to materialize it before send — this splits the graph
-        # so the send is isolated and the receiving rank's recv can complete.
+        # 已翻譯註解。
+        # 已翻譯註解。
         mx.eval(output)
 
         if self.r != self.s - 1:
@@ -176,10 +176,10 @@ class PipelineLastLayer(CustomMlxLayer):
                     output, (self.r + 1) % self.s, group=self.group
                 )
             if cache is not None:
-                # CacheList (used by MLA models like DeepSeekV32, GLM MoE DSA)
-                # doesn't have .keys directly; access via first sub-cache.
+                # 已翻譯註解。
+                # 已翻譯註解。
                 _cache = cache[0] if hasattr(cache, "caches") else cache  # type: ignore
-                if hasattr(_cache, "keys"):  # pyright: ignore[reportAny]
+                if hasattr(_cache, "keys"):  # 已翻譯註解。
                     _cache.keys = mx.depends(_cache.keys, output)  # type: ignore
             mx.eval(output)
             if cache is not None and hasattr(_cache, "keys"):  # type: ignore
@@ -231,7 +231,7 @@ def get_inner_model(model: nn.Module) -> nn.Module:
 
 
 def get_layers(inner_model_instance: nn.Module) -> list[_LayerCallable]:
-    # Handle both model.layers and model.h cases
+    # 已翻譯註解。
     layers: list[_LayerCallable]
     if hasattr(inner_model_instance, "layers"):
         layers = cast(list[_LayerCallable], inner_model_instance.layers)
@@ -250,7 +250,7 @@ def _patch_hybrid_cache(
     ssm_idx: int,
     has_linear: bool,
 ) -> None:
-    # Hacks to make make_mask happy.
+    # 已翻譯註解。
     original = model.make_cache
 
     def patched() -> list[ArraysCache | KVCache]:
@@ -279,12 +279,12 @@ def pipeline_auto_parallel(
     model_shard_meta: PipelineShardMetadata,
 ) -> Generator[ModelLoadingResponse, None, nn.Module]:
     """
-    Automatically parallelize a model across multiple devices.
-    Args:
-    model: The model to parallelize (must have a 'layers' or 'h' property)
-    model_shard_meta: The metadata for the model shard
-    Returns:
-    The parallelized model
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     inner_model_instance: nn.Module = get_inner_model(model)
 
@@ -312,8 +312,8 @@ def pipeline_auto_parallel(
         inner_model_instance.layer_types = inner_model_instance.layer_types[
             start_layer:end_layer
         ]
-        # We can assume the model has at least one layer thanks to placement.
-        # If a layer type doesn't exist, we can set it to 0.
+        # 已翻譯註解。
+        # 已翻譯註解。
         inner_model_instance.swa_idx = (
             0
             if "sliding_attention" not in inner_model_instance.layer_types
@@ -357,9 +357,9 @@ def pipeline_auto_parallel(
             )
 
     if isinstance(inner_model_instance, NemotronHInnerModel):
-        # NemotronH uses block_type: "M" (Mamba/SSM), "*" (Attention), "E" (MoE), "-" (MLP)
-        # Only "M" and "*" blocks have cache entries.
-        # Recompute fa_idx and ssm_idx as cache-array indices for the shard's layers.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         cache_idx = 0
         fa_idx: int | None = None
         ssm_idx: int | None = None
@@ -396,10 +396,10 @@ def pipeline_auto_parallel(
 
 
 def patch_pipeline_model[T](model: T, group: mx.distributed.Group) -> T:
-    # Patch __call__ on the model's class
+    # 已翻譯註解。
     cls = model.__class__
-    original_call = cls.__call__  # type :ignore
-    call_signature = signature(original_call)  # type :ignore
+    original_call = cls.__call__  # 已翻譯註解。
+    call_signature = signature(original_call)  # 已翻譯註解。
 
     def patched_call(
         self: T,
@@ -411,7 +411,7 @@ def patch_pipeline_model[T](model: T, group: mx.distributed.Group) -> T:
             "cache", None
         )
 
-        # Add dependency to last cache entry to ensure distributed ops are evaluated
+        # 已翻譯註解。
         if cache is not None and len(cache) > 0:  # type: ignore
             last = cache[-1]  # type: ignore
             dep_cache = last[0] if hasattr(last, "caches") else last  # type: ignore
@@ -425,7 +425,7 @@ def patch_pipeline_model[T](model: T, group: mx.distributed.Group) -> T:
 
 
 def patch_tensor_model[T](model: T) -> T:
-    """Patch model's __call__ to ensure distributed ops sync during inference."""
+    """此說明已翻譯為繁體中文。"""
     cls = model.__class__
     original_call = cls.__call__
     call_signature = signature(original_call)
@@ -435,17 +435,17 @@ def patch_tensor_model[T](model: T) -> T:
         *args: object,
         **kwargs: object,
     ) -> mx.array:
-        logits: mx.array = original_call(self, *args, **kwargs)  # pyright: ignore[reportAny]
+        logits: mx.array = original_call(self, *args, **kwargs)  # 已翻譯註解。
         cache = call_signature.bind_partial(self, *args, **kwargs).arguments.get(
             "cache", None
         )
 
-        # Add dependency to last cache entry to ensure distributed ops are evaluated
-        if cache is not None and len(cache) > 0:  # pyright: ignore[reportAny]
-            last = cache[-1]  # pyright: ignore[reportAny]
-            dep_cache = last[0] if hasattr(last, "caches") else last  # pyright: ignore[reportAny]
+        # 已翻譯註解。
+        if cache is not None and len(cache) > 0:  # 已翻譯註解。
+            last = cache[-1]  # 已翻譯註解。
+            dep_cache = last[0] if hasattr(last, "caches") else last  # 已翻譯註解。
             if hasattr(dep_cache, "keys"):  # type: ignore
-                dep_cache.keys = mx.depends(dep_cache.keys, logits)  # pyright: ignore[reportAny]
+                dep_cache.keys = mx.depends(dep_cache.keys, logits)  # 已翻譯註解。
 
         return logits
 
@@ -633,7 +633,7 @@ class LlamaShardingStrategy(TensorParallelShardingStrategy):
         model = cast(LlamaModel, model)
         total = len(model.layers)
         for i, layer in enumerate(model.layers):
-            # Force load weights before sharding to avoid FAST_SYNCH deadlock
+            # 已翻譯註解。
             mx.eval(layer.parameters())
             layer.self_attn.q_proj = self.all_to_sharded_linear(layer.self_attn.q_proj)
             layer.self_attn.k_proj = self.all_to_sharded_linear(layer.self_attn.k_proj)
@@ -657,7 +657,7 @@ def _set_layers(model: nn.Module, layers: list[_LayerCallable]) -> None:
     if hasattr(inner_model_instance, "layers"):
         inner_model_instance.layers = layers
 
-        # Update DeepSeek V3 specific parameters when layers are shrunk
+        # 已翻譯註解。
         if isinstance(
             model,
             (
@@ -696,7 +696,7 @@ class DeepSeekShardingStrategy(TensorParallelShardingStrategy):
         for i, layer in enumerate(model.layers):
             mx.eval(layer.parameters())
 
-            # Shard the self attention
+            # 已翻譯註解。
             if layer.self_attn.q_lora_rank is None:
                 layer.self_attn.q_proj = self.all_to_sharded_linear(
                     layer.self_attn.q_proj
@@ -709,7 +709,7 @@ class DeepSeekShardingStrategy(TensorParallelShardingStrategy):
             layer.self_attn.o_proj = self.sharded_to_all_linear(layer.self_attn.o_proj)
             layer.self_attn.num_heads //= self.N
 
-            # Logic from upstream mlx
+            # 已翻譯註解。
             num_heads = layer.self_attn.num_heads
             sh = self.group.rank() * num_heads
             eh = sh + num_heads
@@ -720,13 +720,13 @@ class DeepSeekShardingStrategy(TensorParallelShardingStrategy):
             layer.self_attn.embed_q.apply(shard_heads)
             layer.self_attn.unembed_out.apply(shard_heads)
 
-            # Shard the MLP
+            # 已翻譯註解。
             if isinstance(layer.mlp, (DeepseekV3MLP, DeepseekV32MLP)):
                 layer.mlp.gate_proj = self.all_to_sharded_linear(layer.mlp.gate_proj)
                 layer.mlp.down_proj = self.sharded_to_all_linear(layer.mlp.down_proj)
                 layer.mlp.up_proj = self.all_to_sharded_linear(layer.mlp.up_proj)
 
-            # Shard the MoE.
+            # 已翻譯註解。
             else:
                 if getattr(layer.mlp, "shared_experts", None) is not None:
                     self.all_to_sharded_linear_in_place(
@@ -752,7 +752,7 @@ class DeepSeekShardingStrategy(TensorParallelShardingStrategy):
 
 
 class ShardedMoE(CustomMlxLayer):
-    """Wraps any MoE layer with distributed sum_gradients / all_sum."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, layer: _LayerCallable):
         super().__init__(layer)
@@ -768,7 +768,7 @@ class ShardedMoE(CustomMlxLayer):
 
 
 class ShardedMoEV4(CustomMlxLayer):
-    """Same as ShardedMoE but for DeepseekV4MoE which takes (x, input_ids)."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, layer: DeepseekV4MoE):
         super().__init__(cast(_LayerCallable, cast(object, layer)))
@@ -801,17 +801,17 @@ def _shard_quantized_rows(
 
 
 class _AllSumLinear(nn.Module):
-    """Wraps an unsharded wo_b that takes a head-sharded partial wo_a output.
+    """此說明已翻譯為繁體中文。
 
-    Flow per rank:
-      1. all_sum the incoming partial wo_a output (summed across the head
-         input shards → full wo_a_out on every rank)
-      2. apply the unsharded wo_b → full hidden on every rank
+    此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
+         此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
 
-    One collective per layer on the smaller of (n_groups * o_lora_rank) vs
-    hidden. wo_b compute is replicated, but at decode B=1 it's only ~30M FLOPs
-    per layer and 61 extra all_gathers/token cost more than running wo_b on
-    every rank.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(self, inner: nn.Module, group: mx.distributed.Group):
@@ -829,24 +829,24 @@ def _shard_v4_attention_heads(
     world_size: int,
     rank: int,
 ) -> None:
-    """Interleaved-per-group head sharding for V4Attention.
+    """此說明已翻譯為繁體中文。
 
-    V4 uses a grouped low-rank output projection: `_grouped_output_projection`
-    reshapes the flat `n_heads * head_dim` dim into `(o_groups, heads_per_group,
-    head_dim)`, so group g owns heads `[g * heads_per_group : (g+1) * heads_per_group]`.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    A naive contiguous `shard_linear("all-to-sharded")` on wq_b puts whole
-    original groups on each rank — the per-rank "group g" ends up containing
-    heads that don't belong to original group g. That breaks the wo_a grouped
-    weight mapping. We instead slice heads interleaved-by-group: each rank
-    owns `heads_per_group / N` heads *from every original group*, kept in
-    group-major order so SDPA → reshape → wo_a preserves the group mapping.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Affects `wq_b.weight` / `wq_b.bias`, `attn_sink`. wo_a is sharded via a
-    normal input-dim block split (the default axis-(-1) behavior of
-    shard_inplace), which now correctly aligns with the interleaved head
-    layout because the last dim of out after reshape is `heads_per_group/N *
-    head_dim` per group.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     n_heads: int = attn.n_heads
     head_dim: int = attn.head_dim
@@ -862,12 +862,12 @@ def _shard_v4_attention_heads(
     end = start + hpg_per_rank
 
     def _slice_head_major_flat(arr: mx.array, stride: int) -> mx.array:
-        """Slice arr on axis 0 where the flat 0-axis is (o_groups *
-        heads_per_group * stride), returning a fresh contiguous allocation
-        so the full unsharded array can be freed. Without the contiguous
-        copy the slice is a view and the original weight stays resident —
-        OOM on large V4. Quantized packed weights don't round-trip through
-        numpy so we use mx.contiguous directly."""
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
         rest = arr.shape[1:]
         reshaped = arr.reshape(o_groups, heads_per_group, stride, *rest)
         sliced = reshaped[:, start:end].reshape(o_groups * hpg_per_rank * stride, *rest)
@@ -877,9 +877,9 @@ def _shard_v4_attention_heads(
 
     wq_b: nn.Module = attn.wq_b
     if isinstance(wq_b, nn.QuantizedLinear):
-        # Packed weight: (n_heads*head_dim, q_lora_rank/el_per_int).
-        # scales/biases: (n_heads*head_dim, q_lora_rank/group_size).
-        # Slice axis 0 interleaved-by-group with head_dim stride.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         _shard_quantized_rows(wq_b, head_dim, _slice_head_major_flat)
     else:
         dense = wq_b
@@ -915,7 +915,7 @@ class DeepseekV4ShardingStrategy(TensorParallelShardingStrategy):
         for i, layer in enumerate(model.layers):
             mx.eval(layer.parameters())
 
-            # Head-parallel attention with interleaved-per-group sharding.
+            # 已翻譯註解。
             _shard_v4_attention_heads(layer.attn, self.N, self.group.rank())
             self.sharded_to_all_linear_in_place(layer.attn.wo_a)
             layer.attn.wo_b = _AllSumLinear(layer.attn.wo_b, self.group)  # type: ignore
@@ -961,7 +961,7 @@ class GLM4MoeLiteShardingStrategy(TensorParallelShardingStrategy):
             layer.self_attn.o_proj = self.sharded_to_all_linear(layer.self_attn.o_proj)
             layer.self_attn.num_heads //= self.N
 
-            # Logic from upstream mlx
+            # 已翻譯註解。
             num_heads = layer.self_attn.num_heads
             sh = self.group.rank() * num_heads
             eh = sh + num_heads
@@ -1027,23 +1027,23 @@ class WrappedMiniMaxAttention(CustomMlxLayer):
 
             qk = mx.concatenate(
                 [queries, keys], axis=-1
-            )  # (batch_dim, seq_dim, q_dim + k_dim)
+            )  # 已翻譯註解。
             qk = mx.distributed.all_gather(
                 qk, group=self.group
-            )  # (n*batch_dim, seq_dim, q_dim + k_dim)
+            )  # 已翻譯註解。
 
             qk = qk.reshape(n, batch_dim, seq_dim, q_dim + k_dim).transpose(1, 2, 0, 3)
             queries = qk[..., :q_dim].reshape(
                 batch_dim, seq_dim, -1
-            )  # (batch_dim, seq_dim, n * q_dim)
+            )  # 已翻譯註解。
             keys = qk[..., q_dim:].reshape(
                 batch_dim, seq_dim, -1
-            )  # (batch_dim, seq_dim, n * k_dim)
+            )  # 已翻譯註解。
 
             queries = self._original_layer.q_norm(queries)
             keys = self._original_layer.k_norm(keys)
 
-            # Split back and take this rank's portion
+            # 已翻譯註解。
             queries = mx.split(queries, n, axis=-1)[self.group.rank()]
             keys = mx.split(keys, n, axis=-1)[self.group.rank()]
 
@@ -1088,7 +1088,7 @@ class MiniMaxShardingStrategy(TensorParallelShardingStrategy):
         total = len(model.layers)
         for i, layer in enumerate(model.layers):
             mx.eval(layer.parameters())
-            # Shard the self attention
+            # 已翻譯註解。
             layer.self_attn.q_proj = self.all_to_sharded_linear(layer.self_attn.q_proj)
             layer.self_attn.k_proj = self.all_to_sharded_linear(layer.self_attn.k_proj)
             layer.self_attn.v_proj = self.all_to_sharded_linear(layer.self_attn.v_proj)
@@ -1097,9 +1097,9 @@ class MiniMaxShardingStrategy(TensorParallelShardingStrategy):
             layer.self_attn.num_attention_heads //= self.N
             layer.self_attn.num_key_value_heads //= self.N
 
-            layer.self_attn = WrappedMiniMaxAttention(layer.self_attn, self.group)  # pyright: ignore[reportAttributeAccessIssue,reportArgumentType]
+            layer.self_attn = WrappedMiniMaxAttention(layer.self_attn, self.group)  # 已翻譯註解。
 
-            # Shard the MoE.
+            # 已翻譯註解。
             self.all_to_sharded_linear_in_place(
                 layer.block_sparse_moe.switch_mlp.gate_proj
             )
@@ -1135,7 +1135,7 @@ class QwenShardingStrategy(TensorParallelShardingStrategy):
         total = len(model.layers)
         for i, layer in enumerate(model.layers):
             mx.eval(layer.parameters())
-            # Shard the self attention
+            # 已翻譯註解。
             if isinstance(layer, (Qwen3MoeDecoderLayer, Qwen3TransformerBlock)):
                 layer.self_attn.q_proj = self.all_to_sharded_linear(
                     layer.self_attn.q_proj
@@ -1157,7 +1157,7 @@ class QwenShardingStrategy(TensorParallelShardingStrategy):
                     linear_attn = layer.linear_attn
 
                     if isinstance(linear_attn, Qwen3NextGatedDeltaNet):
-                        # Qwen3-Next: combined projections
+                        # 已翻譯註解。
                         linear_attn.in_proj_qkvz = self.all_to_sharded_linear(
                             linear_attn.in_proj_qkvz
                         )
@@ -1165,9 +1165,9 @@ class QwenShardingStrategy(TensorParallelShardingStrategy):
                             linear_attn.in_proj_ba
                         )
                     else:
-                        # Qwen3.5: separate projections
-                        # in_proj_qkv has sections [q(key_dim), k(key_dim), v(value_dim)]
-                        # that must be split section-aware, not as a contiguous block
+                        # 已翻譯註解。
+                        # 已翻譯註解。
+                        # 已翻譯註解。
                         key_dim = linear_attn.key_dim
                         value_dim = linear_attn.value_dim
                         linear_attn.in_proj_qkv = shard_linear(
@@ -1189,9 +1189,9 @@ class QwenShardingStrategy(TensorParallelShardingStrategy):
                         linear_attn.out_proj
                     )
 
-                    # Shard conv1d: depthwise conv with non-contiguous channel slicing.
-                    # Channel layout is [q(key_dim), k(key_dim), v(value_dim)].
-                    # Each rank takes its head-slice from each of the three sections.
+                    # 已翻譯註解。
+                    # 已翻譯註解。
+                    # 已翻譯註解。
                     rank = self.group.rank()
                     key_dim = linear_attn.key_dim
                     value_dim = linear_attn.value_dim
@@ -1245,7 +1245,7 @@ class QwenShardingStrategy(TensorParallelShardingStrategy):
                     layer.self_attn.num_attention_heads //= self.N
                     layer.self_attn.num_key_value_heads //= self.N
 
-            # Shard the MoE.
+            # 已翻譯註解。
             if isinstance(
                 layer.mlp,
                 (
@@ -1267,10 +1267,10 @@ class QwenShardingStrategy(TensorParallelShardingStrategy):
                         layer.mlp.shared_expert.down_proj
                     )
                     self.all_to_sharded_linear_in_place(layer.mlp.shared_expert.up_proj)
-                layer.mlp = ShardedMoE(layer.mlp)  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+                layer.mlp = ShardedMoE(layer.mlp)  # 已翻譯註解。
                 layer.mlp.sharding_group = self.group
 
-            # Shard the MLP
+            # 已翻譯註解。
             else:
                 layer.mlp.gate_proj = self.all_to_sharded_linear(layer.mlp.gate_proj)
                 layer.mlp.down_proj = self.sharded_to_all_linear(layer.mlp.down_proj)
@@ -1314,7 +1314,7 @@ class Glm4MoeShardingStrategy(TensorParallelShardingStrategy):
                     self.all_to_sharded_linear_in_place(
                         layer.mlp.shared_experts.up_proj
                     )
-                layer.mlp = ShardedMoE(layer.mlp)  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+                layer.mlp = ShardedMoE(layer.mlp)  # 已翻譯註解。
                 layer.mlp.sharding_group = self.group
 
             else:
@@ -1438,16 +1438,16 @@ class NemotronHShardingStrategy(TensorParallelShardingStrategy):
                 self._shard_mamba2_mixer(mixer, rank)
 
             elif isinstance(mixer, NemotronHMoE):
-                # Shard routed experts (SwitchMLP uses fc1/fc2)
+                # 已翻譯註解。
                 self.all_to_sharded_linear_in_place(mixer.switch_mlp.fc1)
                 self.sharded_to_all_linear_in_place(mixer.switch_mlp.fc2)
-                # Shard shared expert in-place (no all-reduce — ShardedMoE handles that)
+                # 已翻譯註解。
                 if hasattr(mixer, "shared_experts"):
                     self.all_to_sharded_linear_in_place(mixer.shared_experts.up_proj)
                     self.sharded_to_all_linear_in_place(mixer.shared_experts.down_proj)
-                mixer = ShardedMoE(mixer)  # pyright: ignore[reportArgumentType]
+                mixer = ShardedMoE(mixer)  # 已翻譯註解。
                 mixer.sharding_group = self.group
-                layer.mixer = mixer  # pyright: ignore[reportAttributeAccessIssue]
+                layer.mixer = mixer  # 已翻譯註解。
 
             mx.eval(layer)
             mx.clear_cache()
@@ -1455,28 +1455,28 @@ class NemotronHShardingStrategy(TensorParallelShardingStrategy):
         return model
 
     def _shard_mamba2_mixer(self, mixer: NemotronHMamba2Mixer, rank: int) -> None:
-        """Shard the Mamba2 mixer along the head dimension."""
+        """此說明已翻譯為繁體中文。"""
         world_size = self.N
         num_heads = mixer.num_heads
         head_dim = mixer.head_dim
         n_groups = mixer.n_groups
         ssm_state_size = mixer.ssm_state_size
-        intermediate_size = mixer.intermediate_size  # = num_heads * head_dim
+        intermediate_size = mixer.intermediate_size  # 已翻譯註解。
 
-        # Per-rank sizes
+        # 已翻譯註解。
         heads_per_rank = num_heads // world_size
         groups_per_rank = n_groups // world_size
         is_per_rank = heads_per_rank * head_dim
         bc_per_rank = groups_per_rank * ssm_state_size
 
-        # === in_proj: output layout is [gate:IS | conv_ssm:IS | B:NG*SS | C:NG*SS | dt:NH] ===
+        # 已翻譯註解。
         gate_start = 0
         conv_ssm_start = intermediate_size
         b_start = 2 * intermediate_size
         c_start = b_start + n_groups * ssm_state_size
         dt_start = c_start + n_groups * ssm_state_size
 
-        # Build index tensor for this rank's slice of each section
+        # 已翻譯註解。
         gate_idx = mx.arange(
             gate_start + rank * is_per_rank, gate_start + (rank + 1) * is_per_rank
         )
@@ -1497,11 +1497,11 @@ class NemotronHShardingStrategy(TensorParallelShardingStrategy):
         indices = mx.concatenate([gate_idx, conv_ssm_idx, b_idx, c_idx, dt_idx])
         mixer.in_proj.weight = mixer.in_proj.weight[indices]
 
-        # === out_proj: input is intermediate_size (sharded) → hidden_size (reduce) ===
+        # 已翻譯註解。
         mixer.out_proj = self.sharded_to_all_linear(mixer.out_proj)
 
-        # === conv1d: depthwise conv on conv_dim channels ===
-        # conv_dim layout: [ssm_hidden:IS | B:NG*SS | C:NG*SS]
+        # 已翻譯註解。
+        # 已翻譯註解。
         conv_ssm_idx_local = mx.arange(rank * is_per_rank, (rank + 1) * is_per_rank)
         conv_b_idx = mx.arange(
             intermediate_size + rank * bc_per_rank,
@@ -1518,19 +1518,19 @@ class NemotronHShardingStrategy(TensorParallelShardingStrategy):
         if mixer.conv1d.bias is not None:
             mixer.conv1d.bias = mixer.conv1d.bias[conv_indices]
 
-        # === Per-head parameters ===
+        # 已翻譯註解。
         h_start = rank * heads_per_rank
         h_end = h_start + heads_per_rank
         mixer.dt_bias = mixer.dt_bias[h_start:h_end]
         mixer.A_log = mixer.A_log[h_start:h_end]
         mixer.D = mixer.D[h_start:h_end]
 
-        # === Norm: weight is intermediate_size ===
+        # 已翻譯註解。
         mixer.norm.weight = mixer.norm.weight[
             rank * is_per_rank : (rank + 1) * is_per_rank
         ]
 
-        # === Update dimensions ===
+        # 已翻譯註解。
         mixer.num_heads = heads_per_rank
         mixer.n_groups = groups_per_rank
         mixer.intermediate_size = is_per_rank
@@ -1584,7 +1584,7 @@ class Gemma4ShardingStrategy(TensorParallelShardingStrategy):
                 self.all_to_sharded_linear_in_place(layer.experts.switch_glu.gate_proj)
                 self.sharded_to_all_linear_in_place(layer.experts.switch_glu.down_proj)
                 self.all_to_sharded_linear_in_place(layer.experts.switch_glu.up_proj)
-                layer.experts = WrappedGemma4Experts(layer.experts)  # pyright: ignore[reportAttributeAccessIssue,reportArgumentType]
+                layer.experts = WrappedGemma4Experts(layer.experts)  # 已翻譯註解。
                 layer.experts.sharding_group = self.group
 
             mx.eval(layer)

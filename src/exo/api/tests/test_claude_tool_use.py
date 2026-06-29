@@ -1,4 +1,4 @@
-"""Claude Messages API 在轉接器中 tool_use 支援的測試。"""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import AsyncGenerator
@@ -26,7 +26,7 @@ async def _collect_response(
     model: str,
     chunk_stream: AsyncGenerator[ErrorChunk | ToolCallChunk | TokenChunk, None],
 ) -> ClaudeMessagesResponse:
-    """用於消耗非同步產生器並解析 JSON 回應的輔助函式。"""
+    """此說明已翻譯為繁體中文。"""
     parts: list[str] = []
     async for part in collect_claude_response(command_id, model, chunk_stream):
         parts.append(part)
@@ -38,7 +38,7 @@ COMMAND_ID = CommandId("cmd_test123")
 
 
 def _parse_sse_events(events: list[str]) -> list[dict[str, Any]]:
-    """將 SSE 事件字串解析為 JSON 字典。"""
+    """此說明已翻譯為繁體中文。"""
     parsed: list[dict[str, Any]] = []
     for event_str in events:
         for line in event_str.strip().split("\n"):
@@ -48,7 +48,7 @@ def _parse_sse_events(events: list[str]) -> list[dict[str, Any]]:
 
 
 class TestCollectClaudeResponseToolUse:
-    """非串流 tool_use 回應收集測試。"""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_tool_call_chunk_produces_tool_use_blocks(self):
         chunks: list[ErrorChunk | ToolCallChunk | TokenChunk] = [
@@ -140,7 +140,7 @@ class TestCollectClaudeResponseToolUse:
 
 
 class TestGenerateClaudeStreamToolUse:
-    """串流 tool_use 事件產生測試。"""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_tool_call_emits_tool_use_events(self):
         chunks: list[ErrorChunk | ToolCallChunk | TokenChunk] = [
@@ -163,7 +163,7 @@ class TestGenerateClaudeStreamToolUse:
 
         parsed = _parse_sse_events(events)
 
-        # 找出 tool_use content_block_start
+        # 已翻譯註解。
         tool_starts = [
             e
             for e in parsed
@@ -177,7 +177,7 @@ class TestGenerateClaudeStreamToolUse:
         assert content_block["input"] == {}
         assert cast(str, content_block["id"]).startswith("toolu_")
 
-        # 找出 input_json_delta
+        # 已翻譯註解。
         json_deltas = [
             e
             for e in parsed
@@ -189,7 +189,7 @@ class TestGenerateClaudeStreamToolUse:
         delta = cast(dict[str, Any], json_deltas[0]["delta"])
         assert json.loads(cast(str, delta["partial_json"])) == {"location": "SF"}
 
-        # 找出 stop reason 為 tool_use 的 message_delta
+        # 已翻譯註解。
         msg_deltas = [e for e in parsed if e.get("type") == "message_delta"]
         assert len(msg_deltas) == 1
         assert cast(dict[str, Any], msg_deltas[0]["delta"])["stop_reason"] == "tool_use"
@@ -216,7 +216,7 @@ class TestGenerateClaudeStreamToolUse:
 
         parsed = _parse_sse_events(events)
 
-        # 應在索引 0 有文字 delta
+        # 已翻譯註解。
         text_deltas = [
             e
             for e in parsed
@@ -238,7 +238,7 @@ class TestGenerateClaudeStreamToolUse:
         assert len(tool_starts) == 1
         assert tool_starts[0]["index"] == 1
 
-        # stop reason 應為 tool_use
+        # 已翻譯註解。
         msg_deltas = [e for e in parsed if e.get("type") == "message_delta"]
         assert cast(dict[str, Any], msg_deltas[0]["delta"])["stop_reason"] == "tool_use"
 

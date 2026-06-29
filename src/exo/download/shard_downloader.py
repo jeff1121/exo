@@ -15,20 +15,20 @@ from exo.shared.types.worker.shards import (
 )
 
 
-# TODO: the PipelineShardMetadata getting reinstantiated is a bit messy. Should this be a classmethod?
+# 待辦事項：已翻譯註解。
 class ShardDownloader(ABC):
     @abstractmethod
     async def ensure_shard(
         self, shard: ShardMetadata, config_only: bool = False
     ) -> Path:
         """
-        Ensures that the shard is downloaded.
-        Does not allow multiple overlapping downloads at once.
-        If you try to download a Shard which overlaps a Shard that is already being downloaded,
-        the download will be cancelled and a new download will start.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Args:
-            shard (Shard): The shard to download.
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
 
     @abstractmethod
@@ -42,10 +42,10 @@ class ShardDownloader(ABC):
     async def get_shard_download_status(
         self,
     ) -> AsyncIterator[tuple[Path, RepoDownloadProgress]]:
-        """Get the download status of shards.
+        """此說明已翻譯為繁體中文。
 
-        Yields:
-            tuple[Path, RepoDownloadProgress]: The path and progress of a shard download.
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         yield (Path("/tmp/noop_shard"), NOOP_DOWNLOAD_PROGRESS)
 

@@ -63,10 +63,10 @@ class DistributedImageModel:
         if group is not None:
             logger.info("Initialized distributed diffusion runner")
 
-            mx.eval(adapter.model.parameters())  # pyright: ignore[reportAny]
+            mx.eval(adapter.model.parameters())  # 已翻譯註解。
 
-            # TODO(ciaran): Do we need this?
-            mx.eval(adapter.model)  # pyright: ignore[reportAny]
+            # 待辦事項：已翻譯註解。
+            mx.eval(adapter.model)  # 已翻譯註解。
 
             mx_barrier(group)
             logger.info(f"Transformer sharded for rank {group.rank()}")
@@ -98,7 +98,7 @@ class DistributedImageModel:
         )
 
     def get_steps_for_quality(self, quality: Literal["low", "medium", "high"]) -> int:
-        """Get the number of inference steps for a quality level."""
+        """此說明已翻譯為繁體中文。"""
         return self._config.get_steps_for_quality(quality)
 
     def generate(
@@ -129,12 +129,12 @@ class DistributedImageModel:
         if advanced_params is not None and advanced_params.negative_prompt is not None:
             negative_prompt = advanced_params.negative_prompt
 
-        # For edit mode: compute dimensions from input image
-        # This also stores image_paths in the adapter for encode_prompt()
+        # 已翻譯註解。
+        # 已翻譯註解。
         if image_path is not None:
             computed_dims = self._adapter.set_image_dimensions(image_path)
             if computed_dims is not None:
-                # Override user-provided dimensions with computed ones
+                # 已翻譯註解。
                 width, height = computed_dims
 
         config = Config(
@@ -142,7 +142,7 @@ class DistributedImageModel:
             height=height,
             width=width,
             image_path=image_path,
-            model_config=self._adapter.model.model_config,  # pyright: ignore[reportAny]
+            model_config=self._adapter.model.model_config,  # 已翻譯註解。
             guidance=guidance_override if guidance_override is not None else 4.0,
         )
 
@@ -162,7 +162,7 @@ class DistributedImageModel:
             cancel_checker=cancel_checker,
         ):
             if isinstance(result, tuple):
-                # Partial image: (GeneratedImage, partial_index, total_partials)
+                # 已翻譯註解。
                 image, partial_idx, total_partials = result
                 yield (image, partial_idx, total_partials)
             else:

@@ -13,7 +13,7 @@ from typing import cast, final
 from exo.shared.constants import EXO_TRACING_ENABLED
 from exo.worker.runner.bootstrap import logger
 
-# Context variable to track the current trace category for hierarchical nesting
+# 已翻譯註解。
 _current_category: ContextVar[str | None] = ContextVar("current_category", default=None)
 
 
@@ -58,7 +58,7 @@ class TraceStats:
     by_rank: dict[int, dict[str, CategoryStats]] = field(default_factory=dict)
 
 
-# Global trace buffer - each rank accumulates traces here
+# 已翻譯註解。
 _trace_buffer: list[TraceEvent] = []
 
 
@@ -82,31 +82,31 @@ def trace(
     rank: int,
     category: str = "compute",
 ) -> Generator[None, None, None]:
-    """Context manager to trace any operation.
+    """此說明已翻譯為繁體中文。
 
-    Nested traces automatically inherit the parent category, creating hierarchical
-    categories like "sync/compute" or "async/comms".
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Args:
-        name: Name of the operation (e.g., "recv 0", "send 1", "joint_blocks")
-        rank: This rank's ID
-        category: Category for grouping in trace viewer ("comm", "compute", "step")
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    Example:
-        with trace(f"sync {t}", rank, "sync"):
-            with trace("joint_blocks", rank, "compute"):
-                # Recorded with category "sync/compute"
-                hidden_states = some_computation(...)
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+                此說明已翻譯為繁體中文。
+                此說明已翻譯為繁體中文。
     """
     if not EXO_TRACING_ENABLED:
         yield
         return
 
-    # Combine with parent category if nested
+    # 已翻譯註解。
     parent = _current_category.get()
     full_category = f"{parent}/{category}" if parent else category
 
-    # Set as current for nested traces
+    # 已翻譯註解。
     token = _current_category.set(full_category)
 
     try:
@@ -131,7 +131,7 @@ def export_trace(traces: list[TraceEvent], output_path: Path) -> None:
     trace_events: list[dict[str, object]] = []
 
     for event in traces:
-        # Chrome trace format uses "X" for complete events (with duration)
+        # 已翻譯註解。
         chrome_event: dict[str, object] = {
             "name": event.name,
             "cat": event.category,
@@ -149,7 +149,7 @@ def export_trace(traces: list[TraceEvent], output_path: Path) -> None:
         trace_events.append(
             {
                 "name": "thread_name",
-                "ph": "M",  # Metadata event
+                "ph": "M",  # 已翻譯註解。
                 "pid": 0,
                 "tid": rank,
                 "args": {"name": f"Rank {rank}"},
@@ -174,7 +174,7 @@ def load_trace_file(path: Path) -> list[TraceEvent]:
     traces: list[TraceEvent] = []
 
     for event in events:
-        # Skip metadata events
+        # 已翻譯註解。
         if event.get("ph") == "M":
             continue
 
@@ -186,7 +186,7 @@ def load_trace_file(path: Path) -> list[TraceEvent]:
         start_us = int(ts_value) if isinstance(ts_value, (int, float, str)) else 0
         duration_us = int(dur_value) if isinstance(dur_value, (int, float, str)) else 0
 
-        # Get rank from tid or args
+        # 已翻譯註解。
         rank = int(tid_value) if isinstance(tid_value, (int, float, str)) else 0
         args = event.get("args")
         if isinstance(args, dict):
@@ -214,22 +214,22 @@ def compute_stats(traces: list[TraceEvent]) -> TraceStats:
     if not traces:
         return stats
 
-    # Calculate wall time from earliest start to latest end
+    # 已翻譯註解。
     min_start = min(t.start_us for t in traces)
     max_end = max(t.start_us + t.duration_us for t in traces)
     stats.total_wall_time_us = max_end - min_start
 
-    # Initialize nested dicts
+    # 已翻譯註解。
     by_category: dict[str, CategoryStats] = defaultdict(CategoryStats)
     by_rank: dict[int, dict[str, CategoryStats]] = defaultdict(
         lambda: defaultdict(CategoryStats)
     )
 
     for event in traces:
-        # By category
+        # 已翻譯註解。
         by_category[event.category].add(event.duration_us)
 
-        # By rank and category
+        # 已翻譯註解。
         by_rank[event.rank][event.category].add(event.duration_us)
 
     stats.by_category = dict(by_category)

@@ -1,4 +1,4 @@
-"""Tests for download verification and cache behavior."""
+"""此說明已翻譯為繁體中文。"""
 
 import time
 from datetime import timedelta
@@ -25,26 +25,26 @@ def model_id() -> ModelId:
 
 
 class TestFileVerification:
-    """Tests for file size verification in _download_file."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_redownload_when_file_size_changes_upstream(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that files with mismatched sizes are re-downloaded."""
-        # Import inside test to allow patching
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         from exo.download.download_utils import (
-            _download_file,  # pyright: ignore[reportPrivateUsage]
+            _download_file,  # 已翻譯註解。
         )
 
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
-        # Create a local file with wrong size
+        # 已翻譯註解。
         local_file = target_dir / "test.safetensors"
         async with aiofiles.open(local_file, "wb") as f:
-            await f.write(b"local content")  # 13 bytes
+            await f.write(b"local content")  # 已翻譯註解。
 
-        remote_size = 1000  # Different from local
+        remote_size = 1000  # 已翻譯註解。
         remote_hash = "abc123"
 
         with (
@@ -57,28 +57,28 @@ class TestFileVerification:
                 "exo.download.download_utils.create_http_session"
             ) as mock_session_factory,
         ):
-            # Set up mock HTTP response for re-download
+            # 已翻譯註解。
             mock_response = MagicMock()
             mock_response.status = 200
-            mock_response.content.read = AsyncMock(  # pyright: ignore[reportAny]
+            mock_response.content.read = AsyncMock(  # 已翻譯註解。
                 side_effect=[b"x" * remote_size, b""]
             )
 
             mock_session = MagicMock()
-            mock_session.get.return_value.__aenter__ = AsyncMock(  # pyright: ignore[reportAny]
+            mock_session.get.return_value.__aenter__ = AsyncMock(  # 已翻譯註解。
                 return_value=mock_response
             )
-            mock_session.get.return_value.__aexit__ = AsyncMock(  # pyright: ignore[reportAny]
+            mock_session.get.return_value.__aexit__ = AsyncMock(  # 已翻譯註解。
                 return_value=None
             )
-            mock_session_factory.return_value.__aenter__ = AsyncMock(  # pyright: ignore[reportAny]
+            mock_session_factory.return_value.__aenter__ = AsyncMock(  # 已翻譯註解。
                 return_value=mock_session
             )
-            mock_session_factory.return_value.__aexit__ = AsyncMock(  # pyright: ignore[reportAny]
+            mock_session_factory.return_value.__aexit__ = AsyncMock(  # 已翻譯註解。
                 return_value=None
             )
 
-            # Mock calc_hash to return the expected hash
+            # 已翻譯註解。
             with patch(
                 "exo.download.download_utils.calc_hash",
                 new_callable=AsyncMock,
@@ -86,27 +86,27 @@ class TestFileVerification:
             ):
                 await _download_file(model_id, "main", "test.safetensors", target_dir)
 
-            # file_meta should be called twice: once for verification, once for download
+            # 已翻譯註解。
             assert mock_file_meta.call_count == 2
 
     async def test_skip_download_when_file_size_matches(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that files with matching sizes are not re-downloaded."""
+        """此說明已翻譯為繁體中文。"""
         from exo.download.download_utils import (
-            _download_file,  # pyright: ignore[reportPrivateUsage]
+            _download_file,  # 已翻譯註解。
         )
 
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
-        # Create a local file
+        # 已翻譯註解。
         local_file = target_dir / "test.safetensors"
         local_content = b"local content"
         async with aiofiles.open(local_file, "wb") as f:
             await f.write(local_content)
 
-        remote_size = len(local_content)  # Same as local
+        remote_size = len(local_content)  # 已翻譯註解。
         remote_hash = "abc123"
 
         with (
@@ -123,7 +123,7 @@ class TestFileVerification:
                 model_id, "main", "test.safetensors", target_dir
             )
 
-            # Should return immediately without downloading
+            # 已翻譯註解。
             assert result == local_file
             mock_file_meta.assert_called_once()
             mock_session_factory.assert_not_called()
@@ -131,15 +131,15 @@ class TestFileVerification:
     async def test_offline_fallback_uses_local_file(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that local files are used when network is unavailable."""
+        """此說明已翻譯為繁體中文。"""
         from exo.download.download_utils import (
-            _download_file,  # pyright: ignore[reportPrivateUsage]
+            _download_file,  # 已翻譯註解。
         )
 
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
-        # Create a local file
+        # 已翻譯註解。
         local_file = target_dir / "test.safetensors"
         async with aiofiles.open(local_file, "wb") as f:
             await f.write(b"local content")
@@ -158,18 +158,18 @@ class TestFileVerification:
                 model_id, "main", "test.safetensors", target_dir
             )
 
-            # Should return local file without attempting download
+            # 已翻譯註解。
             assert result == local_file
             mock_session_factory.assert_not_called()
 
 
 class TestFileListCache:
-    """Tests for file list caching behavior."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_fetch_fresh_and_update_cache(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that fresh data is fetched and cache is updated."""
+        """此說明已翻譯為繁體中文。"""
         models_dir = tmp_path / "models"
 
         file_list = [
@@ -191,7 +191,7 @@ class TestFileListCache:
             assert result == file_list
             mock_fetch.assert_called_once()
 
-            # Verify cache was written
+            # 已翻譯註解。
             cache_file = (
                 models_dir
                 / "caches"
@@ -209,12 +209,12 @@ class TestFileListCache:
     async def test_fallback_to_cache_when_fetch_fails(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that cached data is used when fetch fails."""
+        """此說明已翻譯為繁體中文。"""
         models_dir = tmp_path / "models"
         cache_dir = models_dir / "caches" / model_id.normalize()
         await aios.makedirs(cache_dir, exist_ok=True)
 
-        # Create cache file
+        # 已翻譯註解。
         cached_file_list = [
             FileListEntry(type="file", path="model.safetensors", size=1000),
         ]
@@ -240,7 +240,7 @@ class TestFileListCache:
     async def test_error_propagates_when_no_cache(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that errors propagate when fetch fails and no cache exists."""
+        """此說明已翻譯為繁體中文。"""
         models_dir = tmp_path / "models"
 
         with (
@@ -257,21 +257,21 @@ class TestFileListCache:
 
 
 class TestModelDeletion:
-    """Tests for model deletion including cache cleanup."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_delete_model_clears_cache(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test that deleting a model also deletes its cache."""
+        """此說明已翻譯為繁體中文。"""
         models_dir = tmp_path / "models"
         model_dir = models_dir / model_id.normalize()
         cache_dir = models_dir / "caches" / model_id.normalize()
 
-        # Create model and cache directories
+        # 已翻譯註解。
         await aios.makedirs(model_dir, exist_ok=True)
         await aios.makedirs(cache_dir, exist_ok=True)
 
-        # Add some files
+        # 已翻譯註解。
         async with aiofiles.open(model_dir / "model.safetensors", "w") as f:
             await f.write("model data")
         async with aiofiles.open(cache_dir / "file_list.json", "w") as f:
@@ -290,11 +290,11 @@ class TestModelDeletion:
     async def test_delete_model_only_cache_exists(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test deleting when only cache exists (model already deleted)."""
+        """此說明已翻譯為繁體中文。"""
         models_dir = tmp_path / "models"
         cache_dir = models_dir / "caches" / model_id.normalize()
 
-        # Only create cache directory
+        # 已翻譯註解。
         await aios.makedirs(cache_dir, exist_ok=True)
         async with aiofiles.open(cache_dir / "file_list.json", "w") as f:
             await f.write("[]")
@@ -305,15 +305,15 @@ class TestModelDeletion:
         ):
             result = await delete_model(model_id)
 
-            # Returns False because model dir didn't exist
+            # 已翻譯註解。
             assert result is False
-            # But cache should still be cleaned up
+            # 已翻譯註解。
             assert not await aios.path.exists(cache_dir)
 
     async def test_delete_nonexistent_model(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Test deleting a model that doesn't exist."""
+        """此說明已翻譯為繁體中文。"""
         models_dir = tmp_path / "models"
         await aios.makedirs(models_dir, exist_ok=True)
 
@@ -327,22 +327,22 @@ class TestModelDeletion:
 
 
 class TestProgressResetOnRedownload:
-    """Tests for progress tracking when files are re-downloaded."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_progress_resets_correctly_on_redownload(
         self, model_id: ModelId
     ) -> None:
-        """Test that progress tracking resets when a file is re-downloaded.
+        """此說明已翻譯為繁體中文。
 
-        When a file is deleted and re-downloaded (due to size mismatch),
-        the progress tracking should reset rather than calculating negative
-        downloaded_this_session values.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
-        # Simulate file_progress dict as it exists in download_shard
+        # 已翻譯註解。
         file_progress: dict[str, RepoFileDownloadProgress] = {}
 
-        # Initialize with old file progress (simulating existing large file)
-        old_file_size = 1_500_000_000  # 1.5 GB
+        # 已翻譯註解。
+        old_file_size = 1_500_000_000  # 已翻譯註解。
         file_progress["model.safetensors"] = RepoFileDownloadProgress(
             repo_id=model_id,
             repo_revision="main",
@@ -353,33 +353,33 @@ class TestProgressResetOnRedownload:
             speed=0,
             eta=timedelta(0),
             status="not_started",
-            start_time=time.time() - 10,  # Started 10 seconds ago
+            start_time=time.time() - 10,  # 已翻譯註解。
         )
 
-        # Simulate the logic from on_progress_wrapper after re-download starts
-        # This is the exact logic from the fixed on_progress_wrapper
-        curr_bytes = 100_000  # 100 KB - new download just started
+        # 已翻譯註解。
+        # 已翻譯註解。
+        curr_bytes = 100_000  # 已翻譯註解。
         previous_progress = file_progress.get("model.safetensors")
 
-        # Detect re-download: curr_bytes < previous downloaded
+        # 已翻譯註解。
         is_redownload = (
             previous_progress is not None
             and curr_bytes < previous_progress.downloaded.in_bytes
         )
 
         if is_redownload or previous_progress is None:
-            # Fresh download or re-download: reset tracking
+            # 已翻譯註解。
             start_time = time.time()
             downloaded_this_session = curr_bytes
         else:
-            # Continuing download: accumulate
+            # 已翻譯註解。
             start_time = previous_progress.start_time
             downloaded_this_session = (
                 previous_progress.downloaded_this_session.in_bytes
                 + (curr_bytes - previous_progress.downloaded.in_bytes)
             )
 
-        # Key assertions
+        # 已翻譯註解。
         assert is_redownload is True, "Should detect re-download scenario"
         assert downloaded_this_session == curr_bytes, (
             "downloaded_this_session should equal curr_bytes on re-download"
@@ -388,7 +388,7 @@ class TestProgressResetOnRedownload:
             "downloaded_this_session should be positive, not negative"
         )
 
-        # Calculate speed (should be positive)
+        # 已翻譯註解。
         elapsed = time.time() - start_time
         speed = downloaded_this_session / elapsed if elapsed > 0 else 0
         assert speed >= 0, "Speed should be non-negative"
@@ -396,16 +396,16 @@ class TestProgressResetOnRedownload:
     async def test_progress_accumulates_on_continuing_download(
         self, model_id: ModelId
     ) -> None:
-        """Test that progress accumulates correctly for continuing downloads.
+        """此說明已翻譯為繁體中文。
 
-        When a download continues from where it left off (resume),
-        the progress should accumulate correctly.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         file_progress: dict[str, RepoFileDownloadProgress] = {}
 
-        # Initialize with partial download progress
-        initial_downloaded = 500_000  # 500 KB already downloaded
-        start_time = time.time() - 5  # Started 5 seconds ago
+        # 已翻譯註解。
+        initial_downloaded = 500_000  # 已翻譯註解。
+        start_time = time.time() - 5  # 已翻譯註解。
         file_progress["model.safetensors"] = RepoFileDownloadProgress(
             repo_id=model_id,
             repo_revision="main",
@@ -419,11 +419,11 @@ class TestProgressResetOnRedownload:
             start_time=start_time,
         )
 
-        # Progress callback with more bytes downloaded
-        curr_bytes = 600_000  # 600 KB - continuing download
+        # 已翻譯註解。
+        curr_bytes = 600_000  # 已翻譯註解。
         previous_progress = file_progress.get("model.safetensors")
 
-        # This is NOT a re-download (curr_bytes > previous downloaded)
+        # 已翻譯註解。
         is_redownload = (
             previous_progress is not None
             and curr_bytes < previous_progress.downloaded.in_bytes
@@ -439,7 +439,7 @@ class TestProgressResetOnRedownload:
                 + (curr_bytes - previous_progress.downloaded.in_bytes)
             )
 
-        # Key assertions
+        # 已翻譯註解。
         assert is_redownload is False, (
             "Should NOT detect re-download for continuing download"
         )

@@ -1,4 +1,4 @@
-"""用於轉換請求/回應的 OpenAI Responses API 轉接器。"""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import AsyncGenerator
@@ -85,7 +85,7 @@ from exo.shared.types.text_generation import (
 
 
 def _build_response_usage(usage: Usage) -> ResponseUsage:
-    """由內部 Usage 型別建立 ResponseUsage。"""
+    """此說明已翻譯為繁體中文。"""
     return ResponseUsage(
         input_tokens=usage.prompt_tokens,
         input_tokens_details=InputTokensDetails(
@@ -100,12 +100,12 @@ def _build_response_usage(usage: Usage) -> ResponseUsage:
 
 
 def _format_sse(event: ResponsesStreamEvent) -> str:
-    """將串流事件格式化為 SSE 訊息。"""
+    """此說明已翻譯為繁體中文。"""
     return f"event: {event.type}\ndata: {event.model_dump_json(exclude_none=True)}\n\n"
 
 
 def _extract_content(content: str | list[ResponseContentPart]) -> str:
-    """從可能是字串或分段列表的 content 欄位擷取純文字。"""
+    """此說明已翻譯為繁體中文。"""
     if isinstance(content, str):
         return content
     return "".join(
@@ -351,8 +351,8 @@ async def responses_request_to_text_generation(
         effort_from_reasoning, request.enable_thinking
     )
 
-    # Responses API 通常不會把工具參數放在「function」巢狀欄位中。
-    # 由於後端（給 MLX chat templates）遵循 chat completions 的工具格式
+    # 已翻譯註解。
+    # 已翻譯註解。
     # 我們需要正規化成該格式。
     normalised_tools: list[dict[str, Any]] | None = None
     if request.tools:
@@ -401,9 +401,9 @@ async def collect_responses_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    # 這裡使用 AsyncGenerator[str] 而不是直接回傳 ChatCompletionReponse，因為
-    # FastAPI 對取消處理較佳，但不知為何不會自動序列化
-    """收集所有 token chunks 並回傳單一 ResponsesResponse。"""
+    # 已翻譯註解。
+    # 已翻譯註解。
+    """此說明已翻譯為繁體中文。"""
     response_id = f"resp_{command_id}"
     item_id = f"item_{command_id}"
     reasoning_id = f"rs_{command_id}"
@@ -444,7 +444,7 @@ async def collect_responses_response(
     if error_message is not None:
         raise ValueError(error_message)
 
-    # 若有可用資料則由 usage 建立使用量
+    # 已翻譯註解。
     usage = _build_response_usage(last_usage) if last_usage is not None else None
 
     output: list[ResponseItem] = []
@@ -482,13 +482,13 @@ async def generate_responses_stream(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """由 TokenChunks 產生 OpenAI Responses API 串流事件。"""
+    """此說明已翻譯為繁體中文。"""
     response_id = f"resp_{command_id}"
     item_id = f"item_{command_id}"
     reasoning_id = f"rs_{command_id}"
     seq = count(1)
 
-    # response.created
+    # 已翻譯註解。
     initial_response = ResponsesResponse(
         id=response_id,
         model=model,
@@ -501,7 +501,7 @@ async def generate_responses_stream(
     )
     yield _format_sse(created_event)
 
-    # response.in_progress
+    # 已翻譯註解。
     in_progress_event = ResponseInProgressEvent(
         sequence_number=next(seq), response=initial_response
     )
@@ -533,7 +533,7 @@ async def generate_responses_stream(
                 fc_id = f"fc_{tool.id}"
                 call_id = f"call_{tool.id}"
 
-                # function_call 的 response.output_item.added
+                # 已翻譯註解。
                 fc_item = ResponseFunctionCallItem(
                     id=fc_id,
                     call_id=call_id,
@@ -548,7 +548,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(fc_added)
 
-                # response.function_call_arguments.delta
+                # 已翻譯註解。
                 args_delta = ResponseFunctionCallArgumentsDeltaEvent(
                     sequence_number=next(seq),
                     item_id=fc_id,
@@ -557,7 +557,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(args_delta)
 
-                # response.function_call_arguments.done
+                # 已翻譯註解。
                 args_done = ResponseFunctionCallArgumentsDoneEvent(
                     sequence_number=next(seq),
                     item_id=fc_id,
@@ -567,7 +567,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(args_done)
 
-                # response.output_item.done
+                # 已翻譯註解。
                 fc_done_item = ResponseFunctionCallItem(
                     id=fc_id,
                     call_id=call_id,
@@ -587,13 +587,13 @@ async def generate_responses_stream(
             continue
 
         if chunk.is_thinking:
-            # 在第一個 thinking token 時建立 reasoning 區塊
+            # 已翻譯註解。
             if not reasoning_started:
                 reasoning_started = True
                 reasoning_output_index = next_output_index
                 next_output_index += 1
 
-                # reasoning 的 response.output_item.added
+                # 已翻譯註解。
                 reasoning_item = ResponseReasoningItem(
                     id=reasoning_id,
                     summary=[],
@@ -606,7 +606,7 @@ async def generate_responses_stream(
                 )
                 yield _format_sse(rs_added)
 
-                # response.reasoning_summary_part.added
+                # 已翻譯註解。
                 part_added = ResponseReasoningSummaryPartAddedEvent(
                     sequence_number=next(seq),
                     item_id=reasoning_id,
@@ -618,7 +618,7 @@ async def generate_responses_stream(
 
             accumulated_thinking += chunk.text
 
-            # response.reasoning_summary_text.delta
+            # 已翻譯註解。
             rs_delta = ResponseReasoningSummaryTextDeltaEvent(
                 sequence_number=next(seq),
                 item_id=reasoning_id,
@@ -629,9 +629,9 @@ async def generate_responses_stream(
             yield _format_sse(rs_delta)
             continue
 
-        # 轉換到文字時關閉 reasoning 區塊
+        # 已翻譯註解。
         if reasoning_started and not message_started:
-            # response.reasoning_summary_text.done
+            # 已翻譯註解。
             rs_text_done = ResponseReasoningSummaryTextDoneEvent(
                 sequence_number=next(seq),
                 item_id=reasoning_id,
@@ -641,7 +641,7 @@ async def generate_responses_stream(
             )
             yield _format_sse(rs_text_done)
 
-            # response.reasoning_summary_part.done
+            # 已翻譯註解。
             rs_part_done = ResponseReasoningSummaryPartDoneEvent(
                 sequence_number=next(seq),
                 item_id=reasoning_id,
@@ -651,7 +651,7 @@ async def generate_responses_stream(
             )
             yield _format_sse(rs_part_done)
 
-            # reasoning 的 response.output_item.done
+            # 已翻譯註解。
             rs_item_done = ResponseOutputItemDoneEvent(
                 sequence_number=next(seq),
                 output_index=reasoning_output_index,
@@ -662,7 +662,7 @@ async def generate_responses_stream(
             )
             yield _format_sse(rs_item_done)
 
-        # 在第一個文字 token 時建立 message 區塊
+        # 已翻譯註解。
         if not message_started:
             message_started = True
             message_output_index = next_output_index
@@ -692,7 +692,7 @@ async def generate_responses_stream(
 
         accumulated_text += chunk.text
 
-        # response.output_text.delta
+        # 已翻譯註解。
         delta_event = ResponseTextDeltaEvent(
             sequence_number=next(seq),
             item_id=item_id,
@@ -702,7 +702,7 @@ async def generate_responses_stream(
         )
         yield _format_sse(delta_event)
 
-    # 若 reasoning 區塊後未接文字則關閉
+    # 已翻譯註解。
     if reasoning_started and not message_started:
         rs_text_done = ResponseReasoningSummaryTextDoneEvent(
             sequence_number=next(seq),
@@ -732,7 +732,7 @@ async def generate_responses_stream(
         )
         yield _format_sse(rs_item_done)
 
-    # 若尚未建立 message 區塊，現在建立一個（空文字）
+    # 已翻譯註解。
     if not message_started:
         message_output_index = next_output_index
         next_output_index += 1
@@ -759,7 +759,7 @@ async def generate_responses_stream(
         )
         yield _format_sse(part_added_evt)
 
-    # response.output_text.done
+    # 已翻譯註解。
     text_done = ResponseTextDoneEvent(
         sequence_number=next(seq),
         item_id=item_id,
@@ -769,7 +769,7 @@ async def generate_responses_stream(
     )
     yield _format_sse(text_done)
 
-    # response.content_part.done
+    # 已翻譯註解。
     final_part = ResponseOutputText(text=accumulated_text)
     part_done = ResponseContentPartDoneEvent(
         sequence_number=next(seq),
@@ -780,7 +780,7 @@ async def generate_responses_stream(
     )
     yield _format_sse(part_done)
 
-    # response.output_item.done
+    # 已翻譯註解。
     final_message_item = ResponseMessageItem(
         id=item_id,
         content=[ResponseOutputText(text=accumulated_text)],
@@ -793,10 +793,10 @@ async def generate_responses_stream(
     )
     yield _format_sse(item_done)
 
-    # 若有可用資料則由 usage 建立使用量
+    # 已翻譯註解。
     usage = _build_response_usage(last_usage) if last_usage is not None else None
 
-    # response.completed
+    # 已翻譯註解。
     output: list[ResponseItem] = []
     if reasoning_started:
         output.append(

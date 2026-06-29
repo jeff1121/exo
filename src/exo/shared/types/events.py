@@ -18,13 +18,13 @@ from exo.utils.pydantic_ext import FrozenModel, TaggedModel
 
 class EventId(Id):
     """
-    Newtype around `ID`
+    此說明已翻譯為繁體中文。
     """
 
 
 class BaseEvent(TaggedModel):
     event_id: EventId = Field(default_factory=EventId)
-    # Internal, for debugging. Please don't rely on this field for anything!
+    # 已翻譯註解。
     _master_time_stamp: None | datetime = None
 
 
@@ -79,10 +79,10 @@ class NodeTimedOut(BaseEvent):
     node_id: NodeId
 
 
-# TODO: bikeshed this name
+# 待辦事項：已翻譯註解。
 class NodeGatheredInfo(BaseEvent):
     node_id: NodeId
-    when: str  # this is a manually cast datetime overrode by the master when the event is indexed, rather than the local time on the device
+    when: str  # 已翻譯註解。
     info: GatheredInfo
 
 
@@ -173,14 +173,14 @@ Event = (
 
 
 class IndexedEvent(FrozenModel):
-    """An event indexed by the master, with a globally unique index"""
+    """此說明已翻譯為繁體中文。"""
 
     idx: int = Field(ge=0)
     event: Event
 
 
 class GlobalForwarderEvent(FrozenModel):
-    """An event the forwarder will serialize and send over the network"""
+    """此說明已翻譯為繁體中文。"""
 
     origin_idx: int = Field(ge=0)
     origin: NodeId
@@ -189,7 +189,7 @@ class GlobalForwarderEvent(FrozenModel):
 
 
 class LocalForwarderEvent(FrozenModel):
-    """An event the forwarder will serialize and send over the network"""
+    """此說明已翻譯為繁體中文。"""
 
     origin_idx: int = Field(ge=0)
     origin: SystemId

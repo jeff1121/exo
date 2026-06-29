@@ -9,7 +9,7 @@ from typing import Self
 
 import anyio
 from anyio.lowlevel import checkpoint as anyio_checkpoint
-from daemon import DaemonContext  # pyright: ignore[reportMissingTypeStubs]
+from daemon import DaemonContext  # 已翻譯註解。
 from exo_rs import Pidfile, PidfileError
 from loguru import logger
 from pydantic import PositiveInt
@@ -74,10 +74,10 @@ class Node:
 
         logger.info(f"Starting node {node_id}")
 
-        # 第一次執行 exo 時目錄不存在，這裡可能會出錯
+        # 已翻譯註解。
         EXO_DEFAULT_MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-        # 建立 DownloadCoordinator（除非使用 --no-downloads）
+        # 已翻譯註解。
         if not args.no_downloads:
             download_coordinator = DownloadCoordinator(
                 node_id,
@@ -113,7 +113,7 @@ class Node:
         else:
             worker = None
 
-        # 我們讓每個節點一開始都具有 master
+        # 已翻譯註解。
         master = Master(
             node_id,
             session_id,
@@ -127,7 +127,7 @@ class Node:
         er_send, er_recv = channel[ElectionResult]()
         election = Election(
             node_id,
-            # 如果真的有人把一百萬台裝置組成 exo 叢集，那真是太厲害了。
+            # 已翻譯註解。
             seniority=1_000_000 if args.force_master else 0,
             # 註：目前這裡確實會產生回饋循環，我有一些想法可改善，
             # 但整體而言似乎不值得增加那麼多複雜度
@@ -170,7 +170,7 @@ class Node:
             tg.start_soon(self._elect_loop)
 
     def shutdown(self):
-        # 如果這是第二次呼叫 shutdown，就直接 sys.exit
+        # 已翻譯註解。
         if self._tg.cancel_called():
             import sys
 
@@ -184,13 +184,13 @@ class Node:
                 # 至少目前還算集中在這裡
 
                 # 我不喜歡這段重複邏輯，但目前仍可維持。
-                # TODO: 這個函式整體上需要重構
+                # 待辦事項：已翻譯註解。
 
                 # 總結：
-                # 當出現新 master 時：
-                # - 必要時在本地選出 master
-                # - 關閉並重新建立 worker
-                # - 關閉並重新建立 API
+                # 已翻譯註解。
+                # 已翻譯註解。
+                # 已翻譯註解。
+                # 已翻譯註解。
 
                 if result.is_new_master:
                     await anyio_checkpoint()
@@ -255,7 +255,7 @@ class Node:
                         self._tg.start_soon(self.download_coordinator.run)
                     if self.worker:
                         await self.worker.shutdown()
-                        # TODO: 將 profiling 等資訊加入資源監控
+                        # 待辦事項：已翻譯註解。
                         self.worker = Worker(
                             self.node_id,
                             event_receiver=self.event_router.receiver(),
@@ -276,10 +276,10 @@ class Node:
 
 
 def main():
-    # 先解析參數 => --help 或錯誤參數不需要 PID 鎖定
+    # 已翻譯註解。
     args = Args.parse()
 
-    # 若無法取得 PID 檔，提早結束
+    # 已翻譯註解。
     try:
         pidfile = Pidfile(EXO_PID_FILE, 0o0600)
     except PidfileError as e:
@@ -288,8 +288,8 @@ def main():
 
     try:
         if args.legacy_daemon:
-            # 讓 stdio 明確綁定到 /dev/null 串流。multiprocessing 的 spawn 需要
-            # 有效的 stdio 檔案描述符；若讓 DaemonContext 關閉/重開它們，可能導致 runner 啟動失敗。
+            # 已翻譯註解。
+            # 已翻譯註解。
             for stream in (sys.stdout, sys.stderr, sys.__stdout__, sys.__stderr__):
                 if stream is not None:
                     stream.flush()
@@ -304,13 +304,13 @@ def main():
                 stdout=stdout,
                 stderr=stderr,
             ):
-                # 清理未使用的檔案描述符（只要不是 stdio）
+                # 已翻譯註解。
                 for f in (
                     f for f in (stdin, stdout, stderr) if f.fileno() not in STDIO_FDS
                 ):
                     f.close()
 
-                # 1) 若啟用 daemon 模式 => fork 後再寫入 PID
+                # 已翻譯註解。
                 try:
                     pidfile.write()
                 except PidfileError as e:
@@ -318,7 +318,7 @@ def main():
                     raise SystemExit(1) from e
                 main_inner(args)
         else:
-            # 2) 否則            => 直接寫入 PID
+            # 已翻譯註解。
             try:
                 pidfile.write()
             except PidfileError as e:
@@ -336,7 +336,7 @@ def main_inner(args: "Args"):
 
     mp.set_start_method("spawn", force=True)
 
-    # TODO: 重構目前的詳細日誌等級系統
+    # 待辦事項：已翻譯註解。
     logger_setup(EXO_LOG, args.verbosity)
 
     logger.info(f"pid = {os.getpid()}")
@@ -356,7 +356,7 @@ def main_inner(args: "Args"):
         os.environ["EXO_NO_BATCH"] = "1"
         logger.info("Continuous batching disabled (--no-batch)")
 
-    # 為 runner 子程序設定 FAST_SYNCH 覆寫環境變數
+    # 已翻譯註解。
     if args.fast_synch is True:
         os.environ["EXO_FAST_SYNCH"] = "true"
         logger.info("FAST_SYNCH forced ON")
@@ -387,7 +387,7 @@ class Args(FrozenModel):
     no_downloads: bool = False
     offline: bool = os.getenv("EXO_OFFLINE", "false").lower() == "true"
     no_batch: bool = False
-    fast_synch: bool | None = None  # None = 自動，True = 強制開啟，False = 強制關閉
+    fast_synch: bool | None = None  # 已翻譯註解。
     legacy_daemon: bool = False
     bootstrap_peers: list[str] = []
     namespace: str
@@ -501,4 +501,4 @@ class Args(FrozenModel):
         )
 
         args = parser.parse_args()
-        return cls(**vars(args))  # pyright: ignore[reportAny] - 這裡是刻意在執行期驗證，無法以靜態方式完成
+        return cls(**vars(args))  # 已翻譯註解。

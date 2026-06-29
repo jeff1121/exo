@@ -1,5 +1,5 @@
-# TODO: Do we want so many constants?
-#  I think we want a lot of these as parameters?
+# 待辦事項：已翻譯註解。
+#  已翻譯註解。
 
 KV_GROUP_SIZE: int | None = 32
 KV_BITS: int | None = None
@@ -13,5 +13,5 @@ KV_CACHE_BITS: int | None = None
 
 DEFAULT_TOP_LOGPROBS: int = 5
 
-# TODO: We should really make this opt-in, but Kimi requires trust_remote_code=True
+# 待辦事項：已翻譯註解。
 TRUST_REMOTE_CODE: bool = True

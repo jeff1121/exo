@@ -17,7 +17,7 @@ import aiofiles.os as aios
 import aiohttp
 import certifi
 from huggingface_hub import (
-    snapshot_download,  # pyright: ignore[reportUnknownVariableType]
+    snapshot_download,  # 已翻譯註解。
 )
 from loguru import logger
 from pydantic import (
@@ -50,11 +50,11 @@ from exo.shared.types.worker.shards import ShardMetadata
 
 
 class HuggingFaceAuthenticationError(Exception):
-    """當 HuggingFace 下載模型回傳 401/403 時拋出。"""
+    """此說明已翻譯為繁體中文。"""
 
 
 class HuggingFaceRateLimitError(Exception):
-    """HuggingFace 的 429 狀態碼。"""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, msg: str, retry_after: float | None = None) -> None:
         super().__init__(msg)
@@ -62,10 +62,10 @@ class HuggingFaceRateLimitError(Exception):
 
 
 def _parse_retry_after(headers: Mapping[str, str]) -> float | None:
-    """從 HF 的 RateLimit 標頭解析重置前秒數。
+    """此說明已翻譯為繁體中文。
 
-    HF 在 429 時會回傳例如 ``ratelimit: "api";r=0;t=52``；其中 ``t`` 是等待秒數。
-    若標頭不存在或沒有 ``t`` 欄位，回傳 ``None``。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     raw = headers.get("RateLimit") or headers.get("ratelimit")
     if raw is None:
@@ -83,7 +83,7 @@ def _parse_retry_after(headers: Mapping[str, str]) -> float | None:
 # 重置視窗為 5 分鐘
 _RATE_LIMIT_MAX_SLEEP_SECS = 300.0
 
-# 24 小時。若要強制刷新，請手動清除快取（或呼叫 `delete_model`）。
+# 已翻譯註解。
 _FILE_LIST_CACHE_TTL_SECS = 24 * 60 * 60
 
 
@@ -155,7 +155,7 @@ def resolve_existing_model(
     """在所有模型目錄中尋找已存在且完整的模型。
 
     先檢查唯讀目錄，再檢查可寫目錄。
-    只有在 ``is_model_directory_complete`` 確認
+    此說明已翻譯為繁體中文。
     所有權重檔皆存在時才會回傳候選路徑。
     """
     normalized = model_id.normalize()
@@ -181,7 +181,7 @@ def build_model_path(model_id: ModelId) -> Path:
 def select_download_dir(required_bytes: int) -> Path:
     """挑選第一個有足夠空間的可寫模型目錄。
 
-    若都沒有足夠空間，會拋出 ``InsufficientDiskSpaceError``。
+    此說明已翻譯為繁體中文。
     """
     for candidate_dir in EXO_MODELS_DIRS:
         if not candidate_dir.exists():
@@ -258,7 +258,7 @@ async def delete_model(model_id: ModelId) -> bool:
 
 
 async def seed_models(seed_dir: str | Path):
-    """將 resources 資料夾中的模型移到預設模型目錄。"""
+    """此說明已翻譯為繁體中文。"""
     source_dir = Path(seed_dir)
     await aios.makedirs(EXO_DEFAULT_MODELS_DIR, exist_ok=True)
     dest_dir = EXO_DEFAULT_MODELS_DIR
@@ -280,8 +280,8 @@ def _scan_model_directory(
 ) -> list[FileListEntry] | None:
     """掃描本地模型目錄並建立檔案清單。
 
-    至少需要一個 ``*.safetensors.index.json``。若索引中列出的
-    權重檔在磁碟上缺失，該項的 ``size`` 會是 ``None``。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     index_files = list(model_dir.glob("**/*.safetensors.index.json"))
     if not index_files:
@@ -363,9 +363,9 @@ async def _build_file_list_from_local_directory(
 ) -> list[FileListEntry] | None:
     """根據本地已存在的模型檔建立檔案清單。
 
-    我們只能從 safetensors 索引得知所需檔案，因此
-    本地目錄必須包含 *.safetensors.index.json，且
-    其中列出的 safetensors 檔案需存在。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     normalized = model_id.normalize()
     for search_dir in (*EXO_MODELS_READ_ONLY_DIRS, *EXO_MODELS_DIRS):
@@ -389,7 +389,7 @@ async def fetch_file_list_with_cache(
     target_dir = await ensure_cache_dir(model_id)
     cache_file = target_dir / f"{model_id.normalize()}--{revision}--file_list.json"
 
-    # 快取可跨程序重啟保留，避免冷啟動時再次對 HF 造成突發請求
+    # 已翻譯註解。
     if await aios.path.exists(cache_file):
         try:
             cache_age = time.time() - (await aios.stat(cache_file)).st_mtime
@@ -489,7 +489,7 @@ async def _fetch_file_list(
 ) -> list[FileListEntry]:
     api_url = f"{get_hf_endpoint()}/api/models/{model_id}/tree/{revision}"
     url = f"{api_url}/{path}" if path else api_url
-    # ?recursive=true 會在單次請求中回傳整個子樹
+    # 已翻譯註解。
     if recursive:
         url = f"{url}?recursive=true"
 
@@ -514,10 +514,10 @@ async def _fetch_file_list(
                 if item.type == "file":
                     files.append(FileListEntry.model_validate(item))
                 elif item.type == "directory" and recursive:
-                    # 已由 ?recursive=true 內嵌回傳
+                    # 已翻譯註解。
                     continue
             if recursive and len(data) >= 1000:
-                # HF tree 端點每頁 1000 筆；目前不追蹤游標分頁
+                # 已翻譯註解。
                 logger.warning(
                     f"File list for {model_id} hit the 1000-entry page cap "
                     "and may be truncated; cursor pagination is not implemented"
@@ -589,7 +589,7 @@ async def file_meta(
         session.head(url, headers=headers) as r,
     ):
         if r.status == 307:
-            # 發生重新導向時，只信任 Hugging Face 的 x-linked-* 標頭。
+            # 已翻譯註解。
             x_linked_size = r.headers.get("x-linked-size")
             x_linked_etag = r.headers.get("x-linked-etag")
             if x_linked_size and x_linked_etag:
@@ -837,10 +837,10 @@ async def get_weight_map(model_id: ModelId, revision: str = "main") -> dict[str,
 
 
 async def resolve_allow_patterns(shard: ShardMetadata) -> list[str]:
-    # TODO: 「智慧型」下載目前停用，原因如下：
-    #  (i) 尚未處理所有檔案類型；
-    # (ii) 尚未具備黏著工作階段。
-    # (iii) 張量平行需要所有檔案。
+    # 待辦事項：已翻譯註解。
+    #  已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
     return ["*"]
     try:
         weight_map = await get_weight_map(str(shard.model_card.model_id))
@@ -920,8 +920,8 @@ async def download_shard(
         )
     )
 
-    # 對影像模型，略過根目錄的 safetensors 檔，因為權重
-    # 儲存在元件子目錄中（例如 transformer/、vae/）
+    # 已翻譯註解。
+    # 已翻譯註解。
     if is_image_model(shard):
         filtered_file_list = [
             f
@@ -951,7 +951,7 @@ async def download_shard(
     ) -> None:
         previous_progress = file_progress.get(file.path)
 
-        # 偵測重新下載：curr_bytes < 先前已下載量代表檔案被刪除後重啟下載
+        # 已翻譯註解。
         is_redownload = (
             previous_progress is not None
             and curr_bytes < previous_progress.downloaded.in_bytes

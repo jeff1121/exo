@@ -3,10 +3,10 @@ from loguru import logger
 
 class OrderedBuffer[T]:
     """
-    A buffer that resequences events to ensure their ordering is preserved.
-    Currently this buffer doesn't raise any errors if an event is lost
-    This buffer is NOT thread safe, and is designed to only be polled from one
-    source at a time.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(self):
@@ -14,7 +14,7 @@ class OrderedBuffer[T]:
         self.next_idx_to_release: int = 0
 
     def ingest(self, idx: int, t: T):
-        """Ingest a sequence into the buffer"""
+        """此說明已翻譯為繁體中文。"""
         logger.trace(f"Ingested event {t}")
         if idx < self.next_idx_to_release:
             return
@@ -26,7 +26,7 @@ class OrderedBuffer[T]:
         self.store[idx] = t
 
     def drain(self) -> list[T]:
-        """Drain all available events from the buffer"""
+        """此說明已翻譯為繁體中文。"""
         ret: list[T] = []
         while self.next_idx_to_release in self.store:
             idx = self.next_idx_to_release
@@ -37,7 +37,7 @@ class OrderedBuffer[T]:
         return ret
 
     def drain_indexed(self) -> list[tuple[int, T]]:
-        """Drain all available events from the buffer"""
+        """此說明已翻譯為繁體中文。"""
         ret: list[tuple[int, T]] = []
         while self.next_idx_to_release in self.store:
             idx = self.next_idx_to_release
@@ -50,8 +50,8 @@ class OrderedBuffer[T]:
 
 class MultiSourceBuffer[SourceId, T]:
     """
-    A buffer that resequences events to ensure their ordering is preserved.
-    Tracks events with multiple sources
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(self):

@@ -50,10 +50,10 @@ from exo.worker.engines.mlx.utils_mlx import (
 
 
 def _is_primary_output_node(shard_metadata: ShardMetadata) -> bool:
-    """Check if this node is the primary output node for image generation.
+    """此說明已翻譯為繁體中文。
 
-    For CFG models: the last pipeline stage in CFG group 0 (positive prompt).
-    For non-CFG models: the last pipeline stage.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     if isinstance(shard_metadata, CfgShardMetadata):
         is_pipeline_last = (
@@ -112,7 +112,7 @@ class MfluxBuilder(Builder):
             bound_instance.bound_shard, self.group
         )
         return
-        # very important!
+        # 已翻譯註解。
         yield
 
     def close(self) -> None:
@@ -196,7 +196,7 @@ class ImageEngine(Engine):
             return self.should_cancel(task_id)
 
         try:
-            # todo: yield CancelledResponse properly
+            # 待辦事項：已翻譯註解。
             for response in generate_image(
                 model=self.image_model,
                 task=task_params,

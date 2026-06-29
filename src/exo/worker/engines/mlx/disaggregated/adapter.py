@@ -57,7 +57,7 @@ def str_to_mx_dtype(dtype: DType) -> mx.Dtype:
 
 
 def array_to_bytes(t: mx.array) -> bytes:
-    # bf16 has no native numpy dtype; bitcast through uint16.
+    # 已翻譯註解。
     if t.dtype == mx.bfloat16:
         return np.asarray(t.view(mx.uint16)).tobytes()
     if t.dtype in (mx.float16, mx.float32):

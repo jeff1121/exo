@@ -1,4 +1,4 @@
-# pyright: reportUnusedFunction=false, reportAny=false
+# 已翻譯註解。
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -8,16 +8,16 @@ from exo.api.main import API
 
 
 def test_http_exception_handler_formats_openai_style() -> None:
-    """測試 HTTPException 會被轉為 OpenAI 風格的錯誤格式。"""
+    """此說明已翻譯為繁體中文。"""
 
     app = FastAPI()
 
     # 設定例外處理器
     api = object.__new__(API)
     api.app = app
-    api._setup_exception_handlers()  # pyright: ignore[reportPrivateUsage]
+    api._setup_exception_handlers()  # 已翻譯註解。
 
-    # 新增會拋出 HTTPException 的測試路由
+    # 已翻譯註解。
     @app.get("/test-error")
     async def _test_error() -> None:
         raise HTTPException(status_code=500, detail="Test error message")

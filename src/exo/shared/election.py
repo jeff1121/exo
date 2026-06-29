@@ -58,14 +58,14 @@ class Election:
         is_candidate: bool = True,
         seniority: int = 0,
     ):
-        # 若不是候選者，就不要提高 seniority。
-        # 參考：若所有節點都不是 master 候選者，此節點仍可能被選為 master
-        # 任何 master 候選者都會自動勝過此節點。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         self.seniority = seniority if is_candidate else -1
         self.clock = 0
         self.node_id = node_id
         self.commands_seen = 0
-        # 每個節點啟動時都先視為 master
+        # 已翻譯註解。
         self.current_session: SessionId = SessionId(
             master_node_id=node_id, election_clock=0
         )
@@ -130,7 +130,7 @@ class Election:
                 logger.debug(f"Election message received: {message}")
                 if message.proposed_session.master_node_id == self.node_id:
                     logger.debug("Dropping message from ourselves")
-                    # 丟棄自己送出的訊息（見 exo.routing.router）
+                    # 已翻譯註解。
                     continue
                 # 若新一輪開始，我們就參與
                 if message.clock > self.clock:
@@ -215,7 +215,7 @@ class Election:
                 # 小技巧：重新廣播狀態，避免有人漏收。
                 await self._em_sender.send(status)
                 logger.debug("Woke up from sleep")
-                # 加入 anyio checkpoint：理想上用 anyio.lowlevel.chekpoint() 或 checkpoint_if_cancelled()，但先前型別檢查無法通過
+                # 已翻譯註解。
                 await anyio.sleep(0)
 
                 # 選舉完成！

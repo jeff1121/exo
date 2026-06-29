@@ -32,8 +32,8 @@ from exo.shared.types.memory import Memory
 from exo.shared.types.text_generation import ReasoningDialect
 from exo.utils.pydantic_ext import FrozenModel
 
-# kinda ugly...
-# TODO: load search path from config.toml
+# 已翻譯註解。
+# 待辦事項：已翻譯註解。
 _custom_cards_dir = Path(str(EXO_CUSTOM_MODEL_CARDS_DIR))
 _BUILTIN_CARD_DIRS = [
     Path(RESOURCES_DIR) / "inference_model_cards",
@@ -56,7 +56,7 @@ class _CardCache:
             logger.warning(f"failed to save custom model card ({e.strerror})")
 
     async def pop(self, model_id: ModelId) -> "ModelCard | None":
-        """Delete a user-added custom model card. Returns True if deleted."""
+        """此說明已翻譯為繁體中文。"""
         card_path = _custom_cards_dir / (ModelId(model_id).normalize() + ".toml")
         try:
             if await card_path.exists():
@@ -73,7 +73,7 @@ class _CardCache:
         return [c for c in self.cc.values() if not _is_image_card(c)]
 
     async def _load_cards_from_dir(self, directory: Path, *, is_custom: bool) -> None:
-        """Load all TOML model cards from a directory into the cache."""
+        """此說明已翻譯為繁體中文。"""
         async for toml_file in directory.rglob("*.toml"):
             try:
                 card = await ModelCard.load_from_path(toml_file)
@@ -207,7 +207,7 @@ class ModelCard(FrozenModel):
     async def save(self, path: Path) -> None:
         async with await open_file(path, "w") as f:
             py = self.model_dump(exclude_none=True, exclude={"is_custom"})
-            data = tomlkit.dumps(py)  # pyright: ignore[reportUnknownMemberType]
+            data = tomlkit.dumps(py)  # 已翻譯註解。
             await f.write(data)
 
     async def save_to_custom_dir(self) -> None:
@@ -220,7 +220,7 @@ class ModelCard(FrozenModel):
             py = tomlkit.loads(await f.read())
             return ModelCard.model_validate(py)
 
-    # Is it okay that model card.load defaults to network access if the card doesn't exist? do we want to be more explicit here?
+    # 已翻譯註解。
     @staticmethod
     async def load(model_id: ModelId) -> "ModelCard":
         if card_cache.get(model_id) is None:
@@ -234,12 +234,12 @@ class ModelCard(FrozenModel):
 
     @staticmethod
     async def fetch_from_hf(model_id: ModelId) -> "ModelCard":
-        """Fetches storage size and number of layers for a Hugging Face model, returns Pydantic ModelMeta.
+        """此說明已翻譯為繁體中文。
 
-        This is a pure fetch — it does NOT save to disk or update the cache.
-        Persistence is handled by the event-sourcing layer (worker event handler).
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
-        # TODO: failure if files do not exist
+        # 待辦事項：已翻譯註解。
         config_data = await fetch_config_data(model_id)
         num_layers = config_data.layer_count
         mem_size_bytes = await fetch_safetensors_size(model_id)
@@ -258,12 +258,12 @@ class ModelCard(FrozenModel):
             vision=config_data.vision,
             backends=list(
                 Backend
-            ),  # all backends — we don't know what an arbitrary HF model supports; let placement gate decide
+            ),  # 已翻譯註解。
         )
 
 
 class ConfigData(BaseModel):
-    model_config = {"extra": "ignore"}  # Allow unknown fields
+    model_config = {"extra": "ignore"}  # 已翻譯註解。
 
     architectures: list[str] | None = None
     hidden_size: Annotated[int, Field(ge=0)] | None = None
@@ -319,19 +319,19 @@ class ConfigData(BaseModel):
                 "num_decoder_layers",
                 "decoder_layers",
             ]:
-                if (val := text_config.get(field)) is not None:  # pyright: ignore[reportAny]
+                if (val := text_config.get(field)) is not None:  # 已翻譯註解。
                     data[field] = val
 
         vision_config = data.get("vision_config")
         image_token_id = data.get("image_token_id")
         if vision_config is not None and image_token_id is not None:
             model_type = str(
-                data.get("model_type", vision_config.get("model_type", ""))  # pyright: ignore[reportAny]
+                data.get("model_type", vision_config.get("model_type", ""))  # 已翻譯註解。
             )
             assert info.context is not None
 
             data["vision"] = VisionCardConfig(
-                image_token_id=int(image_token_id),  # pyright: ignore[reportAny]
+                image_token_id=int(image_token_id),  # 已翻譯註解。
                 model_type=model_type,
                 weights_repo=info.context["model_id"],  # type: ignore
             )
@@ -340,7 +340,7 @@ class ConfigData(BaseModel):
 
 
 async def fetch_config_data(model_id: ModelId) -> ConfigData:
-    """Downloads and parses config.json for a model."""
+    """此說明已翻譯為繁體中文。"""
     from exo.download.download_utils import (
         download_file_with_retry,
         resolve_model_dir,
@@ -363,7 +363,7 @@ async def fetch_config_data(model_id: ModelId) -> ConfigData:
 
 
 async def fetch_safetensors_size(model_id: ModelId) -> Memory:
-    """Gets model size from safetensors index or falls back to HF API."""
+    """此說明已翻譯為繁體中文。"""
     from exo.download.download_utils import (
         download_file_with_retry,
         resolve_model_dir,

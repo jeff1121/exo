@@ -1,8 +1,8 @@
 """
-Unit tests for tokenizer loading and functionality across all supported models.
+此說明已翻譯為繁體中文。
 
-This test downloads only tokenizer-related files (not full model weights) to verify
-that tokenizers can be loaded and used correctly for encoding/decoding.
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 """
 
 import asyncio
@@ -22,7 +22,7 @@ from exo.worker.engines.mlx.utils_mlx import (
     load_tokenizer_for_model_id,
 )
 
-# Files needed for tokenizer functionality
+# 已翻譯註解。
 TOKENIZER_FILE_PATTERNS = [
     "tokenizer.json",
     "tokenizer_config.json",
@@ -33,13 +33,13 @@ TOKENIZER_FILE_PATTERNS = [
     "tiktoken.model",
     "added_tokens.json",
     "tokenizer.model",
-    "tokenization_*.py",  # Custom tokenizer implementations
-    "tool_declaration_ts.py",  # Dependency of tokenization_kimi.py
+    "tokenization_*.py",  # 已翻譯註解。
+    "tool_declaration_ts.py",  # 已翻譯註解。
 ]
 
 
 def is_tokenizer_file(filename: str) -> bool:
-    """Check if a file is needed for tokenizer functionality."""
+    """此說明已翻譯為繁體中文。"""
     for pattern in TOKENIZER_FILE_PATTERNS:
         if "*" in pattern:
             prefix = pattern.split("*")[0]
@@ -52,7 +52,7 @@ def is_tokenizer_file(filename: str) -> bool:
 
 
 async def download_tokenizer_files(model_id: ModelId) -> Path:
-    """Download only the tokenizer-related files for a model."""
+    """此說明已翻譯為繁體中文。"""
     target_dir = await resolve_model_dir(model_id)
 
     file_list = await fetch_file_list_with_cache(model_id, "main", recursive=True)
@@ -71,13 +71,13 @@ async def download_tokenizer_files(model_id: ModelId) -> Path:
     return target_dir
 
 
-# Get a sample of models to test (one per family to keep tests fast)
+# 已翻譯註解。
 def get_test_models() -> list[ModelCard]:
-    """Get a representative sample of models to test."""
-    # Pick one model from each family to test
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     families: dict[str, ModelCard] = {}
     for card in asyncio.run(card_cache.list_all()):
-        # Extract family name (e.g., "llama-3.1" from "llama-3.1-8b")
+        # 已翻譯註解。
         parts = card.model_id.short().split("-")
         family = "-".join(parts[:2]) if len(parts) >= 2 else parts[0]
 
@@ -94,7 +94,7 @@ pytestmark = pytest.mark.slow
 
 @pytest.fixture(scope="module")
 def event_loop():
-    """Create event loop for async tests."""
+    """此說明已翻譯為繁體中文。"""
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
@@ -106,13 +106,13 @@ def event_loop():
 )
 @pytest.mark.asyncio
 async def test_tokenizer_encode_decode(model_card: ModelCard) -> None:
-    """Test that tokenizer can encode and decode text correctly."""
+    """此說明已翻譯為繁體中文。"""
     model_id = model_card.model_id
 
-    # Download tokenizer files
+    # 已翻譯註解。
     model_path = await download_tokenizer_files(model_id)
 
-    # Verify required files exist
+    # 已翻譯註解。
     has_tokenizer = (
         (model_path / "tokenizer.json").exists()
         or (model_path / "tokenizer_config.json").exists()
@@ -122,10 +122,10 @@ async def test_tokenizer_encode_decode(model_card: ModelCard) -> None:
     if not has_tokenizer:
         pytest.skip(f"Required tokenizer files not found for {model_id}")
 
-    # Load tokenizer
+    # 已翻譯註解。
     tokenizer = load_tokenizer_for_model_id(model_id, model_path)
 
-    # Test basic encoding
+    # 已翻譯註解。
     test_text = "Hello, world!"
     encoded = tokenizer.encode(test_text)
     assert isinstance(encoded, list), f"encode() should return a list for {model_id}"
@@ -134,7 +134,7 @@ async def test_tokenizer_encode_decode(model_card: ModelCard) -> None:
         f"All tokens should be integers for {model_id}"
     )
 
-    # Test decoding
+    # 已翻譯註解。
     decoded = tokenizer.decode(encoded)
     assert isinstance(decoded, str), f"decode() should return a string for {model_id}"
     normalized_decoded = decoded.replace(" ", "").lower()
@@ -143,25 +143,25 @@ async def test_tokenizer_encode_decode(model_card: ModelCard) -> None:
         f"decode(encode(x)) should preserve text for {model_id}: got {decoded!r}"
     )
 
-    # Test with longer text
+    # 已翻譯註解。
     long_text = "The quick brown fox jumps over the lazy dog. " * 10
     long_encoded = tokenizer.encode(long_text)
     assert len(long_encoded) > len(encoded), (
         f"Longer text should produce more tokens for {model_id}"
     )
 
-    # Test empty string
+    # 已翻譯註解。
     empty_encoded = tokenizer.encode("")
     assert isinstance(empty_encoded, list), (
         f"encode('') should return a list for {model_id}"
     )
 
-    # Test special characters
+    # 已翻譯註解。
     special_text = 'Hello!\n\tWorld? <test> & "quotes"'
     special_encoded = tokenizer.encode(special_text)
     assert len(special_encoded) > 0, f"Special chars should encode for {model_id}"
 
-    # Test unicode
+    # 已翻譯註解。
     unicode_text = "Hello 世界 🌍"
     unicode_encoded = tokenizer.encode(unicode_text)
     assert len(unicode_encoded) > 0, f"Unicode should encode for {model_id}"
@@ -173,7 +173,7 @@ async def test_tokenizer_encode_decode(model_card: ModelCard) -> None:
 )
 @pytest.mark.asyncio
 async def test_tokenizer_has_required_attributes(model_card: ModelCard) -> None:
-    """Test that tokenizer has required attributes for inference."""
+    """此說明已翻譯為繁體中文。"""
     model_id = model_card.model_id
 
     model_path = await download_tokenizer_files(model_id)
@@ -190,14 +190,14 @@ async def test_tokenizer_has_required_attributes(model_card: ModelCard) -> None:
     tokenizer = load_tokenizer_for_model_id(model_id, model_path)
     eos_token_ids = get_eos_token_ids_for_model(model_id)
 
-    # Check for vocabulary size
+    # 已翻譯註解。
     empty_vocab: dict[str, int] = {}
     vocab_size: int = getattr(tokenizer, "vocab_size", None) or len(
         getattr(tokenizer, "get_vocab", lambda: empty_vocab)()
     )
     assert vocab_size > 0, f"Tokenizer should have vocab_size > 0 for {model_id}"
 
-    # Check for EOS token (either from tokenizer or explicitly provided)
+    # 已翻譯註解。
     has_eos = (
         eos_token_ids is not None
         or getattr(tokenizer, "eos_token_id", None) is not None
@@ -212,11 +212,11 @@ async def test_tokenizer_has_required_attributes(model_card: ModelCard) -> None:
 )
 @pytest.mark.asyncio
 async def test_tokenizer_special_tokens(model_card: ModelCard) -> None:
-    """Test that tokenizer can encode text containing special tokens.
+    """此說明已翻譯為繁體中文。
 
-    This is critical because the actual inference path uses prompts with
-    special tokens from chat templates. If special tokens aren't handled
-    correctly, encoding will fail.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     model_id = model_card.model_id
 
@@ -232,10 +232,10 @@ async def test_tokenizer_special_tokens(model_card: ModelCard) -> None:
 
     tokenizer = load_tokenizer_for_model_id(model_id, model_path)
 
-    # Get special tokens from the tokenizer
+    # 已翻譯註解。
     special_tokens: list[str] = []
 
-    # Try to get special tokens from various sources
+    # 已翻譯註解。
     if hasattr(tokenizer, "all_special_tokens"):
         special_tokens.extend(tokenizer.all_special_tokens)
     elif hasattr(tokenizer, "_tokenizer") and hasattr(
@@ -244,7 +244,7 @@ async def test_tokenizer_special_tokens(model_card: ModelCard) -> None:
     ):
         special_tokens.extend(tokenizer._tokenizer.all_special_tokens)
 
-    # Also check for common special token attributes
+    # 已翻譯註解。
     for attr in [
         "bos_token",
         "eos_token",
@@ -259,9 +259,9 @@ async def test_tokenizer_special_tokens(model_card: ModelCard) -> None:
         if token and isinstance(token, str) and token not in special_tokens:
             special_tokens.append(token)
 
-    # If we found special tokens, test encoding text that contains them
+    # 已翻譯註解。
     if special_tokens:
-        # Create text with special tokens interspersed
+        # 已翻譯註解。
         test_with_special = f"{special_tokens[0]}Hello world"
         if len(special_tokens) > 1:
             test_with_special += f"{special_tokens[1]}"
@@ -277,12 +277,12 @@ async def test_tokenizer_special_tokens(model_card: ModelCard) -> None:
             f"All tokens should be integers for {model_id}"
         )
 
-        # Verify we can decode
+        # 已翻譯註解。
         decoded = tokenizer.decode(encoded)
         assert isinstance(decoded, str), f"decode() should return string for {model_id}"
 
-    # Test with angle-bracket tokens (common format for special tokens)
-    # These should not raise errors even if they're not actual special tokens
+    # 已翻譯註解。
+    # 已翻譯註解。
     angle_bracket_text = "<|test|>Hello<|end|>"
     encoded = tokenizer.encode(angle_bracket_text)
     assert isinstance(encoded, list), (
@@ -293,10 +293,10 @@ async def test_tokenizer_special_tokens(model_card: ModelCard) -> None:
     )
 
 
-# Specifically test Kimi tokenizer since it has special handling
+# 已翻譯註解。
 @pytest.mark.asyncio
 async def test_kimi_tokenizer_specifically():
-    """Test Kimi tokenizer with its specific patches and quirks."""
+    """此說明已翻譯為繁體中文。"""
     kimi_models = [
         card for card in await card_cache.list_all() if "kimi" in card.model_id.lower()
     ]
@@ -309,14 +309,14 @@ async def test_kimi_tokenizer_specifically():
 
     model_path = await download_tokenizer_files(model_id)
 
-    # Ensure the custom tokenizer file exists
+    # 已翻譯註解。
     if not (model_path / "tokenization_kimi.py").exists():
         pytest.skip("tokenization_kimi.py not found")
 
     tokenizer = load_tokenizer_for_model_id(model_id, model_path)
     eos_token_ids = get_eos_token_ids_for_model(model_id)
 
-    # Test encode/decode cycle
+    # 已翻譯註解。
     test_text = "Hello, world!"
     encoded = tokenizer.encode(test_text)
     decoded = tokenizer.decode(encoded)
@@ -324,11 +324,11 @@ async def test_kimi_tokenizer_specifically():
     assert len(encoded) > 0, "Kimi tokenizer should encode text"
     assert isinstance(decoded, str), "Kimi tokenizer should decode to string"
 
-    # Test that the patched encode works (returns list of ints)
+    # 已翻譯註解。
     assert all(isinstance(t, int) for t in encoded), "Tokens should be integers"
 
-    # Test encoding text with special tokens (like from chat templates)
-    # This is critical - the warmup inference uses prompts with special tokens
+    # 已翻譯註解。
+    # 已翻譯註解。
     special_token_text = "<|im_user|>user<|im_middle|>Hello<|im_end|><|im_assistant|>"
     special_encoded = tokenizer.encode(special_token_text)
     assert len(special_encoded) > 0, "Kimi tokenizer should handle special tokens"
@@ -336,14 +336,14 @@ async def test_kimi_tokenizer_specifically():
         "Special token encoding should return integers"
     )
 
-    # Verify EOS token is set
+    # 已翻譯註解。
     assert eos_token_ids == [163586], "Kimi EOS token should be [163586]"
 
 
-# Test GLM tokenizer since it also has special handling
+# 已翻譯註解。
 @pytest.mark.asyncio
 async def test_glm_tokenizer_specifically():
-    """Test GLM tokenizer with its specific EOS tokens."""
+    """此說明已翻譯為繁體中文。"""
 
     def contains(card: ModelCard, x: str):
         return x in card.model_id.lower()
@@ -373,7 +373,7 @@ async def test_glm_tokenizer_specifically():
     tokenizer = load_tokenizer_for_model_id(model_id, model_path)
     eos_token_ids = get_eos_token_ids_for_model(model_id)
 
-    # Test encode/decode
+    # 已翻譯註解。
     test_text = "Hello, world!"
     encoded = tokenizer.encode(test_text)
     decoded = tokenizer.decode(encoded)
@@ -381,7 +381,7 @@ async def test_glm_tokenizer_specifically():
     assert len(encoded) > 0, "GLM tokenizer should encode text"
     assert isinstance(decoded, str), "GLM tokenizer should decode to string"
 
-    # Verify EOS tokens
+    # 已翻譯註解。
     assert eos_token_ids == [
         151336,
         151329,

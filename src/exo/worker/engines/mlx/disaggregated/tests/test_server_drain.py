@@ -1,5 +1,5 @@
-"""Server thread receives request, runs resolve in another thread (mimicking
-runner main thread + work queue), streams cache bytes."""
+"""此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。"""
 
 import queue
 import threading

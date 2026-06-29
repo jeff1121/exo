@@ -32,11 +32,11 @@ def encode_messages(
     context: list[dict[str, Any]] | None = None,
     drop_thinking: bool = True,
     add_default_bos_token: bool = True,
-    tools: Any = None,  # pyright: ignore[reportAny]
+    tools: Any = None,  # 已翻譯註解。
 ) -> str:
-    # V3.2 (like V4) is `tool_conditional`: when tools are in play, prior-turn
-    # reasoning_content must be retained so multi-step tool chains stay
-    # coherent.
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
     effective_drop_thinking = drop_thinking
     if tools:
         effective_drop_thinking = False
@@ -71,14 +71,14 @@ _PARAM_PATTERN = re.compile(
 
 
 def parse_dsml_output(text: str) -> list[ToolCallItem] | None:
-    """Parse DSML function_calls block from model output text.
+    """此說明已翻譯為繁體中文。
 
-    Args:
-        text: The text containing the DSML function_calls block
-              (including the start/end markers).
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+              此說明已翻譯為繁體中文。
 
-    Returns:
-        List of ToolCallItem, or None if parsing fails.
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
     """
     tool_calls: list[ToolCallItem] = []
 

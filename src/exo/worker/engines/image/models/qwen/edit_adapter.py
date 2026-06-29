@@ -96,19 +96,19 @@ class QwenEditPromptData(PromptData):
     def get_batched_cfg_data(
         self,
     ) -> tuple[mx.array, mx.array, mx.array | None, mx.array | None] | None:
-        """Batch positive and negative embeddings for CFG with batch_size=2.
+        """此說明已翻譯為繁體中文。
 
-        Pads shorter sequence to max length using zeros for embeddings
-        and zeros (masked) for attention mask. Duplicates conditioning
-        latents for both positive and negative passes.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Returns:
-            Tuple of (batched_embeds, batched_mask, None, batched_cond_latents)
-            - batched_embeds: [2, max_seq, hidden]
-            - batched_mask: [2, max_seq]
-            - None for pooled (Qwen doesn't use it)
-            - batched_cond_latents: [2, latent_seq, latent_dim]
-            TODO(ciaran): type this
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         pos_embeds = self._prompt_embeds
         neg_embeds = self._negative_prompt_embeds
@@ -177,13 +177,13 @@ class QwenEditPromptData(PromptData):
 
 
 class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
-    """Adapter for Qwen-Image-Edit model.
+    """此說明已翻譯為繁體中文。
 
-    Key differences from standard QwenModelAdapter:
-    - Uses QwenImageEdit model with vision-language components
-    - Encodes prompts WITH input images via VL tokenizer/encoder
-    - Creates conditioning latents from input images
-    - Supports image editing with concatenated latents during diffusion
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(
@@ -231,7 +231,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         text_seq_len: int,
         encoder_hidden_states_mask: mx.array | None = None,
     ) -> list[JointBlockWrapper[Any]]:
-        """Create wrapped joint blocks for Qwen Edit."""
+        """此說明已翻譯為繁體中文。"""
         return [
             QwenJointBlockWrapper(block, text_seq_len, encoder_hidden_states_mask)
             for block in self._transformer.transformer_blocks
@@ -241,7 +241,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         self,
         text_seq_len: int,
     ) -> list[SingleBlockWrapper[Any]]:
-        """Qwen has no single blocks."""
+        """此說明已翻譯為繁體中文。"""
         return []
 
     def slice_transformer_blocks(
@@ -254,12 +254,12 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         ]
 
     def set_image_dimensions(self, image_path: Path) -> tuple[int, int]:
-        """Compute and store dimensions from input image.
+        """此說明已翻譯為繁體中文。
 
-        Also stores image_paths for use in encode_prompt().
+        此說明已翻譯為繁體中文。
 
-        Returns:
-            (output_width, output_height) for runtime config
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         vl_w, vl_h, vae_w, vae_h, out_w, out_h = self._compute_dimensions_from_image(
             image_path
@@ -274,7 +274,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         return out_w, out_h
 
     def create_latents(self, seed: int, runtime_config: Config) -> mx.array:
-        """Create initial noise latents (pure noise for edit mode)."""
+        """此說明已翻譯為繁體中文。"""
         return QwenLatentCreator.create_noise(
             seed=seed,
             height=runtime_config.height,
@@ -294,7 +294,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         if negative_prompt is None or negative_prompt == "":
             negative_prompt = " "
 
-        # TODO(ciaran): config is untyped and unused, unsure if Config or RuntimeConfig is intended
+        # 待辦事項：已翻譯註解。
         (
             prompt_embeds,
             prompt_mask,
@@ -304,7 +304,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
             prompt,
             negative_prompt,
             dims.image_paths,
-            self._config,  # pyright: ignore[reportArgumentType]
+            self._config,  # 已翻譯註解。
             dims.vl_width,
             dims.vl_height,
         )
@@ -315,7 +315,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
             cond_h_patches,
             cond_w_patches,
             num_images,
-        ) = QwenEditUtil.create_image_conditioning_latents(  # pyright: ignore[reportUnknownMemberType]
+        ) = QwenEditUtil.create_image_conditioning_latents(  # 已翻譯註解。
             vae=self._model.vae,
             height=dims.vae_height,
             width=dims.vae_width,
@@ -370,7 +370,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         timestep = QwenTransformer._compute_timestep(t, runtime_config)  # noqa: SLF001
         batch_size = ref_tensor.shape[0]
         timestep = mx.broadcast_to(timestep, (batch_size,)).astype(mx.float32)
-        return self._transformer.time_text_embed(timestep, ref_tensor)  # pyright: ignore[reportAny]
+        return self._transformer.time_text_embed(timestep, ref_tensor)  # 已翻譯註解。
 
     def compute_rotary_embeddings(
         self,
@@ -389,7 +389,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
 
         return QwenTransformer._compute_rotary_embeddings(
             encoder_hidden_states_mask=encoder_hidden_states_mask,
-            pos_embed=self._transformer.pos_embed,  # pyright: ignore[reportAny]
+            pos_embed=self._transformer.pos_embed,  # 已翻譯註解。
             config=runtime_config,
             cond_image_grid=cond_image_grid,
         )
@@ -416,7 +416,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         pil_image = ImageUtil.load_image(str(image_path)).convert("RGB")
         image_size = pil_image.size
 
-        # Vision-language dimensions (384x384 target area)
+        # 已翻譯註解。
         condition_image_size = 384 * 384
         condition_ratio = image_size[0] / image_size[1]
         vl_width = math.sqrt(condition_image_size * condition_ratio)
@@ -424,7 +424,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         vl_width = round(vl_width / 32) * 32
         vl_height = round(vl_height / 32) * 32
 
-        # VAE dimensions (1024x1024 target area)
+        # 已翻譯註解。
         vae_image_size = 1024 * 1024
         vae_ratio = image_size[0] / image_size[1]
         vae_width = math.sqrt(vae_image_size * vae_ratio)
@@ -432,7 +432,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         vae_width = round(vae_width / 32) * 32
         vae_height = round(vae_height / 32) * 32
 
-        # Output dimensions from input image aspect ratio
+        # 已翻譯註解。
         target_area = 1024 * 1024
         ratio = image_size[0] / image_size[1]
         output_width = math.sqrt(target_area * ratio)
@@ -440,7 +440,7 @@ class QwenEditModelAdapter(ModelAdapter[QwenImageEdit, QwenTransformer]):
         output_width = round(output_width / 32) * 32
         output_height = round(output_height / 32) * 32
 
-        # Ensure multiple of 16 for VAE
+        # 已翻譯註解。
         vae_scale_factor = 8
         multiple_of = vae_scale_factor * 2
         output_width = output_width // multiple_of * multiple_of

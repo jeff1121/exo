@@ -19,18 +19,18 @@ def socket_connection() -> SocketConnection:
 
 
 def test_add_node(topology: Topology):
-    # arrange
+    # 已翻譯註解。
     node_id = NodeId()
 
-    # act
+    # 已翻譯註解。
     topology.add_node(node_id)
 
-    # assert
+    # 已翻譯註解。
     assert topology.node_is_leaf(node_id)
 
 
 def test_add_connection(topology: Topology, socket_connection: SocketConnection):
-    # arrange
+    # 已翻譯註解。
     node_a = NodeId()
     node_b = NodeId()
     connection = Connection(source=node_a, sink=node_b, edge=socket_connection)
@@ -39,10 +39,10 @@ def test_add_connection(topology: Topology, socket_connection: SocketConnection)
     topology.add_node(node_b)
     topology.add_connection(connection)
 
-    # act
+    # 已翻譯註解。
     data = list(topology.list_connections())
 
-    # assert
+    # 已翻譯註解。
     assert data == [connection]
 
     assert topology.node_is_leaf(node_a)
@@ -52,7 +52,7 @@ def test_add_connection(topology: Topology, socket_connection: SocketConnection)
 def test_remove_connection_still_connected(
     topology: Topology, socket_connection: SocketConnection
 ):
-    # arrange
+    # 已翻譯註解。
     node_a = NodeId()
     node_b = NodeId()
     conn = Connection(source=node_a, sink=node_b, edge=socket_connection)
@@ -61,17 +61,17 @@ def test_remove_connection_still_connected(
     topology.add_node(node_b)
     topology.add_connection(conn)
 
-    # act
+    # 已翻譯註解。
     topology.remove_connection(conn)
 
-    # assert
+    # 已翻譯註解。
     assert list(topology.get_all_connections_between(node_a, node_b)) == []
 
 
 def test_remove_node_still_connected(
     topology: Topology, socket_connection: SocketConnection
 ):
-    # arrange
+    # 已翻譯註解。
     node_a = NodeId()
     node_b = NodeId()
     conn = Connection(source=node_a, sink=node_b, edge=socket_connection)
@@ -81,15 +81,15 @@ def test_remove_node_still_connected(
     topology.add_connection(conn)
     assert list(topology.out_edges(node_a)) == [conn]
 
-    # act
+    # 已翻譯註解。
     topology.remove_node(node_b)
 
-    # assert
+    # 已翻譯註解。
     assert list(topology.out_edges(node_a)) == []
 
 
 def test_list_nodes(topology: Topology, socket_connection: SocketConnection):
-    # arrange
+    # 已翻譯註解。
     node_a = NodeId()
     node_b = NodeId()
     conn = Connection(source=node_a, sink=node_b, edge=socket_connection)
@@ -99,10 +99,10 @@ def test_list_nodes(topology: Topology, socket_connection: SocketConnection):
     topology.add_connection(conn)
     assert list(topology.out_edges(node_a)) == [conn]
 
-    # act
+    # 已翻譯註解。
     nodes = list(topology.list_nodes())
 
-    # assert
+    # 已翻譯註解。
     assert len(nodes) == 2
     assert all(isinstance(node, NodeId) for node in nodes)
     assert set(node for node in nodes) == set([node_a, node_b])

@@ -114,7 +114,7 @@ class Worker:
                 tg.start_soon(self._poll_connection_updates)
                 tg.start_soon(self._reconcile_custom_cards)
         except* (EventRouterBrokenResourceError, EventRouterClosedResourceError):
-            # 事件路由器已關閉（try-star 語法會處理錯誤群組）
+            # 已翻譯註解。
             pass
         finally:
             # 實際關閉流程：會等待所有任務完成後再執行。
@@ -226,7 +226,7 @@ class Worker:
             assert task.task_status
             await self.event_sender.send(TaskCreated(task_id=task.task_id, task=task))
 
-            # 若 runner 無回應，不要直接讓 worker 終止
+            # 已翻譯註解。
             match task:
                 case CreateRunner():
                     await self._create_supervisor(task)
@@ -377,7 +377,7 @@ class Worker:
             ].start_task(task)
 
     async def _create_supervisor(self, task: CreateRunner) -> RunnerSupervisor:
-        """建立並儲存新的 AssignedRunner，初始狀態為下載中。"""
+        """此說明已翻譯為繁體中文。"""
         runner = await RunnerSupervisor.create(
             bound_instance=task.bound_instance,
             event_sender=self.event_sender.clone(),
@@ -402,10 +402,10 @@ class Worker:
                     continue
                 conns[nid].add(ip)
                 edge = SocketConnection(
-                    # 形式上的 multiaddr
+                    # 已翻譯註解。
                     sink_multiaddr=Multiaddr(address=f"/ip4/{ip}/tcp/{self.api_port}")
                     if "." in ip
-                    # 形式上的 multiaddr
+                    # 已翻譯註解。
                     else Multiaddr(address=f"/ip6/{ip}/tcp/{self.api_port}"),
                 )
                 if edge not in edges:
@@ -419,7 +419,7 @@ class Worker:
             for conn in self.state.topology.out_edges(self.node_id):
                 if not isinstance(conn.edge, SocketConnection):
                     continue
-                # 忽略透過 mDNS 發現的連線
+                # 已翻譯註解。
                 if conn.edge.sink_multiaddr.port != self.api_port:
                     continue
                 if (

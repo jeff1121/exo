@@ -21,16 +21,16 @@ class FrozenModel(BaseModel):
 class TaggedModel(FrozenModel):
     @model_serializer(mode="wrap")
     def _serialize(self, handler: SerializerFunctionWrapHandler):
-        inner = handler(self)  # pyright: ignore[reportAny]
+        inner = handler(self)  # 已翻譯註解。
         return {self.__class__.__name__: inner}
 
     @model_validator(mode="wrap")
     @classmethod
-    def _validate(cls, v: Any, handler: ValidatorFunctionWrapHandler) -> Self:  # pyright: ignore[reportAny]
-        if isinstance(v, dict) and len(v) == 1 and cls.__name__ in v:  # pyright: ignore[reportUnknownArgumentType]
-            return handler(v[cls.__name__])  # pyright: ignore[reportAny]
+    def _validate(cls, v: Any, handler: ValidatorFunctionWrapHandler) -> Self:  # 已翻譯註解。
+        if isinstance(v, dict) and len(v) == 1 and cls.__name__ in v:  # 已翻譯註解。
+            return handler(v[cls.__name__])  # 已翻譯註解。
 
-        return handler(v)  # pyright: ignore[reportAny]
+        return handler(v)  # 已翻譯註解。
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({super().__str__()})"

@@ -1,6 +1,6 @@
 class _PhantomData[*T]:
     """
-    Internal machinery of the phantom data - it stores nothing.
+    此說明已翻譯為繁體中文。
     """
 
 

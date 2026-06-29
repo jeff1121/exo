@@ -27,4 +27,4 @@ def test_reasoning_effort_none_derives_thinking_false() -> None:
 
 @pytest.mark.parametrize("effort", ["minimal", "low", "medium", "high", "xhigh"])
 def test_non_none_effort_derives_thinking_true(effort: str) -> None:
-    assert resolve_reasoning_params(effort, None) == (effort, True)  # pyright: ignore[reportArgumentType]
+    assert resolve_reasoning_params(effort, None) == (effort, True)  # 已翻譯註解。

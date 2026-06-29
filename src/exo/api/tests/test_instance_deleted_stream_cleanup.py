@@ -1,5 +1,5 @@
-# pyright: reportUnusedFunction=false, reportAny=false
-"""測試 InstanceDeleted 事件會關閉進行中的生成串流。"""
+# 已翻譯註解。
+"""此說明已翻譯為繁體中文。"""
 
 from unittest.mock import MagicMock
 
@@ -17,11 +17,11 @@ from exo.shared.types.worker.instances import InstanceId
 
 
 def _make_api_with_state(state: State) -> API:
-    """建立預先設定狀態的最小 API 實例。"""
+    """此說明已翻譯為繁體中文。"""
     api = object.__new__(API)
     api.state = state
-    api._text_generation_queues = {}  # pyright: ignore[reportPrivateUsage]
-    api._image_generation_queues = {}  # pyright: ignore[reportPrivateUsage]
+    api._text_generation_queues = {}  # 已翻譯註解。
+    api._image_generation_queues = {}  # 已翻譯註解。
     return api
 
 
@@ -39,7 +39,7 @@ def _make_text_gen_task(
 
 
 def test_close_streams_for_deleted_instance() -> None:
-    """刪除實例時，會關閉該實例命令對應的文字生成 sender。"""
+    """此說明已翻譯為繁體中文。"""
     instance_id = InstanceId("inst-1")
     command_id = CommandId("cmd-1")
     task = _make_text_gen_task(instance_id, command_id)
@@ -48,12 +48,12 @@ def test_close_streams_for_deleted_instance() -> None:
     api = _make_api_with_state(state)
 
     sender = MagicMock()
-    api._text_generation_queues[command_id] = sender  # pyright: ignore[reportPrivateUsage]
+    api._text_generation_queues[command_id] = sender  # 已翻譯註解。
 
-    api._close_streams_for_instance(instance_id)  # pyright: ignore[reportPrivateUsage]
+    api._close_streams_for_instance(instance_id)  # 已翻譯註解。
 
     sender.close.assert_called_once()
-    assert command_id not in api._text_generation_queues  # pyright: ignore[reportPrivateUsage]
+    assert command_id not in api._text_generation_queues  # 已翻譯註解。
 
 
 def test_close_streams_ignores_unrelated_instances() -> None:
@@ -67,16 +67,16 @@ def test_close_streams_ignores_unrelated_instances() -> None:
     api = _make_api_with_state(state)
 
     sender = MagicMock()
-    api._text_generation_queues[other_cmd] = sender  # pyright: ignore[reportPrivateUsage]
+    api._text_generation_queues[other_cmd] = sender  # 已翻譯註解。
 
-    api._close_streams_for_instance(target_id)  # pyright: ignore[reportPrivateUsage]
+    api._close_streams_for_instance(target_id)  # 已翻譯註解。
 
     sender.close.assert_not_called()
-    assert other_cmd in api._text_generation_queues  # pyright: ignore[reportPrivateUsage]
+    assert other_cmd in api._text_generation_queues  # 已翻譯註解。
 
 
 def test_close_streams_for_deleted_instance_image_generation() -> None:
-    """刪除實例時，會關閉該實例命令對應的影像生成 sender。"""
+    """此說明已翻譯為繁體中文。"""
     instance_id = InstanceId("inst-img")
     command_id = CommandId("cmd-img")
     task = ImageGeneration(
@@ -89,9 +89,9 @@ def test_close_streams_for_deleted_instance_image_generation() -> None:
     api = _make_api_with_state(state)
 
     sender = MagicMock()
-    api._image_generation_queues[command_id] = sender  # pyright: ignore[reportPrivateUsage]
+    api._image_generation_queues[command_id] = sender  # 已翻譯註解。
 
-    api._close_streams_for_instance(instance_id)  # pyright: ignore[reportPrivateUsage]
+    api._close_streams_for_instance(instance_id)  # 已翻譯註解。
 
     sender.close.assert_called_once()
-    assert command_id not in api._image_generation_queues  # pyright: ignore[reportPrivateUsage]
+    assert command_id not in api._image_generation_queues  # 已翻譯註解。

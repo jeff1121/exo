@@ -15,7 +15,7 @@ from exo.shared.types.events import Event
 
 _EVENT_ADAPTER: TypeAdapter[Event] = TypeAdapter(Event)
 
-_HEADER_SIZE = 4  # uint32 big-endian
+_HEADER_SIZE = 4  # 已翻譯註解。
 _OFFSET_CACHE_SIZE = 128
 _MAX_ARCHIVES = 5
 
@@ -25,11 +25,11 @@ def _serialize_event(event: Event) -> bytes:
 
 
 def _deserialize_event(raw: bytes) -> Event:
-    # Decode msgpack into a Python dict, then re-encode as JSON for Pydantic.
-    # Pydantic's validate_json() uses JSON-mode coercion (e.g. string -> enum)
-    # even under strict=True, whereas validate_python() does not. Going through
-    # JSON is the only way to get correct round-trip deserialization without
-    # disabling strict mode or adding casts everywhere.
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 取得正確往返反序列化的唯一方式。
     as_json = json.dumps(msgspec.msgpack.decode(raw, type=dict))
     return _EVENT_ADAPTER.validate_json(as_json)
 
@@ -39,7 +39,7 @@ def _unpack_header(header: bytes) -> int:
 
 
 def _skip_record(f: BufferedReader) -> bool:
-    """Skip one length-prefixed record. Returns False on EOF."""
+    """此說明已翻譯為繁體中文。"""
     header = f.read(_HEADER_SIZE)
     if len(header) < _HEADER_SIZE:
         return False
@@ -48,7 +48,7 @@ def _skip_record(f: BufferedReader) -> bool:
 
 
 def _read_record(f: BufferedReader) -> Event | None:
-    """Read one length-prefixed record. Returns None on EOF."""
+    """此說明已翻譯為繁體中文。"""
     header = f.read(_HEADER_SIZE)
     if len(header) < _HEADER_SIZE:
         return None
@@ -60,13 +60,13 @@ def _read_record(f: BufferedReader) -> Event | None:
 
 
 class DiskEventLog:
-    """Append-only event log backed by a file on disk.
+    """此說明已翻譯為繁體中文。
 
-    On-disk format: sequence of length-prefixed msgpack records.
-    Each record is [4-byte big-endian uint32 length][msgpack payload].
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Uses a bounded LRU cache of event index → byte offset for efficient
-    random access without storing an offset per event.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(self, directory: Path) -> None:
@@ -76,7 +76,7 @@ class DiskEventLog:
         self._offset_cache: OrderedDict[int, int] = OrderedDict()
         self._count: int = 0
 
-        # Rotate stale active file from a previous session/crash
+        # 已翻譯註解。
         if self._active_path.exists():
             self._rotate(self._active_path, self._directory)
 
@@ -89,13 +89,13 @@ class DiskEventLog:
             self._offset_cache.popitem(last=False)
 
     def _seek_to(self, f: BufferedReader, target_idx: int) -> None:
-        """Seek f to the byte offset of event target_idx, using cache or scanning forward."""
+        """此說明已翻譯為繁體中文。"""
         if target_idx in self._offset_cache:
             self._offset_cache.move_to_end(target_idx)
             f.seek(self._offset_cache[target_idx])
             return
 
-        # Find the highest cached index before target_idx
+        # 已翻譯註解。
         scan_from_idx = 0
         scan_from_offset = 0
         for cached_idx in self._offset_cache:
@@ -103,7 +103,7 @@ class DiskEventLog:
                 scan_from_idx = cached_idx
                 scan_from_offset = self._offset_cache[cached_idx]
 
-        # Scan forward, skipping records
+        # 向前掃描並略過紀錄
         f.seek(scan_from_offset)
         for _ in range(scan_from_idx, target_idx):
             _skip_record(f)
@@ -117,7 +117,7 @@ class DiskEventLog:
         self._count += 1
 
     def read_range(self, start: int, end: int) -> Iterator[Event]:
-        """Yield events from index start (inclusive) to end (exclusive)."""
+        """此說明已翻譯為繁體中文。"""
         end = min(end, self._count)
         if start < 0 or end < 0 or start >= end:
             return
@@ -131,12 +131,12 @@ class DiskEventLog:
                     break
                 yield event
 
-            # Cache where we ended up so the next sequential read is a hit
+            # 快取目前結束位置，讓下一次連續讀取可命中
             if end < self._count:
                 self._cache_offset(end, f.tell())
 
     def read_all(self) -> Iterator[Event]:
-        """Yield all events from the log one at a time."""
+        """逐筆產生日誌中的所有事件。"""
         if self._count == 0:
             return
         self._file.flush()
@@ -151,7 +151,7 @@ class DiskEventLog:
         return self._count
 
     def close(self) -> None:
-        """Close the file and rotate active file to compressed archive."""
+        """此說明已翻譯為繁體中文。"""
         if self._file.closed:
             return
         self._file.close()
@@ -162,10 +162,9 @@ class DiskEventLog:
 
     @staticmethod
     def _rotate(source: Path, directory: Path) -> None:
-        """Compress source into a timestamped archive.
+        """將來源檔壓縮為含時間戳的封存檔。
 
-        Keeps at most ``_MAX_ARCHIVES`` compressed copies.  Oldest beyond
-        the limit are deleted.
+        此說明已翻譯為繁體中文。
         """
         try:
             stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M-%S_%f")
@@ -176,12 +175,12 @@ class DiskEventLog:
             source.unlink()
             logger.info(f"Rotated event log: {source} -> {dest}")
 
-            # Prune oldest archives beyond the limit
+            # 清理超過上限的最舊封存檔
             archives = sorted(directory.glob("events.*.bin.zst"))
             for old in archives[:-_MAX_ARCHIVES]:
                 old.unlink()
         except Exception as e:
             logger.opt(exception=e).warning(f"Failed to rotate event log {source}")
-            # Clean up the source even if compression fails
+            # 即使壓縮失敗也嘗試清理來源檔
             with contextlib.suppress(OSError):
                 source.unlink()

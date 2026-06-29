@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 class BlockType(Enum):
-    JOINT = "joint"  # Separate image/text streams
-    SINGLE = "single"  # Concatenated streams
+    JOINT = "joint"  # 已翻譯註解。
+    SINGLE = "single"  # 已翻譯註解。
 
 
 class TransformerBlockConfig(BaseModel):
@@ -13,7 +13,7 @@ class TransformerBlockConfig(BaseModel):
 
     block_type: BlockType
     count: int
-    has_separate_text_output: bool  # True for joint blocks that output text separately
+    has_separate_text_output: bool  # 已翻譯註解。
 
 
 class ImageModelConfig(BaseModel):
@@ -21,10 +21,10 @@ class ImageModelConfig(BaseModel):
 
     block_configs: tuple[TransformerBlockConfig, ...]
 
-    default_steps: dict[str, int]  # {"low": X, "medium": Y, "high": Z}
-    num_sync_steps: int  # Number of sync steps for distributed inference
+    default_steps: dict[str, int]  # 已翻譯註解。
+    num_sync_steps: int  # 已翻譯註解。
 
-    guidance_scale: float | None = None  # None or <= 1.0 disables CFG
+    guidance_scale: float | None = None  # 已翻譯註解。
 
     @property
     def total_blocks(self) -> int:

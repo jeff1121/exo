@@ -6,7 +6,7 @@ from exo.shared.types.thunderbolt import (
     ThunderboltConnectivity,
 )
 from exo.utils.info_gatherer.info_gatherer import (
-    _gather_iface_map,  # pyright: ignore[reportPrivateUsage]
+    _gather_iface_map,  # 已翻譯註解。
 )
 
 

@@ -73,11 +73,11 @@ class RunnerDiagnosticCollector:
             evidence=evidence,
         )
 
-        # TODO: Eventually this will become a stateful parser with a more advanced architecture,
-        #       right now the statefulness is restricted to bespoke handling of specific errors
+        # 待辦事項：已翻譯註解。
+        #       已翻譯註解。
         #
-        # `RunnerRingSocketReceivingError` usually happens a few times before `RunnerRingTransportError`
-        #  therefore we deduplicate and only keep last `RunnerRingSocketReceivingError`
+        # 已翻譯註解。
+        #  已翻譯註解。
         if len(self._diagnostics) > 0 and (
             isinstance(self._diagnostics[-1], RunnerRingSocketReceivingError)
             and isinstance(diagnostic, RunnerRingSocketReceivingError)

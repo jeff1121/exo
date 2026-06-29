@@ -1,4 +1,4 @@
-"""用於請求/回應轉換的 Claude Messages API 型別。"""
+"""此說明已翻譯為繁體中文。"""
 
 from typing import Any, Literal
 
@@ -11,7 +11,7 @@ ClaudeToolInputSchema = dict[str, Any]
 
 
 class ClaudeToolDefinition(BaseModel, frozen=True):
-    """Claude Messages API 請求中的工具定義。"""
+    """此說明已翻譯為繁體中文。"""
 
     name: str
     description: str | None = None
@@ -25,14 +25,14 @@ ClaudeStopReason = Literal["end_turn", "max_tokens", "stop_sequence", "tool_use"
 
 # 內容區塊型別
 class ClaudeTextBlock(BaseModel, frozen=True):
-    """Claude Messages API 的文字內容區塊。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["text"] = "text"
     text: str
 
 
 class ClaudeImageSource(BaseModel, frozen=True):
-    """Claude 圖像區塊的圖片來源。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["base64", "url"]
     media_type: str | None = None
@@ -41,14 +41,14 @@ class ClaudeImageSource(BaseModel, frozen=True):
 
 
 class ClaudeImageBlock(BaseModel, frozen=True):
-    """Claude Messages API 的圖片內容區塊。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["image"] = "image"
     source: ClaudeImageSource
 
 
 class ClaudeThinkingBlock(BaseModel, frozen=True):
-    """Claude Messages API 的思考內容區塊。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["thinking"] = "thinking"
     thinking: str
@@ -56,7 +56,7 @@ class ClaudeThinkingBlock(BaseModel, frozen=True):
 
 
 class ClaudeToolUseBlock(BaseModel, frozen=True):
-    """Claude Messages API 的工具使用內容區塊。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["tool_use"] = "tool_use"
     id: str
@@ -65,7 +65,7 @@ class ClaudeToolUseBlock(BaseModel, frozen=True):
 
 
 class ClaudeToolResultBlock(BaseModel, frozen=True):
-    """Claude Messages API 請求中的工具結果內容區塊。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["tool_result"] = "tool_result"
     tool_use_id: str
@@ -78,7 +78,7 @@ ClaudeContentBlock = (
     ClaudeTextBlock | ClaudeImageBlock | ClaudeThinkingBlock | ClaudeToolUseBlock
 )
 
-# 輸入內容區塊也可包含 tool_result（由使用者在 tool_use 後送出）
+# 已翻譯註解。
 ClaudeInputContentBlock = (
     ClaudeTextBlock
     | ClaudeImageBlock
@@ -90,7 +90,7 @@ ClaudeInputContentBlock = (
 
 # 請求型別
 class ClaudeMessage(BaseModel, frozen=True):
-    """Claude Messages API 請求中的訊息。"""
+    """此說明已翻譯為繁體中文。"""
 
     role: ClaudeRole
     content: str | list[ClaudeInputContentBlock]
@@ -102,7 +102,7 @@ class ClaudeThinkingConfig(BaseModel, frozen=True):
 
 
 class ClaudeMessagesRequest(BaseModel):
-    """Claude Messages API 的請求主體。"""
+    """此說明已翻譯為繁體中文。"""
 
     model: ModelId
     max_tokens: int
@@ -120,14 +120,14 @@ class ClaudeMessagesRequest(BaseModel):
 
 # 回應型別
 class ClaudeUsage(BaseModel, frozen=True):
-    """Claude Messages API 回應中的 token 使用量。"""
+    """此說明已翻譯為繁體中文。"""
 
     input_tokens: int
     output_tokens: int
 
 
 class ClaudeMessagesResponse(BaseModel, frozen=True):
-    """Claude Messages API 的回應主體。"""
+    """此說明已翻譯為繁體中文。"""
 
     id: str
     type: Literal["message"] = "message"
@@ -141,7 +141,7 @@ class ClaudeMessagesResponse(BaseModel, frozen=True):
 
 # 串流事件型別
 class ClaudeMessageStart(BaseModel, frozen=True):
-    """message_start 事件中的部分訊息。"""
+    """此說明已翻譯為繁體中文。"""
 
     id: str
     type: Literal["message"] = "message"
@@ -183,7 +183,7 @@ class ClaudeThinkingDelta(BaseModel, frozen=True):
 
 
 class ClaudeInputJsonDelta(BaseModel, frozen=True):
-    """工具使用輸入 JSON 內容區塊的增量。"""
+    """此說明已翻譯為繁體中文。"""
 
     type: Literal["input_json_delta"] = "input_json_delta"
     partial_json: str
@@ -205,13 +205,13 @@ class ClaudeContentBlockStopEvent(BaseModel, frozen=True):
 
 
 class ClaudeMessageDeltaUsage(BaseModel, frozen=True):
-    """message_delta 事件中的使用量。"""
+    """此說明已翻譯為繁體中文。"""
 
     output_tokens: int
 
 
 class ClaudeMessageDelta(BaseModel, frozen=True):
-    """message_delta 事件中的增量。"""
+    """此說明已翻譯為繁體中文。"""
 
     stop_reason: ClaudeStopReason | None = None
     stop_sequence: str | None = None

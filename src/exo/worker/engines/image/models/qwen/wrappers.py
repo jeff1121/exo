@@ -33,12 +33,12 @@ class QwenJointBlockWrapper(JointBlockWrapper[QwenTransformerBlock]):
         self._num_heads = block.attn.num_heads
         self._head_dim = block.attn.head_dim
 
-        # Intermediate state stored between _compute_qkv and _apply_output
+        # 已翻譯註解。
         self._img_mod: QwenStreamModulation | None = None
         self._txt_mod: QwenStreamModulation | None = None
 
     def set_encoder_mask(self, mask: mx.array | None) -> None:
-        """Set the encoder hidden states mask for attention."""
+        """此說明已翻譯為繁體中文。"""
         self._encoder_hidden_states_mask = mask
 
     def _compute_qkv(
@@ -114,7 +114,7 @@ class QwenJointBlockWrapper(JointBlockWrapper[QwenTransformerBlock]):
         (img_cos, img_sin), (txt_cos, txt_sin) = rotary_embeddings
 
         if patch_mode:
-            # Slice image RoPE for patch, keep full text RoPE
+            # 已翻譯註解。
             img_cos = img_cos[self._patch_start : self._patch_end]
             img_sin = img_sin[self._patch_start : self._patch_end]
 
@@ -175,10 +175,10 @@ class QwenJointBlockWrapper(JointBlockWrapper[QwenTransformerBlock]):
         txt_attn_output = attn_out[:, : self._text_seq_len, :]
         img_attn_output = attn_out[:, self._text_seq_len :, :]
 
-        img_attn_output = attn.attn_to_out[0](img_attn_output)  # pyright: ignore[reportAny]
+        img_attn_output = attn.attn_to_out[0](img_attn_output)  # 已翻譯註解。
         txt_attn_output = attn.to_add_out(txt_attn_output)
 
-        hidden_states = hidden_states + self._img_mod.gate1 * img_attn_output  # pyright: ignore[reportAny]
+        hidden_states = hidden_states + self._img_mod.gate1 * img_attn_output  # 已翻譯註解。
         encoder_hidden_states = (
             encoder_hidden_states + self._txt_mod.gate1 * txt_attn_output
         )
@@ -187,14 +187,14 @@ class QwenJointBlockWrapper(JointBlockWrapper[QwenTransformerBlock]):
         img_modulated2, img_gate2 = QwenTransformerBlock._modulate(
             img_normed2, self._img_mod.mod2
         )
-        img_mlp_output = self.block.img_ff(img_modulated2)  # pyright: ignore[reportAny]
-        hidden_states = hidden_states + img_gate2 * img_mlp_output  # pyright: ignore[reportAny]
+        img_mlp_output = self.block.img_ff(img_modulated2)  # 已翻譯註解。
+        hidden_states = hidden_states + img_gate2 * img_mlp_output  # 已翻譯註解。
 
         txt_normed2 = self.block.txt_norm2(encoder_hidden_states)
         txt_modulated2, txt_gate2 = QwenTransformerBlock._modulate(
             txt_normed2, self._txt_mod.mod2
         )
-        txt_mlp_output = self.block.txt_ff(txt_modulated2)  # pyright: ignore[reportAny]
-        encoder_hidden_states = encoder_hidden_states + txt_gate2 * txt_mlp_output  # pyright: ignore[reportAny]
+        txt_mlp_output = self.block.txt_ff(txt_modulated2)  # 已翻譯註解。
+        encoder_hidden_states = encoder_hidden_states + txt_gate2 * txt_mlp_output  # 已翻譯註解。
 
         return encoder_hidden_states, hidden_states

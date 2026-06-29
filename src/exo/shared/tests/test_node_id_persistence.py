@@ -19,9 +19,9 @@ NUM_CONCURRENT_PROCS = 10
 def _get_keypair_concurrent_subprocess_task(
     sem: SemaphoreT, ev: EventT, queue: QueueT[bytes]
 ) -> None:
-    # synchronise with parent process
+    # 已翻譯註解。
     sem.release()
-    # wait to be told to begin simultaneous read
+    # 已翻譯註解。
     ev.wait()
     queue.put(get_node_zid().encode())
 
@@ -33,7 +33,7 @@ def _get_keypair_concurrent(num_procs: int) -> bytes:
     ev = Event()
     queue: QueueT[bytes] = Queue(maxsize=num_procs)
 
-    # make parent process wait for all subprocesses to start
+    # 已翻譯註解。
     logger.info(f"PARENT: Starting {num_procs} subprocesses")
     ps: list[BaseProcess] = []
     for _ in range(num_procs):
@@ -45,19 +45,19 @@ def _get_keypair_concurrent(num_procs: int) -> bytes:
     for _ in range(num_procs):
         sem.acquire()
 
-    # start all the sub processes simultaneously
+    # 已翻譯註解。
     logger.info("PARENT: Beginning read")
     ev.set()
 
-    # wait until all subprocesses are done & read results
+    # 已翻譯註解。
     for p in ps:
         p.join()
 
-    # check that the input/output order match, and that
-    # all subprocesses end up reading the same file
+    # 已翻譯註解。
+    # 已翻譯註解。
     logger.info("PARENT: Checking consistency")
     keypair: bytes | None = None
-    qsize = 0  # cannot use Queue.qsize due to MacOS incompatibility :(
+    qsize = 0  # 已翻譯註解。
     while not queue.empty():
         qsize += 1
         temp_keypair = queue.get()
@@ -66,7 +66,7 @@ def _get_keypair_concurrent(num_procs: int) -> bytes:
         else:
             assert keypair == temp_keypair
     assert num_procs == qsize
-    return keypair  # pyright: ignore[reportReturnType]
+    return keypair  # 已翻譯註解。
 
 
 def _delete_if_exists(p: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
@@ -78,16 +78,16 @@ def _delete_if_exists(p: str | bytes | os.PathLike[str] | os.PathLike[bytes]):
 def test_node_id_fetching(caplog: LogCaptureFixture):
     reps = 10
 
-    # delete current file and write a new one
+    # 已翻譯註解。
     _delete_if_exists(EXO_NODE_ZID)
     kp = _get_keypair_concurrent(NUM_CONCURRENT_PROCS)
 
-    with caplog.at_level(101):  # supress logs
-        # make sure that continuous fetches return the same value
+    with caplog.at_level(101):  # 已翻譯註解。
+        # 已翻譯註解。
         for _ in range(reps):
             assert kp == _get_keypair_concurrent(NUM_CONCURRENT_PROCS)
 
-        # make sure that after deleting, we are not fetching the same value
+        # 已翻譯註解。
         _delete_if_exists(EXO_NODE_ZID)
         for _ in range(reps):
             assert kp != _get_keypair_concurrent(NUM_CONCURRENT_PROCS)

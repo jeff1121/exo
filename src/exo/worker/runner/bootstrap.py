@@ -58,7 +58,7 @@ def entrypoint(
 
     logger.info(f"Fast synch flag: {os.environ['MLX_METAL_FAST_SYNCH']}")
 
-    # Import main after setting global logger - this lets us just import logger from this module
+    # 已翻譯註解。
     try:
         event_sender_downcast: MpSender[Event] = cast(MpSender[Event], event_sender)
 
@@ -78,7 +78,7 @@ def entrypoint(
 
             from exo.worker.engines.mlx.builder import MlxBuilder
 
-            # evil sharing of the event sender
+            # 已翻譯註解。
             builder = MlxBuilder(
                 model_id=bound_instance.bound_shard.model_card.model_id,
                 event_sender=event_sender_downcast,

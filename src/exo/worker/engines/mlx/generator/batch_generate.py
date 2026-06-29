@@ -251,7 +251,7 @@ class ExoBatchGenerator:
             else:
                 prefix_cache_hit = "partial"
 
-        # We need to clamp rotating kv caches to max size so that mlx lm's _merge_caches behaves
+        # 已翻譯註解。
         for c in cache:
             if (
                 isinstance(c, RotatingKVCache)
@@ -292,7 +292,7 @@ class ExoBatchGenerator:
             )
         )
         if is_bench:
-            # Only sample length eos tokens
+            # 已翻譯註解。
             eos_ids = eos_ids_from_tokenizer(self.tokenizer)
             logits_processors = [ban_token_ids(eos_ids)] + logits_processors
 

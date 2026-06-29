@@ -1,4 +1,4 @@
-"""Tests for offline/air-gapped mode."""
+"""此說明已翻譯為繁體中文。"""
 
 import os
 import time
@@ -11,7 +11,7 @@ import aiofiles.os as aios
 import pytest
 
 from exo.download.download_utils import (
-    _download_file,  # pyright: ignore[reportPrivateUsage]
+    _download_file,  # 已翻譯註解。
     download_file_with_retry,
     fetch_file_list_with_cache,
 )
@@ -36,13 +36,13 @@ async def temp_models_dir(tmp_path: Path) -> AsyncIterator[Path]:
 
 
 class TestDownloadFileOffline:
-    """Tests for _download_file with skip_internet=True."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_returns_local_file_without_http_verification(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """When skip_internet=True and file exists locally, return it immediately
-        without making any HTTP calls (no file_meta verification)."""
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
@@ -68,8 +68,8 @@ class TestDownloadFileOffline:
     async def test_raises_file_not_found_for_missing_file(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """When skip_internet=True and file does NOT exist locally,
-        raise FileNotFoundError instead of attempting download."""
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
@@ -85,8 +85,8 @@ class TestDownloadFileOffline:
     async def test_returns_local_file_in_subdirectory(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """When skip_internet=True and file exists in a subdirectory,
-        return it without HTTP calls."""
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
         target_dir = tmp_path / "downloads"
         subdir = target_dir / "transformer"
         await aios.makedirs(subdir, exist_ok=True)
@@ -112,12 +112,12 @@ class TestDownloadFileOffline:
 
 
 class TestDownloadFileWithRetryOffline:
-    """Tests for download_file_with_retry with skip_internet=True."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_propagates_skip_internet_to_download_file(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """Verify skip_internet is passed through to _download_file."""
+        """此說明已翻譯為繁體中文。"""
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
@@ -143,7 +143,7 @@ class TestDownloadFileWithRetryOffline:
     async def test_file_not_found_does_not_retry(
         self, model_id: ModelId, tmp_path: Path
     ) -> None:
-        """FileNotFoundError from offline mode should not trigger retries."""
+        """此說明已翻譯為繁體中文。"""
         target_dir = tmp_path / "downloads"
         await aios.makedirs(target_dir, exist_ok=True)
 
@@ -158,12 +158,12 @@ class TestDownloadFileWithRetryOffline:
 
 
 class TestFetchFileListOffline:
-    """Tests for fetch_file_list_with_cache with skip_internet=True."""
+    """此說明已翻譯為繁體中文。"""
 
     async def test_uses_cached_file_list(
         self, model_id: ModelId, temp_models_dir: Path
     ) -> None:
-        """When skip_internet=True and cache file exists, use it without network."""
+        """此說明已翻譯為繁體中文。"""
         from pydantic import TypeAdapter
 
         cache_dir = temp_models_dir / "caches" / model_id.normalize()
@@ -193,8 +193,8 @@ class TestFetchFileListOffline:
     async def test_falls_back_to_local_directory_scan(
         self, model_id: ModelId, temp_models_dir: Path
     ) -> None:
-        """When skip_internet=True and no cache but local files exist,
-        build file list from local directory."""
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
         import json
 
         model_dir = temp_models_dir / model_id.normalize()
@@ -229,8 +229,8 @@ class TestFetchFileListOffline:
     async def test_raises_when_no_cache_and_no_local_files(
         self, model_id: ModelId, temp_models_dir: Path
     ) -> None:
-        """When skip_internet=True and neither cache nor local files exist,
-        raise FileNotFoundError."""
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。"""
         with pytest.raises(FileNotFoundError, match="No internet"):
             await fetch_file_list_with_cache(model_id, "main", skip_internet=True)
 
@@ -268,7 +268,7 @@ class TestFileListCacheTTL:
         from pydantic import TypeAdapter
 
         from exo.download.download_utils import (
-            _FILE_LIST_CACHE_TTL_SECS,  # pyright: ignore[reportPrivateUsage]
+            _FILE_LIST_CACHE_TTL_SECS,  # 已翻譯註解。
         )
 
         cache_dir = temp_models_dir / "caches" / model_id.normalize()

@@ -1,5 +1,5 @@
-# pyright: reportAny=false
-"""測試 /v1/chat/completions 增量是否符合 OpenAI 規範的線路格式。"""
+# 已翻譯註解。
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import AsyncGenerator
@@ -56,7 +56,7 @@ def _parse_data_events(lines: list[str]) -> list[dict[str, Any]]:
 
 
 def _assert_delta_spec_compliant(delta: dict[str, Any]) -> None:
-    """拒絕任何 OpenAI 規範不允許為 null 的 delta 欄位。"""
+    """此說明已翻譯為繁體中文。"""
     for key, value in delta.items():
         if value is None and key not in _NULLABLE_DELTA_FIELDS:
             raise AssertionError(

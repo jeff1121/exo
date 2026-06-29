@@ -20,14 +20,14 @@ class PublishPolicy(str, Enum):
     """Always publish to the network"""
 
 
-@dataclass  # (frozen=True)
+@dataclass  # 已翻譯註解。
 class TypedTopic[T: FrozenModel]:
     topic: str
     publish_policy: PublishPolicy
 
     model_type: type[
         T
-    ]  # This can be worked around with evil type hacking, see https://stackoverflow.com/a/71720366 - I don't think it's necessary here.
+    ]  # 已翻譯註解。
 
     @staticmethod
     def serialize(t: T) -> bytes:

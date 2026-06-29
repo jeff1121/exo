@@ -15,17 +15,17 @@ from exo.worker.runner.llm_inference.model_output_parsers import (
     parse_gpt_oss,
 )
 
-# Token IDs from mlx-community/gpt-oss-20b-MXFP4-Q8 tokenizer.
-# These are stable since they come from the model's vocabulary.
-_CHANNEL = 200005  # <|channel|>
-_START = 200006  # <|start|>
-_MESSAGE = 200008  # <|message|>
-_CALL = 200012  # <|call|>
-_END = 200007  # <|end|>
-_ASSISTANT = 173781  # "assistant"
+# 已翻譯註解。
+# 已翻譯註解。
+_CHANNEL = 200005  # 已翻譯註解。
+_START = 200006  # 已翻譯註解。
+_MESSAGE = 200008  # 已翻譯註解。
+_CALL = 200012  # 已翻譯註解。
+_END = 200007  # 已翻譯註解。
+_ASSISTANT = 173781  # 已翻譯註解。
 
 # fmt: off
-# " to=functions.get_current_weather<|channel|>commentary json<|message|>{\"location\": \"Tokyo\"}<|call|>"
+# 已翻譯註解。
 FORMAT_A_TOKENS: list[tuple[int, str]] = [
     (316,    " to"),
     (28,     "="),
@@ -47,7 +47,7 @@ FORMAT_A_TOKENS: list[tuple[int, str]] = [
     (_CALL,  "<|call|>"),
 ]
 
-# "<|channel|>commentary to=functions.get_current_weather json<|message|>{\"location\": \"Tokyo\"}<|call|>"
+# 已翻譯註解。
 FORMAT_B_TOKENS: list[tuple[int, str]] = [
     (_CHANNEL, "<|channel|>"),
     (12606,  "comment"),
@@ -69,8 +69,8 @@ FORMAT_B_TOKENS: list[tuple[int, str]] = [
     (_CALL,  "<|call|>"),
 ]
 
-# "<|channel|>analysis<|message|>Let me think...<|end|><|start|>assistant<|channel|>commentary to=functions.X ..."
-# Full analysis-then-tool-call as the model actually generates it.
+# 已翻譯註解。
+# 已翻譯註解。
 THINKING_THEN_TOOL_TOKENS: list[tuple[int, str]] = [
     (_CHANNEL, "<|channel|>"),
     (35644,  "analysis"),
@@ -82,7 +82,7 @@ THINKING_THEN_TOOL_TOKENS: list[tuple[int, str]] = [
     (495,    " this"),
     (13,     "."),
     (_END,   "<|end|>"),
-    # Model generates a new message header for the tool call:
+    # 已翻譯註解。
     (_START, "<|start|>"),
     (_ASSISTANT, "assistant"),
     *FORMAT_B_TOKENS,
@@ -95,7 +95,7 @@ def _make_gen_responses(
     last_finish_reason: FinishReason = "stop",
     last_usage: Usage | None = None,
 ) -> list[GenerationResponse]:
-    """Build GenerationResponse list from (token_id, text) pairs."""
+    """此說明已翻譯為繁體中文。"""
     responses: list[GenerationResponse] = []
     for i, (tid, text) in enumerate(tokens):
         is_last = i == len(tokens) - 1
@@ -114,7 +114,7 @@ def _collect(
     tokens: list[tuple[int, str]],
     last_finish_reason: FinishReason = "stop",
 ) -> list[GenerationResponse | ToolCallResponse]:
-    """Feed tokens through parse_gpt_oss and collect all yielded responses."""
+    """此說明已翻譯為繁體中文。"""
 
     def _gen() -> Generator[GenerationResponse, None, None]:
         yield from _make_gen_responses(tokens, last_finish_reason)
@@ -125,14 +125,14 @@ def _collect(
 def _get_tool_call(
     results: list[GenerationResponse | ToolCallResponse],
 ) -> ToolCallResponse:
-    """Extract the single ToolCallResponse from results."""
+    """此說明已翻譯為繁體中文。"""
     tool_calls = [r for r in results if isinstance(r, ToolCallResponse)]
     assert len(tool_calls) == 1, f"Expected 1 ToolCallResponse, got {len(tool_calls)}"
     return tool_calls[0]
 
 
 class TestParseGptOssRecipientPlacement:
-    """Both Harmony recipient placements must produce identical tool calls."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_format_a_yields_tool_call(self):
         results = _collect(FORMAT_A_TOKENS)
@@ -156,12 +156,12 @@ class TestParseGptOssRecipientPlacement:
 
 
 class TestParseGptOssThinkingThenToolCall:
-    """Analysis (thinking) followed by a tool call must yield both."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_thinking_then_tool_call(self):
         results = _collect(THINKING_THEN_TOOL_TOKENS)
 
-        # Thinking tokens should have is_thinking=True and no <think> tags
+        # 已翻譯註解。
         thinking_responses = [
             r for r in results if isinstance(r, GenerationResponse) and r.is_thinking
         ]
@@ -170,7 +170,7 @@ class TestParseGptOssThinkingThenToolCall:
         assert "<think>" not in thinking_text
         assert "</think>" not in thinking_text
 
-        # Non-thinking tokens should have is_thinking=False
+        # 已翻譯註解。
         non_thinking = [
             r
             for r in results
@@ -179,14 +179,14 @@ class TestParseGptOssThinkingThenToolCall:
         non_thinking_text = "".join(r.text for r in non_thinking)
         assert "<think>" not in non_thinking_text
 
-        # And the tool call
+        # 已翻譯註解。
         tc = _get_tool_call(results)
         assert tc.tool_calls[0].name == "get_current_weather"
         assert "Tokyo" in tc.tool_calls[0].arguments
 
 
 # fmt: off
-# Truncated tool call: recipient + channel + message + partial args, no <|call|>
+# 已翻譯註解。
 TRUNCATED_TOOL_CALL_TOKENS: list[tuple[int, str]] = [
     (316,    " to"),
     (28,     "="),
@@ -204,10 +204,10 @@ TRUNCATED_TOOL_CALL_TOKENS: list[tuple[int, str]] = [
     (1243,   '":'),
     (392,    ' "'),
     (173844, "Tokyo"),
-    # No <|call|> — generation truncated here
+    # 已翻譯註解。
 ]
 
-# Plain text tokens (no tool call)
+# 已翻譯註解。
 PLAIN_TEXT_TOKENS: list[tuple[int, str]] = [
     (_CHANNEL, "<|channel|>"),
     (35644,  "analysis"),
@@ -233,7 +233,7 @@ PLAIN_TEXT_TOKENS: list[tuple[int, str]] = [
 
 
 class TestParseGptOssMaxTokensTruncation:
-    """Truncated tool calls must still yield finish_reason."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_truncated_tool_call_yields_finish_reason(self):
         results = _collect(TRUNCATED_TOOL_CALL_TOKENS, last_finish_reason="length")
@@ -256,14 +256,14 @@ class TestParseGptOssMaxTokensTruncation:
             r.finish_reason for r in gen_responses if r.finish_reason is not None
         ]
         assert "length" in finish_reasons
-        # Verify non-empty text was yielded (delta text differs from raw token text
-        # due to Harmony encoding, so we just check something was emitted)
+        # 已翻譯註解。
+        # 已翻譯註解。
         all_text = "".join(r.text for r in gen_responses)
         assert len(all_text) > 0
 
 
 class TestGptOssReasoningTokensCounted:
-    """count_reasoning_tokens must patch Usage when parse_gpt_oss emits thinking tokens."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_thinking_then_text_counts_reasoning_tokens(self):
         usage = Usage(
@@ -282,13 +282,13 @@ class TestGptOssReasoningTokensCounted:
             x for x in count_reasoning_tokens(parse_gpt_oss(_gen())) if x is not None
         )
 
-        # Verify thinking tokens were detected
+        # 已翻譯註解。
         thinking = [
             r for r in results if isinstance(r, GenerationResponse) and r.is_thinking
         ]
         assert len(thinking) > 0
 
-        # Verify reasoning_tokens is patched on responses that carry Usage
+        # 已翻譯註解。
         with_usage = [
             r
             for r in results

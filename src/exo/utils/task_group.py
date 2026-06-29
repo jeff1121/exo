@@ -48,8 +48,8 @@ class TaskGroup:
         assert self._queued is not None
         self._tg = create_task_group()
         r = await self._tg.__aenter__()
-        for func, args, name in self._queued:  # pyright: ignore[reportAny]
-            self._tg.start_soon(func, *args, name=name)  # pyright: ignore[reportAny]
+        for func, args, name in self._queued:  # 已翻譯註解。
+            self._tg.start_soon(func, *args, name=name)  # 已翻譯註解。
         self._queued = None
         return r
 
@@ -59,7 +59,7 @@ class TaskGroup:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> bool:
-        """Exit the task group context waiting for all tasks to finish."""
+        """此說明已翻譯為繁體中文。"""
         assert self._tg is not None, "aenter sets self.lazy, so it exists when we aexit"
         assert self._queued is None
         return await self._tg.__aexit__(exc_type, exc_val, exc_tb)

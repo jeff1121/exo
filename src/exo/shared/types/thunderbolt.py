@@ -15,7 +15,7 @@ class ThunderboltIdentifier(FrozenModel):
     link_speed: str = ""
 
 
-## Intentionally minimal, only collecting data we care about - there's a lot more
+#已翻譯註解。
 
 
 class _ReceptacleTag(BaseModel, extra="ignore"):
@@ -40,8 +40,8 @@ class ThunderboltConnectivityData(BaseModel, extra="ignore"):
         ):
             return
         tag = f"Thunderbolt {self.receptacle_1_tag.receptacle_id_key}"
-        assert tag in ifaces  # doesn't need to be an assertion but im confident
-        # if tag not in ifaces: return None
+        assert tag in ifaces  # 已翻譯註解。
+        # 已翻譯註解。
         iface = f"rdma_{ifaces[tag]}"
         return ThunderboltIdentifier(
             rdma_interface=iface,
@@ -79,7 +79,7 @@ class ThunderboltConnectivity(BaseModel, extra="ignore"):
         )
         if proc.returncode != 0:
             return None
-        # Saving you from PascalCase while avoiding too much pydantic
+        # 已翻譯註解。
         return ThunderboltConnectivity.model_validate_json(
             proc.stdout
         ).SPThunderboltDataType

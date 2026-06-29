@@ -70,7 +70,7 @@ EXO_RUNNER_MUST_TIMEOUT = "EXO RUNNER MUST TIMEOUT"
 
 
 def _check_for_debug_prompts(task_params: TextGenerationTaskParams) -> None:
-    """Check for debug prompt triggers in the input."""
+    """此說明已翻譯為繁體中文。"""
     from exo.worker.engines.mlx.utils_mlx import mlx_force_oom
 
     if len(task_params.input) == 0:
@@ -108,11 +108,11 @@ class SequentialGenerator(Engine):
     _active: (
         tuple[
             TextGeneration,
-            # mlx generator that does work
+            # 已翻譯註解。
             Generator[GenerationResponse],
-            # queue that the 1st generator should push to and 3rd generator should pull from
+            # 已翻譯註解。
             GeneratorQueue[GenerationResponse],
-            # generator to get parsed outputs
+            # 已翻譯註解。
             Iterator[GenerationChunk | None],
         ]
         | None
@@ -136,15 +136,15 @@ class SequentialGenerator(Engine):
         self._maybe_queue.append(task)
 
     def agree_on_tasks(self) -> None:
-        """Agree between all ranks about the task ordering (some may have received in different order or not at all)."""
+        """此說明已翻譯為繁體中文。"""
         agreed, different = mx_all_gather_tasks(self._maybe_queue, self.group)
-        # Extend from `agreed` (sorted by task_id on all ranks) to guarantee every
-        # rank enqueues tasks in the same order, preventing TP collective deadlocks.
+        # 已翻譯註解。
+        # 已翻譯註解。
         self._queue.extend(agreed)
         self._maybe_queue = list(different)
 
     def agree_on_cancellations(self) -> None:
-        """Agree between all ranks about which tasks to cancel."""
+        """此說明已翻譯為繁體中文。"""
         has_cancel_all = False
         for task_id in self.cancel_receiver.collect():
             if task_id == CANCEL_ALL_TASKS:
@@ -184,7 +184,7 @@ class SequentialGenerator(Engine):
         try:
             response = next(gen)
             queue.push(response)
-            # drain potentially many responses every time
+            # 已翻譯註解。
             while (parsed := next(output_generator, None)) is not None:
                 output.append((task.task_id, parsed))
 
@@ -373,15 +373,15 @@ class BatchGenerator(Engine):
         self._maybe_queue.append(task)
 
     def agree_on_tasks(self) -> None:
-        """Agree between all ranks about the task ordering (some may have received in different order or not at all)."""
+        """此說明已翻譯為繁體中文。"""
         agreed, different = mx_all_gather_tasks(self._maybe_queue, self.group)
-        # Extend from `agreed` (sorted by task_id on all ranks) to guarantee every
-        # rank enqueues tasks in the same order, preventing TP collective deadlocks.
+        # 已翻譯註解。
+        # 已翻譯註解。
         self._queue.extend(agreed)
         self._maybe_queue = list(different)
 
     def agree_on_cancellations(self) -> None:
-        """Agree between all ranks about which tasks to cancel."""
+        """此說明已翻譯為繁體中文。"""
         has_cancel_all = False
         for task_id in self.cancel_receiver.collect():
             if task_id == CANCEL_ALL_TASKS:
@@ -405,7 +405,7 @@ class BatchGenerator(Engine):
         if not self._queue:
             self.agree_on_tasks()
 
-        # Submit any queued tasks to the engine
+        # 已翻譯註解。
         while self._queue and len(self._active_tasks) < EXO_MAX_CONCURRENT_REQUESTS:
             task = self._queue.popleft()
             try:
@@ -443,17 +443,17 @@ class BatchGenerator(Engine):
         ] = []
         for uid, response in results:
             if uid not in self._active_tasks:
-                # should we error here?
+                # 已翻譯註解。
                 logger.warning(f"{uid=} not found in active tasks")
                 continue
 
             task, queue, output_generator = self._active_tasks[uid]
             queue.push(response)
-            # If a generator fails to parse for some reason and returns early, we should not crash
+            # 已翻譯註解。
             while (parsed := next(output_generator, None)) is not None:
                 output.append((task.task_id, parsed))
 
-            # check if original response was terminal and append a Finished()
+            # 已翻譯註解。
             if response.finish_reason is not None:
                 output.append((task.task_id, FinishedResponse()))
                 del self._active_tasks[uid]

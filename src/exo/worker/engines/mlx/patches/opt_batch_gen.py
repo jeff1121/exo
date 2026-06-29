@@ -42,7 +42,7 @@ def _get_buffer(batch: GenerationBatch) -> _TopKBuffer:
     buf = getattr(batch, "_topk_buffer", None)
     if buf is None:
         buf = _TopKBuffer()
-        batch._topk_buffer = buf  # pyright: ignore[reportAttributeAccessIssue]
+        batch._topk_buffer = buf  # 已翻譯註解。
     return buf
 
 

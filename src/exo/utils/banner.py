@@ -51,8 +51,8 @@ def print_startup_banner(port: int) -> None:
     print(banner, file=sys.stderr)
 
     if first_run:
-        # Skip browser open when running inside the native macOS app —
-        # FirstLaunchPopout.swift handles the auto-open with a countdown.
+        # 已翻譯註解。
+        # 已翻譯註解。
         if not os.environ.get("EXO_RUNTIME_DIR"):
             try:
                 webbrowser.open(dashboard_url)

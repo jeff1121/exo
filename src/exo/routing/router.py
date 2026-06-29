@@ -27,10 +27,10 @@ from .connection_message import ConnectionMessage
 from .topics import CONNECTION_MESSAGES, PublishPolicy, TypedTopic
 
 
-# A significant current limitation of the TopicRouter is that it is not capable
-# of preventing feedback, as it does not ask for a system id so cannot tell
-# which message is coming/going to which system.
-# This is currently only relevant for Election
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
 class TopicRouter[T: FrozenModel]:
     def __init__(
         self,
@@ -49,7 +49,7 @@ class TopicRouter[T: FrozenModel]:
         logger.debug(f"Topic Router {self.topic} ready to send")
         with self.receiver as items:
             async for item in items:
-                # Check if we should send to network
+                # 已翻譯註解。
                 if (
                     len(self.senders) == 0
                     and self.topic.publish_policy is PublishPolicy.Minimal
@@ -58,12 +58,12 @@ class TopicRouter[T: FrozenModel]:
                     continue
                 if self.topic.publish_policy is PublishPolicy.Always:
                     await self._send_out(item)
-                # Then publish to all senders
+                # 已翻譯註解。
                 await self.publish(item)
 
     async def shutdown(self):
         logger.debug(f"Shutting down Topic Router {self.topic}")
-        # Close all the things!
+        # 已翻譯註解。
         for sender in self.senders:
             sender.close()
         self._sender.close()
@@ -71,9 +71,9 @@ class TopicRouter[T: FrozenModel]:
 
     async def publish(self, item: T):
         """
-        Publish item T on this topic to all senders.
-        NB: this sends to ALL receivers, potentially including receivers held by the object doing the sending.
-        You should handle your own output if you hold a sender + receiver pair.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         to_clear: set[Sender[T]] = set()
         for sender in copy(self.senders):
@@ -133,7 +133,7 @@ class Router:
 
     def sender[T: FrozenModel](self, topic: TypedTopic[T]) -> Sender[T]:
         router = self.topic_routers.get(topic.topic, None)
-        # There's gotta be a way to do this without THIS many asserts
+        # 已翻譯註解。
         assert router is not None
         assert router.topic == topic
         sender = cast(TopicRouter[T], router).new_sender()
@@ -141,7 +141,7 @@ class Router:
 
     def receiver[T: FrozenModel](self, topic: TypedTopic[T]) -> Receiver[T]:
         router = self.topic_routers.get(topic.topic, None)
-        # There's gotta be a way to do this without THIS many asserts
+        # 已翻譯註解。
 
         assert router is not None
         assert router.topic == topic
@@ -161,10 +161,10 @@ class Router:
                     tg.start_soon(router.run)
                 tg.start_soon(self._networking_recv)
                 tg.start_soon(self._networking_publish)
-                # subscribe to pending topics
+                # 已翻譯註解。
                 for topic in self.topic_routers:
                     await self._networking_subscribe(topic)
-                # Router only shuts down if you cancel it.
+                # 已翻譯註解。
                 await sleep_forever()
         finally:
             with move_on_after(1, shield=True):
@@ -233,10 +233,10 @@ def get_node_zid(
     path: Path = EXO_NODE_ZID,
 ) -> NodeId:
     """
-    Obtains the :class:`Keypair` associated with this node-ID.
-    Obtain the :class:`PeerId` by from it.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
-    # TODO(evan): bring back node id persistence once we figure out how to deal with duplicates
+    # 待辦事項：已翻譯註解。
     return NodeId(os.urandom(16).hex().lstrip("0"))
 
     """

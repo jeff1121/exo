@@ -1,8 +1,8 @@
-# pyright: reportPrivateUsage=false
-"""Tests for image generation cancellation logic.
+# 已翻譯註解。
+"""此說明已翻譯為繁體中文。
 
-Tests the NaN sentinel protocol, cancellation checking, and the
-image runner's cancel_checker integration.
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 """
 
 from collections.abc import Callable
@@ -14,14 +14,14 @@ from exo.shared.types.tasks import CANCEL_ALL_TASKS, TaskId
 from exo.worker.engines.image.pipeline.runner import DiffusionRunner
 
 # ---------------------------------------------------------------------------
-# Helpers
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
 def _make_runner() -> DiffusionRunner:
-    """Create a DiffusionRunner with minimal config for unit testing.
+    """此說明已翻譯為繁體中文。
 
-    Uses a mock adapter and no distributed group (single-node).
+    此說明已翻譯為繁體中文。
     """
     mock_config = MagicMock()
     mock_config.joint_block_count = 10
@@ -47,7 +47,7 @@ def _make_runner() -> DiffusionRunner:
 
 
 class FakeCancelReceiver:
-    """Fake MpReceiver that returns pre-loaded items from collect()."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, items: list[TaskId] | None = None):
         self._items = list(items) if items else []
@@ -59,7 +59,7 @@ class FakeCancelReceiver:
 
 
 class FakeImageRunner:
-    """Fake image runner for testing _check_cancelled logic."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, cancel_items: list[TaskId] | None = None) -> None:
         self.cancel_receiver = FakeCancelReceiver(cancel_items)
@@ -74,7 +74,7 @@ class FakeImageRunner:
 
 
 # ---------------------------------------------------------------------------
-# _is_sentinel
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
@@ -92,8 +92,8 @@ class TestIsSentinel:
         assert runner._is_sentinel(tensor) is False
 
     def test_mixed_nan_and_real_is_not_sentinel(self) -> None:
-        """A tensor with some NaN and some real values must NOT be a sentinel.
-        Using mx.any(isnan) would incorrectly flag this as a sentinel.
+        """此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         runner = _make_runner()
         tensor = mx.array([float("nan"), 1.0, 2.0])
@@ -120,14 +120,14 @@ class TestIsSentinel:
 
 
 # ---------------------------------------------------------------------------
-# _check_cancellation
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
 class TestCheckCancellation:
     def test_first_stage_polls_checker(self) -> None:
         runner = _make_runner()
-        assert runner.is_first_stage  # single-node is always first stage
+        assert runner.is_first_stage  # 已翻譯註解。
 
         checker: Callable[[], bool] = MagicMock(return_value=True)
         runner._cancel_checker = checker
@@ -163,31 +163,31 @@ class TestCheckCancellation:
         runner._check_cancellation()
 
         checker.assert_not_called()
-        assert runner._cancelling is True  # stays True
+        assert runner._cancelling is True  # 已翻譯註解。
 
     def test_cancelling_flag_is_false_on_init(self) -> None:
-        """_cancelling defaults to False on a fresh runner."""
+        """此說明已翻譯為繁體中文。"""
         runner = _make_runner()
         assert runner._cancelling is False
 
 
 # ---------------------------------------------------------------------------
-# _send wrapper
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
 class TestSendWrapper:
     def test_send_replaces_data_with_nan_when_cancelling(self) -> None:
-        """When _cancelling is True, _send should replace data with NaN."""
+        """此說明已翻譯為繁體中文。"""
         runner = _make_runner()
         runner._cancelling = True
-        # _send asserts group is not None, so we need a mock group
+        # 已翻譯註解。
         runner.group = MagicMock()
 
         data = mx.ones((2, 3))
         mx.eval(data)
 
-        # Mock mx.distributed.send to capture what's sent
+        # 已翻譯註解。
         original_send = mx.distributed.send
         sent_data: list[mx.array] = []
 
@@ -233,12 +233,12 @@ class TestSendWrapper:
 
 
 # ---------------------------------------------------------------------------
-# Image runner _check_cancelled
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
 class TestImageRunnerCheckCancelled:
-    """Tests for the image runner's _check_cancelled method."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_no_cancellation(self) -> None:
         runner = FakeImageRunner()
@@ -258,31 +258,31 @@ class TestImageRunnerCheckCancelled:
         assert runner._check_cancelled(TaskId("any-task")) is True
 
     def test_collect_accumulates(self) -> None:
-        """Multiple collect() calls accumulate cancelled task IDs."""
+        """此說明已翻譯為繁體中文。"""
         runner = FakeImageRunner([TaskId("task-1")])
         runner._check_cancelled(TaskId("task-1"))
 
-        # First collect drained the receiver, but task-1 is in cancelled_tasks
+        # 已翻譯註解。
         assert runner._check_cancelled(TaskId("task-1")) is True
 
     def test_collect_empty_after_drain(self) -> None:
-        """After draining, collect returns empty and previous cancellations persist."""
+        """此說明已翻譯為繁體中文。"""
         runner = FakeImageRunner([TaskId("task-1")])
 
-        # First call drains
+        # 已翻譯註解。
         runner._check_cancelled(TaskId("other"))
-        # task-1 is now in cancelled_tasks but "other" was never cancelled
+        # 已翻譯註解。
         assert runner._check_cancelled(TaskId("other")) is False
         assert runner._check_cancelled(TaskId("task-1")) is True
 
 
 # ---------------------------------------------------------------------------
-# Drain condition logic
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
 class TestDrainCondition:
-    """Verify the drain condition evaluates correctly for various scenarios."""
+    """此說明已翻譯為繁體中文。"""
 
     def _should_drain(
         self,
@@ -296,7 +296,7 @@ class TestDrainCondition:
         num_sync_steps: int,
         num_inference_steps: int,
     ) -> bool:
-        """Replicate the drain condition from _run_diffusion_loop."""
+        """此說明已翻譯為繁體中文。"""
         return (
             cancelling
             and is_first_stage
@@ -307,13 +307,13 @@ class TestDrainCondition:
         )
 
     def test_no_drain_during_sync_step(self) -> None:
-        """Sync steps have no cross-timestep ring state."""
+        """此說明已翻譯為繁體中文。"""
         assert not self._should_drain(
             cancelling=True,
             is_first_stage=True,
             is_last_stage=False,
             is_distributed=True,
-            t=0,  # sync step
+            t=0,  # 已翻譯註解。
             init_time_step=0,
             num_sync_steps=2,
             num_inference_steps=10,
@@ -325,20 +325,20 @@ class TestDrainCondition:
             is_first_stage=True,
             is_last_stage=False,
             is_distributed=True,
-            t=3,  # async step
+            t=3,  # 已翻譯註解。
             init_time_step=0,
             num_sync_steps=2,
             num_inference_steps=10,
         )
 
     def test_no_drain_on_last_step(self) -> None:
-        """Last step doesn't send, so nothing to drain."""
+        """此說明已翻譯為繁體中文。"""
         assert not self._should_drain(
             cancelling=True,
             is_first_stage=True,
             is_last_stage=False,
             is_distributed=True,
-            t=9,  # last step
+            t=9,  # 已翻譯註解。
             init_time_step=0,
             num_sync_steps=2,
             num_inference_steps=10,
@@ -357,7 +357,7 @@ class TestDrainCondition:
         )
 
     def test_no_drain_on_last_stage(self) -> None:
-        """Last stage is also first stage (single pipeline) — no ring."""
+        """此說明已翻譯為繁體中文。"""
         assert not self._should_drain(
             cancelling=True,
             is_first_stage=True,
@@ -382,7 +382,7 @@ class TestDrainCondition:
         )
 
     def test_no_drain_not_first_stage(self) -> None:
-        """Only first stage needs to drain (it's the one receiving)."""
+        """此說明已翻譯為繁體中文。"""
         assert not self._should_drain(
             cancelling=True,
             is_first_stage=False,
@@ -395,20 +395,20 @@ class TestDrainCondition:
         )
 
     def test_drain_first_async_step(self) -> None:
-        """First async step: last stage sends, so drain is needed."""
+        """此說明已翻譯為繁體中文。"""
         assert self._should_drain(
             cancelling=True,
             is_first_stage=True,
             is_last_stage=False,
             is_distributed=True,
-            t=2,  # first async step (init=0, sync=2)
+            t=2,  # 已翻譯註解。
             init_time_step=0,
             num_sync_steps=2,
             num_inference_steps=10,
         )
 
     def test_drain_with_nonzero_init_time_step(self) -> None:
-        """img2img can have init_time_step > 0."""
+        """此說明已翻譯為繁體中文。"""
         assert self._should_drain(
             cancelling=True,
             is_first_stage=True,

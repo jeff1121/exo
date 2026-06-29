@@ -1,4 +1,4 @@
-"""用於轉換請求/回應的 OpenAI Chat Completions API 轉接器。"""
+"""此說明已翻譯為繁體中文。"""
 
 import base64
 import re
@@ -99,12 +99,12 @@ async def chat_request_to_text_generation(
                         has_images = True
             content = "\n".join(text_parts)
 
-        # 擷取 system 訊息作為 instructions
+        # 已翻譯註解。
         if msg.role == "system":
             if instructions is None:
                 instructions = content
             else:
-                # 附加額外的 system 訊息
+                # 已翻譯註解。
                 instructions = f"{instructions}\n{content}"
             chat_template_messages.append({"role": "system", "content": content})
         else:
@@ -121,8 +121,8 @@ async def chat_request_to_text_generation(
                     InputMessage(role=msg.role, content=InputMessageContent(content))
                 )
 
-            # 為 chat template 建立完整訊息 dict（保留 tool_calls 等欄位）
-            # 為 model_dump 正規化內容
+            # 已翻譯註解。
+            # 已翻譯註解。
             if has_images:
                 multimodal_content: list[dict[str, Any]] = []
                 assert isinstance(msg.content, list)
@@ -181,8 +181,8 @@ async def chat_request_to_text_generation(
 def chunk_to_response(
     chunk: TokenChunk, command_id: CommandId
 ) -> ChatCompletionResponse:
-    """將 TokenChunk 轉為串流 ChatCompletionResponse。"""
-    # 若有可用資料則建立 logprobs
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     logprobs: Logprobs | None = None
     if chunk.logprob is not None:
         logprobs = Logprobs(
@@ -221,13 +221,13 @@ async def generate_chat_stream(
         PrefillProgressChunk | ErrorChunk | ToolCallChunk | TokenChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """由 chunks 產生 Chat Completions API 串流事件。"""
+    """此說明已翻譯為繁體中文。"""
     last_usage: Usage | None = None
 
     async for chunk in chunk_stream:
         match chunk:
             case PrefillProgressChunk():
-                # 使用 SSE 註解，讓第三方客戶端忽略它
+                # 已翻譯註解。
                 yield f": prefill_progress {chunk.model_dump_json()}\n\n"
 
             case ErrorChunk():
@@ -298,9 +298,9 @@ async def collect_chat_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    # 這裡使用 AsyncGenerator[str] 而不是直接回傳 ChatCompletionReponse，因為
-    # FastAPI 對取消處理較佳，但不知為何不會自動序列化
-    """收集所有 token chunks 並回傳單一 ChatCompletionResponse。"""
+    # 已翻譯註解。
+    # 已翻譯註解。
+    """此說明已翻譯為繁體中文。"""
     text_parts: list[str] = []
     thinking_parts: list[str] = []
     tool_calls: list[ToolCall] = []

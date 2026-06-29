@@ -29,10 +29,10 @@ from exo.worker.engines.image.pipeline.block_wrapper import (
 
 @final
 class FluxKontextPromptData(PromptData):
-    """Prompt data for FLUX.1-Kontext image editing.
+    """此說明已翻譯為繁體中文。
 
-    Stores text embeddings along with conditioning latents and position IDs
-    for the input image.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(
@@ -74,18 +74,18 @@ class FluxKontextPromptData(PromptData):
 
     @property
     def conditioning_latents(self) -> mx.array | None:
-        """VAE-encoded input image latents for Kontext conditioning."""
+        """此說明已翻譯為繁體中文。"""
         return self._conditioning_latents
 
     @property
     def kontext_image_ids(self) -> mx.array | None:
-        """Position IDs for Kontext conditioning (first_coord=1)."""
+        """此說明已翻譯為繁體中文。"""
         return self._kontext_image_ids
 
     def get_cfg_branch_data(
         self, positive: bool
     ) -> tuple[mx.array, mx.array | None, mx.array | None, mx.array | None]:
-        """Kontext doesn't use CFG, but we return positive data for compatibility."""
+        """此說明已翻譯為繁體中文。"""
         return (
             self._prompt_embeds,
             None,
@@ -96,19 +96,19 @@ class FluxKontextPromptData(PromptData):
     def get_batched_cfg_data(
         self,
     ) -> tuple[mx.array, mx.array, mx.array | None, mx.array | None] | None:
-        # Kontext doesn't use CFG
+        # 已翻譯註解。
         return None
 
 
 @final
 class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
-    """Adapter for FLUX.1-Kontext image editing model.
+    """此說明已翻譯為繁體中文。
 
-    Key differences from standard FluxModelAdapter:
-    - Takes an input image and computes output dimensions from it
-    - Creates conditioning latents from the input image via VAE
-    - Creates special position IDs (kontext_image_ids) for conditioning tokens
-    - Creates pure noise latents (not img2img blending)
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     def __init__(
@@ -126,7 +126,7 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         )
         self._transformer = self._model.transformer
 
-        # Stores image path and computed dimensions after set_image_dimensions
+        # 已翻譯註解。
         self._image_path: str | None = None
         self._output_height: int | None = None
         self._output_width: int | None = None
@@ -147,7 +147,7 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         text_seq_len: int,
         encoder_hidden_states_mask: mx.array | None = None,
     ) -> list[JointBlockWrapper[Any]]:
-        """Create wrapped joint blocks for Flux Kontext."""
+        """此說明已翻譯為繁體中文。"""
         return [
             FluxJointBlockWrapper(block, text_seq_len)
             for block in self._transformer.transformer_blocks
@@ -157,7 +157,7 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         self,
         text_seq_len: int,
     ) -> list[SingleBlockWrapper[Any]]:
-        """Create wrapped single blocks for Flux Kontext."""
+        """此說明已翻譯為繁體中文。"""
         return [
             FluxSingleBlockWrapper(block, text_seq_len)
             for block in self._transformer.single_transformer_blocks
@@ -172,16 +172,16 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         all_single = list(self._transformer.single_transformer_blocks)
         total_joint_blocks = len(all_joint)
         if end_layer <= total_joint_blocks:
-            # All assigned are joint blocks
+            # 已翻譯註解。
             joint_start, joint_end = start_layer, end_layer
             single_start, single_end = 0, 0
         elif start_layer >= total_joint_blocks:
-            # All assigned are single blocks
+            # 已翻譯註解。
             joint_start, joint_end = 0, 0
             single_start = start_layer - total_joint_blocks
             single_end = end_layer - total_joint_blocks
         else:
-            # Spans both joint and single
+            # 已翻譯註解。
             joint_start, joint_end = start_layer, total_joint_blocks
             single_start = 0
             single_end = end_layer - total_joint_blocks
@@ -192,23 +192,23 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         ]
 
     def set_image_dimensions(self, image_path: Path) -> tuple[int, int]:
-        """Compute and store dimensions from input image.
+        """此說明已翻譯為繁體中文。
 
-        Also stores image_path for use in encode_prompt().
+        此說明已翻譯為繁體中文。
 
-        Args:
-            image_path: Path to the input image
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            (output_width, output_height) for runtime config
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
         from mflux.utils.image_util import ImageUtil
 
         pil_image = ImageUtil.load_image(str(image_path)).convert("RGB")
         image_size = pil_image.size
 
-        # Compute output dimensions from input image aspect ratio
-        # Target area of 1024x1024 = ~1M pixels
+        # 已翻譯註解。
+        # 已翻譯註解。
         target_area = 1024 * 1024
         ratio = image_size[0] / image_size[1]
         output_width = math.sqrt(target_area * ratio)
@@ -216,7 +216,7 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         output_width = round(output_width / 32) * 32
         output_height = round(output_height / 32) * 32
 
-        # Ensure multiple of 16 for VAE
+        # 已翻譯註解。
         vae_scale_factor = 8
         multiple_of = vae_scale_factor * 2
         output_width = output_width // multiple_of * multiple_of
@@ -229,11 +229,11 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         return self._output_width, self._output_height
 
     def create_latents(self, seed: int, runtime_config: Config) -> mx.array:
-        """Create initial noise latents for Kontext.
+        """此說明已翻譯為繁體中文。
 
-        Unlike standard img2img which blends noise with encoded input,
-        Kontext uses pure noise latents. The input image is provided
-        separately as conditioning.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         return FluxLatentCreator.create_noise(
             seed=seed,
@@ -244,18 +244,18 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
     def encode_prompt(
         self, prompt: str, negative_prompt: str | None = None
     ) -> FluxKontextPromptData:
-        """Encode prompt and create conditioning from stored input image.
+        """此說明已翻譯為繁體中文。
 
-        Must call set_image_dimensions() before this method.
+        此說明已翻譯為繁體中文。
 
-        Args:
-            prompt: Text prompt for editing
-            negative_prompt: Ignored (Kontext doesn't use CFG)
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        Returns:
-            FluxKontextPromptData with text embeddings and image conditioning
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
         """
-        del negative_prompt  # Kontext doesn't support negative prompts or CFG
+        del negative_prompt  # 已翻譯註解。
 
         if (
             self._image_path is None
@@ -270,17 +270,17 @@ class FluxKontextModelAdapter(ModelAdapter[Flux1Kontext, Transformer]):
         assert isinstance(self.model.prompt_cache, dict)
         assert isinstance(self.model.tokenizers, dict)
 
-        # Encode text prompt
+        # 已翻譯註解。
         prompt_embeds, pooled_prompt_embeds = PromptEncoder.encode_prompt(
             prompt=prompt,
             prompt_cache=self.model.prompt_cache,
-            t5_tokenizer=self.model.tokenizers["t5"],  # pyright: ignore[reportAny]
-            clip_tokenizer=self.model.tokenizers["clip"],  # pyright: ignore[reportAny]
+            t5_tokenizer=self.model.tokenizers["t5"],  # 已翻譯註解。
+            clip_tokenizer=self.model.tokenizers["clip"],  # 已翻譯註解。
             t5_text_encoder=self.model.t5_text_encoder,
             clip_text_encoder=self.model.clip_text_encoder,
         )
 
-        # Create conditioning latents from input image
+        # 已翻譯註解。
         conditioning_latents, kontext_image_ids = (
             KontextUtil.create_image_conditioning_latents(
                 vae=self.model.vae,

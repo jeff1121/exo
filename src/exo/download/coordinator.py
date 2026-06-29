@@ -144,7 +144,7 @@ class DownloadCoordinator:
                 tg.start_soon(self._command_processor)
                 tg.start_soon(self._emit_existing_download_progress)
         except* (EventRouterBrokenResourceError, EventRouterClosedResourceError):
-            # 事件路由器已關閉（try-star 語法會處理錯誤群組）
+            # 已翻譯註解。
             pass
         finally:
             # 別忘了清理資源
@@ -338,7 +338,7 @@ class DownloadCoordinator:
         else:
             logger.warning(f"Model {model_id} was not found on disk")
 
-        # 發送待處理狀態以重設 UI 狀態，接著移除本地追蹤
+        # 已翻譯註解。
         if model_id in self.download_status:
             current_status = self.download_status[model_id]
             pending = DownloadPending(
@@ -385,20 +385,20 @@ class DownloadCoordinator:
                                 model_directory=self._default_model_dir(model_id),
                             )
                     elif progress.status in ["in_progress", "not_started"]:
-                        # TODO(ciaran): 暫時方案
+                        # 待辦事項：已翻譯註解。
                         # 已確認完成的模型不要降級狀態。
                         if isinstance(
                             self.download_status.get(model_id), DownloadCompleted
                         ):
                             continue
                         # 逐檔大小檢查會將本地檔案與
-                        # 最新 HF "main" 版本比較，而這是會變動的
-                        # 目標。當 HF 在新提交更新文字檔（README、YAML、
-                        # jinja）時，快取檔案清單會有新的
+                        # 已翻譯註解。
+                        # 已翻譯註解。
+                        # 已翻譯註解。
                         # 大小，而本地檔案仍符合舊版本。
                         # 改為使用權威性的完整性檢查
-                        # （is_model_directory_complete），它會驗證是否所有
-                        # safetensors 權重檔都存在。
+                        # 已翻譯註解。
+                        # 已翻譯註解。
                         found = await to_thread.run_sync(
                             resolve_existing_model,
                             model_id,

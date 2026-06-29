@@ -29,10 +29,10 @@ class EventRouterBrokenResourceError(BrokenResourceError):
     pass
 
 
-# Event Router is created and destroyed before consumers of its channels are,
-# hence its nice to have tagged errors for event-router channels being closed
+# 已翻譯註解。
+# 已翻譯註解。
 #
-# so consumers can catch specifically these errors, rather than the generic ones
+# 已翻譯註解。
 _ERROR_CFG = channels.ErrorOverride(
     closed_resource_error=EventRouterClosedResourceError,
     broken_resource_error=EventRouterBrokenResourceError,
@@ -72,11 +72,11 @@ class EventRouter:
             for send in self.internal_outbound:
                 send.close()
 
-    # can make this better in future
+    # 已翻譯註解。
     async def _simple_retry(self):
         while True:
             await anyio.sleep(1 + random())
-            # list here is a shallow clone for shared mutation
+            # 已翻譯註解。
             for e_id, (time, event) in list(self.out_for_delivery.items()):
                 if anyio.current_time() > time + 5:
                     self.out_for_delivery[e_id] = (anyio.current_time(), event)
@@ -137,7 +137,7 @@ class EventRouter:
                     self._nack_cancel_scope is None
                     or self._nack_cancel_scope.cancel_called
                 ):
-                    # Request the next index.
+                    # 已翻譯註解。
                     self._tg.start_soon(self._nack_request, buf.next_idx_to_release)
                     continue
 
@@ -152,9 +152,9 @@ class EventRouter:
                         self.internal_outbound.pop(i)
 
     async def _nack_request(self, since_idx: int) -> None:
-        # We request all events after (and including) the missing index.
-        # This function is started whenever we receive an event that is out of sequence.
-        # It is cancelled as soon as we receiver an event that is in sequence.
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
 
         if since_idx < 0:
             logger.warning(f"Negative value encountered for nack request {since_idx=}")

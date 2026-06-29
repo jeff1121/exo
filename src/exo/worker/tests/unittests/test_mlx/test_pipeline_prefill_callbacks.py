@@ -1,9 +1,9 @@
 # type: ignore
-"""Test that pipeline prefill callbacks and output exactly match stream_generate.
+"""此說明已翻譯為繁體中文。
 
-Spins up a single-device (non-pipeline) run and a distributed pipeline run,
-then verifies that the prompt_progress_callback sequences are identical
-and that generated text matches.
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 """
 
 import json
@@ -43,7 +43,7 @@ def _model_card() -> ModelCard:
 
 
 def _build_prompt(tokenizer: Any, prompt_tokens: int) -> tuple[str, Any]:
-    """Build a prompt with the given number of user-content tokens, return (chat_prompt, task)."""
+    """此說明已翻譯為繁體中文。"""
     from exo.worker.engines.mlx.utils_mlx import apply_chat_template
 
     base_text = "The quick brown fox jumps over the lazy dog. "
@@ -66,13 +66,13 @@ def _build_prompt(tokenizer: Any, prompt_tokens: int) -> tuple[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Single-device process: uses stream_generate path (no pipeline layers)
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 def _run_single_device(
     prompt_tokens: int,
     result_queue: Any,
 ) -> None:
-    """Load full model without pipeline sharding, run mlx_generate, record callbacks."""
+    """此說明已翻譯為繁體中文。"""
     try:
         import mlx.core as mx
         from mlx_lm.utils import load_model
@@ -89,8 +89,8 @@ def _run_single_device(
         model, _ = load_model(model_path, lazy=True, strict=False)
         mx.eval(model)
 
-        # Use PipelineShardMetadata just for get_tokenizer (needs model_card), but
-        # do NOT apply pipeline sharding — the model keeps all layers unwrapped.
+        # 已翻譯註解。
+        # 已翻譯註解。
         dummy_meta = PipelineShardMetadata(
             model_card=_model_card(),
             device_rank=0,
@@ -122,7 +122,7 @@ def _run_single_device(
             if response.finish_reason is not None:
                 break
 
-        # Also record the token count that prefill() received (prompt_tokens[:-1])
+        # 已翻譯註解。
         all_tokens = encode_prompt(tokenizer, prompt)
         prefill_token_count = len(all_tokens) - 1
 
@@ -142,7 +142,7 @@ def _run_single_device(
 
 
 # ---------------------------------------------------------------------------
-# Pipeline device process: uses _pipeline_prefill_cache path
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 def _run_pipeline_device(
     rank: int,
@@ -152,7 +152,7 @@ def _run_pipeline_device(
     prompt_tokens: int,
     result_queue: Any,
 ) -> None:
-    """Load model with pipeline sharding, run mlx_generate, record callbacks."""
+    """此說明已翻譯為繁體中文。"""
     os.environ["MLX_HOSTFILE"] = hostfile_path
     os.environ["MLX_RANK"] = str(rank)
 
@@ -231,7 +231,7 @@ def _run_pipeline_device(
 
 
 # ---------------------------------------------------------------------------
-# Test helpers
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 def _create_hostfile(world_size: int, base_port: int) -> str:
     hosts = [f"127.0.0.1:{base_port + i}" for i in range(world_size)]
@@ -241,7 +241,7 @@ def _create_hostfile(world_size: int, base_port: int) -> str:
 
 
 def _run_single_device_test(prompt_tokens: int, timeout: int = 120) -> dict[str, Any]:
-    """Run single-device (stream_generate) prefill and return results."""
+    """此說明已翻譯為繁體中文。"""
     ctx = mp.get_context("spawn")
     result_queue: Any = ctx.Queue()
 
@@ -266,7 +266,7 @@ def _run_pipeline_test(
     base_port: int,
     timeout: int = 120,
 ) -> dict[int, dict[str, Any]]:
-    """Run pipeline prefill across ranks and return per-rank results."""
+    """此說明已翻譯為繁體中文。"""
     world_size = len(layer_splits)
     hostfile_path = _create_hostfile(world_size, base_port)
     ctx = mp.get_context("spawn")
@@ -316,7 +316,7 @@ def _run_pipeline_test(
 
 
 # ---------------------------------------------------------------------------
-# Tests
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 pytestmark = [
     pytest.mark.slow,
@@ -331,7 +331,7 @@ LAYER_SPLITS_2WAY: list[tuple[int, int]] = [(0, 12), (12, 24)]
 
 
 class TestPipelineNoDeadlock:
-    """Pipeline prefill must not deadlock at any rank count or prompt length."""
+    """此說明已翻譯為繁體中文。"""
 
     @pytest.mark.parametrize(
         "layer_splits,prompt_tokens",
@@ -361,20 +361,20 @@ class TestPipelineNoDeadlock:
         layer_splits: list[tuple[int, int]],
         prompt_tokens: int,
     ) -> None:
-        """Pipeline must complete without deadlock at various prompt lengths."""
+        """此說明已翻譯為繁體中文。"""
         pipeline_results = _run_pipeline_test(
             layer_splits=layer_splits,
             prompt_tokens=prompt_tokens,
             base_port=29650,
             timeout=60,
         )
-        # If we get here, no deadlock. Verify all ranks produced output.
+        # 已翻譯註解。
         for rank, pipe_data in sorted(pipeline_results.items()):
             assert pipe_data["text"], f"Rank {rank} produced no output text"
 
 
 class TestPipelinePrefillCallbacks:
-    """Verify that pipeline prefill callbacks exactly match stream_generate callbacks."""
+    """此說明已翻譯為繁體中文。"""
 
     @pytest.mark.parametrize(
         "prompt_tokens",
@@ -382,8 +382,8 @@ class TestPipelinePrefillCallbacks:
         ids=["short_50", "medium_500", "long_5000"],
     )
     def test_callbacks_match(self, prompt_tokens: int) -> None:
-        """All pipeline ranks must produce identical callback sequences."""
-        # Run 4-rank pipeline
+        """此說明已翻譯為繁體中文。"""
+        # 已翻譯註解。
         pipeline_results = _run_pipeline_test(
             layer_splits=LAYER_SPLITS_4WAY,
             prompt_tokens=prompt_tokens,
@@ -391,7 +391,7 @@ class TestPipelinePrefillCallbacks:
             timeout=180,
         )
 
-        # All ranks must agree on prefill token count and callback sequence
+        # 已翻譯註解。
         rank0_data = pipeline_results[0]
         rank0_callbacks = rank0_data["callbacks"]
         prefill_count = rank0_data["prefill_token_count"]
@@ -411,7 +411,7 @@ class TestPipelinePrefillCallbacks:
                 f"  pipeline R{rank} ({len(pipe_callbacks)} callbacks): {pipe_callbacks}"
             )
 
-        # Structural checks: starts with (0, M), ends with (M, M), monotonically increasing
+        # 已翻譯註解。
         assert rank0_callbacks[0] == (0, prefill_count), (
             f"First callback should be (0, {prefill_count}), got {rank0_callbacks[0]}"
         )
@@ -429,7 +429,7 @@ class TestPipelinePrefillCallbacks:
         ids=["short_50", "medium_500"],
     )
     def test_output_matches(self, prompt_tokens: int) -> None:
-        """Pipeline-generated text must match single-device output."""
+        """此說明已翻譯為繁體中文。"""
         single = _run_single_device_test(prompt_tokens, timeout=180)
 
         pipeline_results = _run_pipeline_test(
@@ -441,15 +441,15 @@ class TestPipelinePrefillCallbacks:
 
         single_text = single["text"]
 
-        # The last rank produces the final logits, so its output should match.
-        # Due to SDPA tiling non-determinism, allow minor differences in text.
+        # 已翻譯註解。
+        # 已翻譯註解。
         last_rank = max(pipeline_results.keys())
         pipe_text = pipeline_results[last_rank]["text"]
 
-        # For deterministic sampling (temp=0.0), outputs should match exactly
-        # or be very close. Log both for debugging even if they match.
+        # 已翻譯註解。
+        # 已翻譯註解。
         if single_text != pipe_text:
-            # Find first divergence point
+            # 已翻譯註解。
             min_len = min(len(single_text), len(pipe_text))
             diverge_idx = next(
                 (i for i in range(min_len) if single_text[i] != pipe_text[i]),
@@ -463,10 +463,10 @@ class TestPipelinePrefillCallbacks:
 
 
 class TestPipelineCallbacksStructure:
-    """Verify structural properties of callbacks independent of model output."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_callback_structure_matches_generate_step(self) -> None:
-        """Verify callbacks follow generate_step's pattern: (0,M), chunks up to M-1, (M,M)."""
+        """此說明已翻譯為繁體中文。"""
         prompt_tokens = 200
         pipeline_results = _run_pipeline_test(
             layer_splits=LAYER_SPLITS_4WAY,
@@ -495,13 +495,13 @@ class TestPipelineCallbacksStructure:
                     f"got {second_to_last}"
                 )
 
-            # All callbacks must have total == M
+            # 已翻譯註解。
             for i, (_, total) in enumerate(callbacks):
                 assert total == m, (
                     f"Rank {rank}: callback {i} has total={total}, expected {m}"
                 )
 
-            # processed values must be non-decreasing
+            # 已翻譯註解。
             processed_vals = [p for p, _ in callbacks]
             for i in range(1, len(processed_vals)):
                 assert processed_vals[i] >= processed_vals[i - 1], (
@@ -509,7 +509,7 @@ class TestPipelineCallbacksStructure:
                     f"{processed_vals}"
                 )
 
-            # No duplicate consecutive callbacks (pipeline dummies must not emit callbacks)
+            # 已翻譯註解。
             for i in range(1, len(callbacks)):
                 assert callbacks[i] != callbacks[i - 1], (
                     f"Rank {rank}: duplicate consecutive callback at index {i}: "

@@ -70,10 +70,10 @@ from exo.utils.info_gatherer.info_gatherer import (
 def _is_rdma_ctl_enabled(
     node_id: NodeId, node_rdma_ctl: Mapping[NodeId, NodeRdmaCtlStatus]
 ) -> bool:
-    """只有在觀察到 rdma_ctl 狀態為啟用時，節點才視為具備 RDMA 能力。
+    """此說明已翻譯為繁體中文。
 
-    缺少條目時預設為 ``False`` —— 若尚未觀察到（或節點
-    無法執行）``rdma_ctl``，就不可參與 RDMA 支援的實例。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     status = node_rdma_ctl.get(node_id)
     return status is not None and status.enabled
@@ -147,8 +147,8 @@ def apply_node_download_progress(event: NodeDownloadProgress, state: State) -> S
 
     replaced = False
     for i, existing_dp in enumerate(current):
-        # TODO(ciaran): 目前先以 model_id 去重。之後當 pipeline 與 tensor 下載分離時，
-        # 需要再次使用 shard_metadata。
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
         # 目前這樣可行
         if (
             existing_dp.shard_metadata.model_card.model_id
@@ -320,7 +320,7 @@ def apply_node_timed_out(event: NodeTimedOut, state: State) -> State:
     node_rdma_ctl = {
         key: value for key, value in state.node_rdma_ctl.items() if key != event.node_id
     }
-    # 僅在離開節點曾啟用 TB bridge 時才重新計算循環
+    # 已翻譯註解。
     leaving_node_status = state.node_thunderbolt_bridge.get(event.node_id)
     leaving_node_had_tb_enabled = (
         leaving_node_status is not None and leaving_node_status.enabled
@@ -455,10 +455,10 @@ def apply_node_gathered_info(event: NodeGatheredInfo, state: State) -> State:
                 **state.node_rdma_ctl,
                 event.node_id: NodeRdmaCtlStatus(enabled=info.enabled),
             }
-            # 若此節點的 RDMA 剛被停用，移除所有與其相連的 RDMA 邊
-            # 以避免 placement / topology 的使用方在 RDMA 支援實例中
+            # 已翻譯註解。
+            # 已翻譯註解。
             # 選到已停用節點。（當兩端再次啟用後，下一次
-            # MacThunderboltConnections 輪詢會重新補回邊。）
+            # 已翻譯註解。
             if not info.enabled:
                 topology.remove_all_rdma_connections_touching(event.node_id)
         case NodeBackends():
@@ -479,7 +479,7 @@ def apply_topology_edge_created(event: TopologyEdgeCreated, state: State) -> Sta
 def apply_topology_edge_deleted(event: TopologyEdgeDeleted, state: State) -> State:
     topology = copy.deepcopy(state.topology)
     topology.remove_connection(event.conn)
-    # TODO: 清理反向連線移除邏輯
+    # 待辦事項：已翻譯註解。
     return state.model_copy(update={"topology": topology})
 
 

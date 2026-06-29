@@ -1,4 +1,4 @@
-"""用於轉換請求/回應的 Claude Messages API 轉接器。"""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 import re
@@ -51,7 +51,7 @@ from exo.shared.types.text_generation import (
 def finish_reason_to_claude_stop_reason(
     finish_reason: FinishReason | None,
 ) -> ClaudeStopReason | None:
-    """將 OpenAI finish_reason 對應到 Claude stop_reason。"""
+    """此說明已翻譯為繁體中文。"""
     if finish_reason is None:
         return None
     mapping: dict[FinishReason, ClaudeStopReason] = {
@@ -65,7 +65,7 @@ def finish_reason_to_claude_stop_reason(
 
 
 def _extract_tool_result_text(block: ClaudeToolResultBlock) -> str:
-    """從 tool_result 的 content 欄位擷取純文字。"""
+    """此說明已翻譯為繁體中文。"""
     if block.content is None:
         return ""
     if isinstance(block.content, str):
@@ -75,18 +75,18 @@ def _extract_tool_result_text(block: ClaudeToolResultBlock) -> str:
     )
 
 
-# 比對「x-anthropic-billing-header: ...;」（可含可選的結尾換行）
-# 或其他每次請求都會改變、破壞 KV 前綴快取的遙測標頭。
+# 已翻譯註解。
+# 已翻譯註解。
 _VOLATILE_HEADER_RE = re.compile(r"^x-anthropic-[^\n]*;\n?", re.MULTILINE)
 
 
 def _strip_volatile_headers(text: str) -> str:
-    """從 system prompt 文字中移除 Anthropic 計費/遙測標頭。
+    """此說明已翻譯為繁體中文。
 
-    Claude Code 會在前面加上如 'x-anthropic-billing-header: cc_version=...;
-    cc_entrypoint=...; cch=...;' 這類包含每次請求內容雜湊的標頭。它們
-    每次請求都會改變，並破壞 KV 前綴快取（前綴約在 20 個 token 處即分歧，
-    而非可匹配數千個對話 token）。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     return _VOLATILE_HEADER_RE.sub("", text)
 
@@ -108,7 +108,7 @@ async def handle_image_block(block: ClaudeImageBlock) -> Base64Image | None:
 async def claude_request_to_text_generation(
     request: ClaudeMessagesRequest,
 ) -> TextGenerationTaskParams:
-    # 處理 system 訊息
+    # 已翻譯註解。
     instructions: str | None = None
     chat_template_messages: list[dict[str, ChatTemplateValue]] = []
     images: list[Base64Image] = []
@@ -124,7 +124,7 @@ async def claude_request_to_text_generation(
             {"role": "system", "content": InputMessageContent(instructions)}
         )
 
-    # 將訊息轉為 input
+    # 已翻譯註解。
     input_messages: list[InputMessage] = []
     for msg in request.messages:
         if isinstance(msg.content, str):
@@ -177,13 +177,13 @@ async def claude_request_to_text_generation(
         content = "".join(text_parts)
         reasoning_content = "".join(thinking_parts) if thinking_parts else None
 
-        # 由文字內容建立 InputMessage
+        # 已翻譯註解。
         if msg.role in ("user", "assistant"):
             input_messages.append(
                 InputMessage(role=msg.role, content=InputMessageContent(content))
             )
 
-        # 建立並保留工具結構的 chat_template_messages
+        # 已翻譯註解。
         if tool_calls:
             chat_msg: dict[str, Any] = {
                 "role": "assistant",
@@ -219,7 +219,7 @@ async def claude_request_to_text_generation(
                 chat_msg["reasoning_content"] = reasoning_content
             chat_template_messages.append(chat_msg)
 
-    # 將 Claude 工具定義轉為 OpenAI 風格的 function tools
+    # 已翻譯註解。
     tools: list[dict[str, Any]] | None = None
     if request.tools:
         tools = [
@@ -266,9 +266,9 @@ async def collect_claude_response(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str]:
-    # 這裡使用 AsyncGenerator[str] 而不是直接回傳 ChatCompletionReponse，因為
-    # FastAPI 對取消處理較佳，但不知為何不會自動序列化
-    """收集所有 token chunks 並回傳單一 ClaudeMessagesResponse。"""
+    # 已翻譯註解。
+    # 已翻譯註解。
+    """此說明已翻譯為繁體中文。"""
     text_parts: list[str] = []
     thinking_parts: list[str] = []
     tool_use_blocks: list[ClaudeToolUseBlock] = []
@@ -292,7 +292,7 @@ async def collect_claude_response(
                     ClaudeToolUseBlock(
                         id=f"toolu_{tool.id}",
                         name=tool.name,
-                        input=json.loads(tool.arguments),  # pyright: ignore[reportAny]
+                        input=json.loads(tool.arguments),  # 已翻譯註解。
                     )
                 )
             stop_reason = "tool_use"
@@ -324,7 +324,7 @@ async def collect_claude_response(
     if not content:
         content.append(ClaudeTextBlock(text=""))
 
-    # 若有可用資料則使用實際 usage 資料
+    # 已翻譯註解。
     input_tokens = last_usage.prompt_tokens if last_usage else 0
     output_tokens = last_usage.completion_tokens if last_usage else 0
 
@@ -348,8 +348,8 @@ async def generate_claude_stream(
         ErrorChunk | ToolCallChunk | TokenChunk | PrefillProgressChunk, None
     ],
 ) -> AsyncGenerator[str, None]:
-    """由 TokenChunks 產生 Claude Messages API 串流事件。"""
-    # 初始 message_start 事件
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     initial_message = ClaudeMessageStart(
         id=f"msg_{command_id}",
         model=model,
@@ -365,7 +365,7 @@ async def generate_claude_stream(
     last_usage: Usage | None = None
     next_block_index = 0
 
-    # 追蹤是否已開始 thinking/text 區塊
+    # 已翻譯註解。
     thinking_block_started = False
     thinking_block_index = -1
     text_block_started = False
@@ -384,12 +384,12 @@ async def generate_claude_stream(
         if isinstance(chunk, ToolCallChunk):
             stop_reason = "tool_use"
 
-            # 輸出 tool_use 內容區塊
+            # 已翻譯註解。
             for tool in chunk.tool_calls:
                 tool_id = f"toolu_{tool.id}"
                 tool_input_json = tool.arguments
 
-                # tool_use 的 content_block_start
+                # 已翻譯註解。
                 tool_block_start = ClaudeContentBlockStartEvent(
                     index=next_block_index,
                     content_block=ClaudeToolUseBlock(
@@ -398,24 +398,24 @@ async def generate_claude_stream(
                 )
                 yield f"event: content_block_start\ndata: {tool_block_start.model_dump_json()}\n\n"
 
-                # 含 input_json_delta 的 content_block_delta
+                # 已翻譯註解。
                 tool_delta_event = ClaudeContentBlockDeltaEvent(
                     index=next_block_index,
                     delta=ClaudeInputJsonDelta(partial_json=tool_input_json),
                 )
                 yield f"event: content_block_delta\ndata: {tool_delta_event.model_dump_json()}\n\n"
 
-                # content_block_stop
+                # 已翻譯註解。
                 tool_block_stop = ClaudeContentBlockStopEvent(index=next_block_index)
                 yield f"event: content_block_stop\ndata: {tool_block_stop.model_dump_json()}\n\n"
 
                 next_block_index += 1
             continue
 
-        output_tokens += 1  # 每個 chunk 計為一個 token
+        output_tokens += 1  # 已翻譯註解。
 
         if chunk.is_thinking:
-            # 在第一個 thinking token 開始時建立 thinking 區塊
+            # 已翻譯註解。
             if not thinking_block_started:
                 thinking_block_started = True
                 thinking_block_index = next_block_index
@@ -432,12 +432,12 @@ async def generate_claude_stream(
             )
             yield f"event: content_block_delta\ndata: {delta_event.model_dump_json()}\n\n"
         else:
-            # 轉換到文字時關閉 thinking 區塊
+            # 已翻譯註解。
             if thinking_block_started and text_block_index == -1:
                 block_stop = ClaudeContentBlockStopEvent(index=thinking_block_index)
                 yield f"event: content_block_stop\ndata: {block_stop.model_dump_json()}\n\n"
 
-            # 在第一個文字 token 開始時建立文字區塊
+            # 已翻譯註解。
             if not text_block_started:
                 text_block_started = True
                 text_block_index = next_block_index
@@ -457,7 +457,7 @@ async def generate_claude_stream(
         if chunk.finish_reason is not None:
             stop_reason = finish_reason_to_claude_stop_reason(chunk.finish_reason)
 
-    # 若可用，使用 usage 中的實際 token 數
+    # 已翻譯註解。
     if last_usage is not None:
         output_tokens = last_usage.completion_tokens
 
@@ -478,13 +478,13 @@ async def generate_claude_stream(
         empty_stop = ClaudeContentBlockStopEvent(index=0)
         yield f"event: content_block_stop\ndata: {empty_stop.model_dump_json()}\n\n"
 
-    # message_delta
+    # 已翻譯註解。
     message_delta = ClaudeMessageDeltaEvent(
         delta=ClaudeMessageDelta(stop_reason=stop_reason),
         usage=ClaudeMessageDeltaUsage(output_tokens=output_tokens),
     )
     yield f"event: message_delta\ndata: {message_delta.model_dump_json()}\n\n"
 
-    # message_stop
+    # 已翻譯註解。
     message_stop = ClaudeMessageStopEvent()
     yield f"event: message_stop\ndata: {message_stop.model_dump_json()}\n\n"

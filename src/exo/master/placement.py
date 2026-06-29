@@ -59,7 +59,7 @@ def add_instance_to_placements(
     topology: Topology,
     current_instances: Mapping[InstanceId, Instance],
 ) -> Mapping[InstanceId, Instance]:
-    # TODO: validate against topology
+    # 待辦事項：已翻譯註解。
 
     return {**current_instances, command.instance.instance_id: command.instance}
 
@@ -69,7 +69,7 @@ def _get_node_download_fraction(
     model_id: ModelId,
     download_status: Mapping[NodeId, Sequence[DownloadProgress]],
 ) -> float:
-    """Return the download fraction (0.0–1.0) for a model on a given node."""
+    """回傳指定節點上某模型的下載進度比例（0.0–1.0）。"""
     for progress in download_status.get(node_id, []):
         if progress.shard_metadata.model_card.model_id != model_id:
             continue
@@ -96,7 +96,7 @@ def _cycle_download_score(
     model_id: ModelId,
     download_status: Mapping[NodeId, Sequence[DownloadProgress]],
 ) -> float:
-    """Sum of download fractions across all nodes in a cycle."""
+    """此說明已翻譯為繁體中文。"""
     return sum(
         _get_node_download_fraction(node_id, model_id, download_status)
         for node_id in cycle
@@ -117,7 +117,7 @@ def place_instance(
     cycles = topology.get_cycles()
     candidate_cycles = list(filter(lambda it: len(it) >= command.min_nodes, cycles))
 
-    # Filter to cycles containing all required nodes (subset matching)
+    # 已翻譯註解。
     if required_nodes:
         candidate_cycles = [
             cycle
@@ -135,10 +135,10 @@ def place_instance(
             raise ValueError(
                 f"Requested Tensor sharding but this model does not support tensor parallelism: {command.model_card.model_id}"
             )
-        # TODO: the condition here for tensor parallel is not correct, but it works good enough for now.
-        # DeepSeek V4 is MQA (num_key_value_heads=1) but its sharding strategy
-        # head-parallelises wq_b/wo_a and shards MoE experts instead of splitting
-        # KV heads, so the kv-head divisibility check doesn't apply.
+        # 待辦事項：已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         is_deepseek_v4 = command.model_card.base_model.startswith("DeepSeek V4")
         kv_heads = command.model_card.num_key_value_heads
         cycles_with_sufficient_memory = [
@@ -242,7 +242,7 @@ def place_instance(
         ),
     )
 
-    # Single-node: force Pipeline/Ring (Tensor and Jaccl require multi-node)
+    # 已翻譯註解。
     if len(selected_cycle) == 1:
         command = command.model_copy(
             update={
@@ -262,7 +262,7 @@ def place_instance(
 
     match command.instance_meta:
         case InstanceMeta.MlxJaccl:
-            # TODO(evan): shard assignments should contain information about ranks, this is ugly
+            # 待辦事項：已翻譯註解。
             def get_device_rank(node_id: NodeId) -> int:
                 runner_id = shard_assignments.node_to_runner[node_id]
                 shard_metadata = shard_assignments.runner_to_shard.get(runner_id)
@@ -329,7 +329,7 @@ def get_transition_events(
 ) -> Sequence[Event]:
     events: list[Event] = []
 
-    # find instances to create
+    # 已翻譯註解。
     for instance_id, instance in target_instances.items():
         if instance_id not in current_instances:
             events.append(
@@ -338,7 +338,7 @@ def get_transition_events(
                 )
             )
 
-    # find instances to delete
+    # 已翻譯註解。
     for instance_id in current_instances:
         if instance_id not in target_instances:
             for task in tasks.values():

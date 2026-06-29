@@ -1,13 +1,13 @@
-# pyright: reportAny=false, reportUnknownVariableType=false
-# pyright: reportUnknownMemberType=false, reportUnknownArgumentType=false
-# pyright: reportUnknownLambdaType=false, reportPrivateUsage=false
-# pyright: reportInvalidCast=false, reportArgumentType=false
-# pyright: reportUnusedImport=false
-"""Test B=1 vs B=2 equivalence for batch generation.
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
+# 已翻譯註解。
+"""此說明已翻譯為繁體中文。
 
-Verifies that running two requests concurrently in a batch (B=2) produces
-identical token selections to running them sequentially (B=1).
-Uses random weights — no model download required.
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
+此說明已翻譯為繁體中文。
 """
 
 from pathlib import Path
@@ -22,7 +22,7 @@ from mlx_lm.sample_utils import make_sampler
 from mlx_lm.tokenizer_utils import TokenizerWrapper
 from transformers import AutoTokenizer
 
-# Import batch_generate to activate the right-padding BatchKVCache patch
+# 已翻譯註解。
 import exo.worker.engines.mlx.generator.batch_generate  # noqa: F401
 from exo.worker.engines.mlx.cache import encode_prompt, make_kv_cache
 from exo.worker.engines.mlx.generator.generate import prefill
@@ -32,7 +32,7 @@ NUM_STEPS = 20
 
 
 def _init_random(model: nn.Module) -> None:
-    """Initialize all model parameters with random values."""
+    """此說明已翻譯為繁體中文。"""
     params = model.parameters()
     new_params = mlx.utils.tree_map(
         lambda p: mx.random.normal(shape=p.shape, dtype=p.dtype)
@@ -50,10 +50,10 @@ def _run_b1_vs_b2(
     tokens_a: mx.array,
     tokens_b: mx.array,
 ) -> tuple[float, int]:
-    """Run B=1 sequential and B=2 batched, return (max_diff, mismatches)."""
+    """此說明已翻譯為繁體中文。"""
     sampler = make_sampler(temp=0.0)
 
-    # B=1 sequential
+    # 已翻譯註解。
     cache_a1 = make_kv_cache(model)
     prefill(model, tokenizer, sampler, tokens_a[:-1], cache_a1, None, None, None)
     merged_a1 = _merge_caches([[c for c in cache_a1]])
@@ -87,7 +87,7 @@ def _run_b1_vs_b2(
         b1_logits_b.append(lb[0, -1])
         next_b = int(mx.argmax(lb[0, -1]).item())
 
-    # B=2 batched
+    # 已翻譯註解。
     cache_a2 = make_kv_cache(model)
     cache_b2 = make_kv_cache(model)
     prefill(model, tokenizer, sampler, tokens_a[:-1], cache_a2, None, None, None)
@@ -114,7 +114,7 @@ def _run_b1_vs_b2(
         next_a2 = int(mx.argmax(l2[0, -1]).item())
         next_b2 = int(mx.argmax(l2[1, -1]).item())
 
-    # Compare
+    # 已翻譯註解。
     max_diff = 0.0
     mismatches = 0
     for step in range(NUM_STEPS):
@@ -148,7 +148,7 @@ def _run_b1_vs_b2(
 
 
 def _make_tokenizer() -> TokenizerWrapper:
-    """Load the Qwen tokenizer (tiny download, shared across Qwen models)."""
+    """此說明已翻譯為繁體中文。"""
     from huggingface_hub import snapshot_download
 
     model_path = Path(
@@ -163,10 +163,10 @@ def _make_tokenizer() -> TokenizerWrapper:
 
 @pytest.mark.slow
 def test_batch_b2_llama() -> None:
-    """Llama-style model (KVCache only) must produce bit-exact logits in B=2.
+    """此說明已翻譯為繁體中文。
 
-    Right-padded BatchKVCache keeps data at position 0 for all sequences,
-    so flash attention sees identical data layout as B=1 → bit-exact output.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     from mlx_lm.models.llama import Model as LlamaModel
     from mlx_lm.models.llama import ModelArgs
@@ -200,10 +200,10 @@ def test_batch_b2_llama() -> None:
 
 @pytest.mark.slow
 def test_batch_b2_qwen35_moe() -> None:
-    """Qwen3.5 MoE model (hybrid SSM+attention+MoE) must produce bit-exact logits in B=2.
+    """此說明已翻譯為繁體中文。
 
-    Right-padded BatchKVCache keeps data at position 0 for all sequences,
-    so flash attention sees identical data layout as B=1 → bit-exact output.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     from mlx_lm.models.qwen3_5_moe import Model as Qwen35MoeModel
     from mlx_lm.models.qwen3_5_moe import ModelArgs

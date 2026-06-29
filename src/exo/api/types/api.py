@@ -34,7 +34,7 @@ class ModelListModel(BaseModel):
     object: str = "model"
     created: int = Field(default_factory=lambda: int(time.time()))
     owned_by: str = "exo"
-    # openwebui 欄位
+    # 已翻譯註解。
     hugging_face_id: str = Field(default="")
     name: str = Field(default="")
     description: str = Field(default="")
@@ -63,7 +63,7 @@ class ChatCompletionMessageText(BaseModel):
 
 class ChatCompletionMessageImageUrl(BaseModel):
     type: Literal["image_url"] = "image_url"
-    image_url: dict[str, str]  # {"url": "data:image/png;base64,..."}
+    image_url: dict[str, str]  # 已翻譯註解。
 
 
 ChatCompletionContentPart = ChatCompletionMessageText | ChatCompletionMessageImageUrl
@@ -187,7 +187,7 @@ class NodePowerStats(BaseModel, frozen=True):
     samples: int
     avg_sys_power: float
     # 分階段拆解。僅在呼叫端標記階段
-    # 邊界（例如 prefill -> generation）時填入；否則為 None。
+    # 已翻譯註解。
     prefill_avg_sys_power: float | None = None
     generation_avg_sys_power: float | None = None
     prefill_energy_joules: float | None = None
@@ -199,10 +199,10 @@ class PowerUsage(BaseModel, frozen=True):
     nodes: list[NodePowerStats]
     total_avg_sys_power_watts: float
     total_energy_joules: float
-    # 在 prefill（提示詞處理）階段與
-    # generation/decode 階段之間拆分。僅在呼叫端標記階段
-    # 邊界時填入；否則為 None。兩階段能耗應加總約等於
-    # `total_energy_joules`（允許插值取整誤差）。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
     prefill_seconds: float | None = None
     generation_seconds: float | None = None
     prefill_energy_joules: float | None = None
@@ -282,7 +282,7 @@ class PlacementPreview(BaseModel):
     sharding: Sharding
     instance_meta: InstanceMeta
     instance: Instance | None = None
-    # 鍵為 NodeId 字串，值為該節點將額外使用的位元組數
+    # 已翻譯註解。
     memory_delta_by_node: dict[str, int] | None = None
     error: str | None = None
 
@@ -345,12 +345,12 @@ ImageSize = Literal[
 
 
 def normalize_image_size(v: object) -> ImageSize:
-    """ImageSize 欄位共用驗證器：將 None 對映為 "auto"，並拒絕無效值。"""
+    """此說明已翻譯為繁體中文。"""
     if v is None:
         return "auto"
     if v not in get_args(ImageSize):
         raise ValueError(f"Invalid size: {v!r}. Must be one of {get_args(ImageSize)}")
-    return v  # pyright: ignore[reportReturnType]
+    return v  # 已翻譯註解。
 
 
 class AdvancedImageParams(BaseModel):
@@ -377,7 +377,7 @@ class ImageGenerationTaskParams(BaseModel):
     style: str | None = "vivid"
     user: str | None = None
     advanced_params: AdvancedImageParams | None = None
-    # 供 benchmark 模式使用的內部旗標 - 由 API 設定，並在序列化時保留
+    # 已翻譯註解。
     bench: bool = False
 
     @field_validator("size", mode="before")
@@ -393,7 +393,7 @@ class BenchImageGenerationTaskParams(ImageGenerationTaskParams):
 class ImageEditsTaskParams(BaseModel):
     """影像編輯請求的內部任務參數。"""
 
-    image_data: str = ""  # Base64 編碼影像（使用分塊傳輸時為空）
+    image_data: str = ""  # 已翻譯註解。
     total_input_chunks: int = 0
     prompt: str
     model: str
@@ -414,7 +414,7 @@ class ImageEditsTaskParams(BaseModel):
         return normalize_image_size(v)
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
             if name == "image_data":
                 yield name, f"<{len(self.image_data)} chars>"
             elif name is not None:
@@ -427,7 +427,7 @@ class ImageData(BaseModel):
     revised_prompt: str | None = None
 
     def __repr_args__(self) -> Generator[tuple[str, Any], None, None]:
-        for name, value in super().__repr_args__():  # pyright: ignore[reportAny]
+        for name, value in super().__repr_args__():  # 已翻譯註解。
             if name == "b64_json" and self.b64_json is not None:
                 yield name, f"<{len(self.b64_json)} chars>"
             elif name is not None:

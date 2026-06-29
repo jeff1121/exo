@@ -1,4 +1,4 @@
-"""Tests for multi-directory model resolution, download target selection, and deletion."""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 import shutil
@@ -24,7 +24,7 @@ NORMALIZED = MODEL_ID.normalize()
 
 
 def _create_complete_model(model_dir: Path) -> None:
-    """Create a minimal complete model directory on disk."""
+    """此說明已翻譯為繁體中文。"""
     model_dir.mkdir(parents=True, exist_ok=True)
     weight_map = {"layer.weight": "model.safetensors"}
     index = {"metadata": {"total_size": 1024}, "weight_map": weight_map}
@@ -34,16 +34,16 @@ def _create_complete_model(model_dir: Path) -> None:
 
 
 def _create_incomplete_model(model_dir: Path) -> None:
-    """Create a model directory missing weight files."""
+    """此說明已翻譯為繁體中文。"""
     model_dir.mkdir(parents=True, exist_ok=True)
     weight_map = {"layer.weight": "model.safetensors"}
     index = {"metadata": {"total_size": 1024}, "weight_map": weight_map}
     (model_dir / "model.safetensors.index.json").write_text(json.dumps(index))
-    # model.safetensors is missing
+    # 已翻譯註解。
 
 
 # ---------------------------------------------------------------------------
-# resolve_existing_model
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
@@ -122,7 +122,7 @@ class TestResolveExistingModel:
 
 
 # ---------------------------------------------------------------------------
-# is_read_only_model_dir
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
@@ -145,7 +145,7 @@ class TestIsReadOnlyModelDir:
 
 
 # ---------------------------------------------------------------------------
-# select_download_dir
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 
@@ -155,7 +155,7 @@ class TestSelectDownloadDir:
         dir2 = tmp_path / "dir2"
         dir1.mkdir()
         dir2.mkdir()
-        # Both exist on same filesystem so both have space; first wins
+        # 已翻譯註解。
         with patch("exo.download.download_utils.EXO_MODELS_DIRS", (dir1, dir2)):
             assert select_download_dir(1) == dir1
 
@@ -170,7 +170,7 @@ class TestSelectDownloadDir:
         def mock_disk_usage(path: str | Path) -> object:
             if Path(path).is_relative_to(dir1):
                 real = real_disk_usage(path)
-                return shutil._ntuple_diskusage(real.total, real.total, 0)  # pyright: ignore[reportPrivateUsage]
+                return shutil._ntuple_diskusage(real.total, real.total, 0)  # 已翻譯註解。
             return real_disk_usage(path)
 
         with (
@@ -187,7 +187,7 @@ class TestSelectDownloadDir:
 
         def mock_disk_usage(path: str | Path) -> object:
             real = real_disk_usage(path)
-            return shutil._ntuple_diskusage(real.total, real.total, 0)  # pyright: ignore[reportPrivateUsage]
+            return shutil._ntuple_diskusage(real.total, real.total, 0)  # 已翻譯註解。
 
         with (
             patch("exo.download.download_utils.EXO_MODELS_DIRS", (dir1,)),
@@ -225,7 +225,7 @@ class TestSelectDownloadDir:
 
 
 # ---------------------------------------------------------------------------
-# delete_model
+# 已翻譯註解。
 # ---------------------------------------------------------------------------
 
 

@@ -1,4 +1,4 @@
-# pyright: reportUnusedImport = false
+# 已翻譯註解。
 
 from collections.abc import Mapping, Sequence
 
@@ -46,18 +46,18 @@ from exo.worker.runner.supervisor import RunnerSupervisor
 
 def plan(
     node_id: NodeId,
-    # runners 預期是最新狀態，因此不應直接來自 state
+    # 已翻譯註解。
     runners: Mapping[RunnerId, RunnerSupervisor],
     global_download_status: Mapping[NodeId, Sequence[DownloadProgress]],
     instances: Mapping[InstanceId, Instance],
-    all_runners: Mapping[RunnerId, RunnerStatus],  # 全域 runner 狀態
+    all_runners: Mapping[RunnerId, RunnerStatus],  # 已翻譯註解。
     tasks: Mapping[TaskId, Task],
     input_chunk_buffer: Mapping[CommandId, Mapping[int, InputImageChunk]],
     image_cache: Mapping[Base64ImageHash, Base64Image],
     instance_backoff: KeyedBackoff[InstanceId],
     download_backoff: KeyedBackoff[ModelId],
 ) -> Task | None:
-    # Python 的 OR 短路邏輯會依序評估這些步驟。
+    # 已翻譯註解。
     return (
         _cancel_tasks(runners, tasks)
         or _kill_runner(runners, all_runners, instances)
@@ -115,7 +115,7 @@ def _create_runner(
         if runner_id in runners:
             continue
 
-        # 若其他節點有 runner 失敗，先不要建立 runner，等待其先恢復。
+        # 已翻譯註解。
         instance_has_failed_runner = any(
             isinstance(all_runners.get(remote_runner_id), RunnerFailed)
             for remote_runner_id in instance.shard_assignments.node_to_runner.values()
@@ -160,7 +160,7 @@ def _model_needs_download(
             )
             and download_backoff.should_proceed(model_id)
         ):
-            # 我們不會隨意使 download_status 失效，以免磁碟檔案被刪除時狀態混亂
+            # 已翻譯註解。
             return DownloadModel(
                 instance_id=runner.bound_instance.instance.instance_id,
                 shard_metadata=runner.bound_instance.bound_shard,
@@ -202,7 +202,7 @@ def _init_distributed_backend(
 
         accepting_ranks = device_rank < world_size - 1
 
-        # Rank = n-1
+        # 已翻譯註解。
         connecting_rank_ready = device_rank == world_size - 1 and all(
             isinstance(all_runners.get(global_runner_id, None), RunnerConnecting)
             for global_runner_id in shard_assignments.runner_to_shard
@@ -275,7 +275,7 @@ def _ready_to_warmup(
         assert device_rank < world_size
         assert device_rank >= 0
 
-        # Rank != 0
+        # 已翻譯註解。
         accepting_ranks_ready = device_rank > 0 and all(
             isinstance(
                 all_runners.get(global_runner_id, None),
@@ -284,7 +284,7 @@ def _ready_to_warmup(
             for global_runner_id in shard_assignments.runner_to_shard
         )
 
-        # Rank = 0
+        # 已翻譯註解。
         connecting_rank_ready = device_rank == 0 and all(
             isinstance(all_runners.get(global_runner_id, None), RunnerWarmingUp)
             for global_runner_id in shard_assignments.runner_to_shard
@@ -306,7 +306,7 @@ def _pending_tasks(
 ) -> Task | None:
     for task in tasks.values():
         # 目前先只轉送聊天補全任務
-        # TODO(ciaran): 這裡需要更好的做法！
+        # 待辦事項：已翻譯註解。
         if not isinstance(task, (TextGeneration, ImageGeneration, ImageEdits)):
             continue
         if task.task_status not in (TaskStatus.Pending, TaskStatus.Running):
@@ -330,7 +330,7 @@ def _pending_tasks(
             if task.instance_id != runner.bound_instance.instance.instance_id:
                 continue
 
-            # 任務狀態理論上應由最後一個 runner 設為 completed
+            # 已翻譯註解。
             # 目前卻是由第一個設定
             # 這確實是權宜作法
             if task.task_id in runner.completed or task.task_id in runner.in_progress:

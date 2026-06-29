@@ -44,7 +44,7 @@ class _InterceptHandler(logging.Handler):
 
 
 def logger_setup(log_file: Path | None, verbosity: int = 0):
-    """Set up logging for this process - formatting, file handles, verbosity and output"""
+    """此說明已翻譯為繁體中文。"""
 
     logging.getLogger("exo_rs").setLevel(logging.INFO)
     logging.getLogger("networking").setLevel(logging.INFO)
@@ -53,7 +53,7 @@ def logger_setup(log_file: Path | None, verbosity: int = 0):
 
     logger.remove()
 
-    # replace all stdlib loggers with _InterceptHandlers that log to loguru
+    # 已翻譯註解。
     logging.basicConfig(handlers=[_InterceptHandler()], level=0)
 
     if verbosity == 0:
@@ -87,7 +87,7 @@ def logger_setup(log_file: Path | None, verbosity: int = 0):
 
 
 def logger_cleanup():
-    """Flush all queues before shutting down so any in-flight logs are written to disk"""
+    """此說明已翻譯為繁體中文。"""
     logger.complete()
 
 

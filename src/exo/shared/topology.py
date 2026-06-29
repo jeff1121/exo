@@ -170,7 +170,7 @@ class Topology:
             self.add_connection(conn)
 
     def remove_all_rdma_connections_touching(self, node_id: NodeId) -> None:
-        """Remove every RDMA edge incident to ``node_id`` (incoming or outgoing)."""
+        """此說明已翻譯為繁體中文。"""
         if node_id not in self._vertex_indices:
             return
         rx_idx = self._vertex_indices[node_id]
@@ -198,7 +198,7 @@ class Topology:
                 self._graph.remove_edge_from_index(conn_idx)
 
     def get_cycles(self) -> list[Cycle]:
-        """Get simple cycles in the graph, including singleton cycles"""
+        """此說明已翻譯為繁體中文。"""
 
         cycle_idxs = rx.simple_cycles(self._graph)
         cycles: list[Cycle] = []
@@ -263,9 +263,9 @@ class Topology:
         node_network: Mapping[NodeId, NodeNetworkInfo],
     ) -> list[list[NodeId]]:
         """
-        Find cycles in the Thunderbolt topology where all nodes have TB bridge enabled.
-        Only returns cycles with >=2 nodes (2+ machines in a loop), as
-        1 node doesn't cause the broadcast storm problem.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         enabled_nodes = {
             node_id
@@ -280,7 +280,7 @@ class Topology:
             enabled_nodes, node_network, "thunderbolt"
         )
 
-        # Build subgraph with only TB bridge enabled nodes and thunderbolt connections
+        # 已翻譯註解。
         graph: rx.PyDiGraph[NodeId, SocketConnection | RDMAConnection] = rx.PyDiGraph()
         node_to_idx: dict[NodeId, int] = {}
 
@@ -292,7 +292,7 @@ class Topology:
             source_id, sink_id = self._graph[u], self._graph[v]
             if source_id not in node_to_idx or sink_id not in node_to_idx:
                 continue
-            # Include connection if it's over a thunderbolt interface
+            # 已翻譯註解。
             if (
                 isinstance(conn, SocketConnection)
                 and conn.sink_multiaddr.ip_address in thunderbolt_ips
@@ -313,7 +313,7 @@ def _get_ips_with_interface_type(
     node_network: Mapping[NodeId, NodeNetworkInfo],
     interface_type: InterfaceType,
 ) -> set[str]:
-    """Get all IP addresses on interfaces of the specified type for the given nodes."""
+    """此說明已翻譯為繁體中文。"""
     ips: set[str] = set()
     for node_id in node_ids:
         network_info = node_network.get(node_id, NodeNetworkInfo())

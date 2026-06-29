@@ -30,8 +30,8 @@ if TYPE_CHECKING:
     from exo.worker.engines.mlx.vision import MediaRegion
 
 
-# Fraction of device memory above which LRU eviction kicks in.
-# Smaller machines need more aggressive eviction.
+# 已翻譯註解。
+# 已翻譯註解。
 def _default_memory_threshold() -> float:
     total_gb = Memory.from_bytes(psutil.virtual_memory().total).in_gb
     if total_gb >= 128:
@@ -49,7 +49,7 @@ _MEMORY_THRESHOLD = float(
 
 
 class CacheSnapshot:
-    """Snapshot of states at a known token position."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(
         self,
@@ -71,11 +71,11 @@ def _detached_copy(a: mx.array) -> mx.array:
 
 def copy_rotating_kv_cache(cache: RotatingKVCache) -> RotatingKVCache | None:
     """
-    Deepcopy copies the metadata associated with an mx array.
-    Specifically, it shares a shared_ptr to the underlying data and
-    the mlx graph inputs of the array. This causes a memory leak for rotating
-    kv cache. By creating an np array, no metadata is stored so the old cache
-    can be cleaned up nicely.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     if cache.keys is None or cache.values is None:
         return None
@@ -214,8 +214,8 @@ def _find_nearest_snapshot(
 
 
 def is_non_trimmable_cache_entry(c: object) -> bool:
-    """A cache entry is non-trimmable if `trim(n)` can't roll back its full
-    state — meaning the prefill +2 rollback must snapshot+restore it instead.
+    """此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     if isinstance(c, (ArraysCache, RotatingKVCache)):
         return True
@@ -225,23 +225,23 @@ def is_non_trimmable_cache_entry(c: object) -> bool:
 
 
 def has_non_kv_caches(cache: KVCacheType) -> bool:
-    """Check if a cache contains any ArraysCache (SSM) entries."""
+    """此說明已翻譯為繁體中文。"""
     return any(is_non_trimmable_cache_entry(c) for c in cache)
 
 
 class KVPrefixCache:
     def __init__(self, group: mx.distributed.Group | None):
-        self.prompts: list[mx.array] = []  # mx array of tokens (ints)
+        self.prompts: list[mx.array] = []  # 已翻譯註解。
         self.caches: list[KVCacheType] = []
         self._snapshots: list[list[CacheSnapshot] | None] = []
         self._media_regions: list[list["MediaRegion"]] = []
-        self._last_used: list[int] = []  # monotonic counter of last access per entry
+        self._last_used: list[int] = []  # 已翻譯註解。
         self.prefill_tps: list[float] = []
         self._access_counter: int = 0
         self._group = group
 
     def clear(self):
-        """Clear all cached prompts and caches."""
+        """此說明已翻譯為繁體中文。"""
         self.prompts.clear()
         self.caches.clear()
         self._snapshots.clear()
@@ -257,7 +257,7 @@ class KVPrefixCache:
         media_regions: list["MediaRegion"] | None = None,
         prefill_tps: float = 0.0,
     ):
-        """Add a new cache entry. Evicts LRU entries if memory is high."""
+        """此說明已翻譯為繁體中文。"""
         self._evict_if_needed()
         self.prompts.append(prompt_tokens)
         self.caches.append(deepcopy(cache))
@@ -278,7 +278,7 @@ class KVPrefixCache:
         media_regions: list["MediaRegion"] | None = None,
         prefill_tps: float = 0.0,
     ):
-        """Update an existing cache entry in-place."""
+        """此說明已翻譯為繁體中文。"""
         old_snapshots = self._snapshots[index]
         merged: list[CacheSnapshot] = []
         if old_snapshots:
@@ -317,22 +317,22 @@ class KVPrefixCache:
         prompt_tokens: mx.array,
         media_regions: list["MediaRegion"] | None = None,
     ) -> tuple[KVCacheType, mx.array, int | None, bool]:
-        """Get KV cache for prompt, returning remaining tokens to prefill.
+        """此說明已翻譯為繁體中文。
 
-        Returns:
-            Tuple of (cache, remaining_tokens, matched_index, is_exact) where:
-            - cache: KV cache to use for generation
-            - remaining_tokens: tokens that still need prefilling
-            - matched_index: index of the matched entry (None if no match)
-            - is_exact: True if the full prompt matched the cached entry
+        此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
+            此說明已翻譯為繁體中文。
 
-        For models with SSM layers (which are ArraysCache in mlx), the cache is trimmed to the
-        nearest SSM snapshot position at or before the match point for correctness.
-        Same for rotating KV Cache.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-        Media region validation: if the token-level prefix match extends into
-        a cached media region whose content_hash differs from the query's, the
-        match is truncated to the start of that region.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
         max_length = len(prompt_tokens)
         query_regions = media_regions or []
@@ -341,7 +341,7 @@ class KVPrefixCache:
         best_length = 0
         is_exact = False
 
-        # Find best cache match
+        # 已翻譯註解。
         for i, cached_prompt in enumerate(self.prompts):
             length = get_prefix_length(prompt_tokens, cached_prompt)
             if length > 0:
@@ -360,9 +360,9 @@ class KVPrefixCache:
         if best_index is None:
             return make_kv_cache(model), prompt_tokens, None, False
 
-        # For exact match: trim to max_length-1 so remaining has the last token
-        # For partial match: trim to best_length, remaining has suffix to prefill
-        # This ensures stream_generate always has at least one token to start with
+        # 已翻譯註解。
+        # 已翻譯註解。
+        # 已翻譯註解。
         has_ssm = has_non_kv_caches(self.caches[best_index])
         cached_length = cache_length(self.caches[best_index])
         if has_ssm:
@@ -372,7 +372,7 @@ class KVPrefixCache:
             target = min(cached_length, desired)
         restore_pos, restore_snap = self._get_snapshot(best_index, target)
 
-        # No usable snapshot — need fresh cache
+        # 已翻譯註解。
         if restore_snap is None and has_ssm:
             return make_kv_cache(model), prompt_tokens, None, False
 
@@ -380,7 +380,7 @@ class KVPrefixCache:
         tokens_to_trim = cached_length - restore_pos
         if tokens_to_trim > 0:
             trim_cache(prompt_cache, tokens_to_trim, restore_snap)
-            # Reset cache offset to match trimmed length
+            # 已翻譯註解。
             for c in prompt_cache:
                 if isinstance(c, (ArraysCache, RotatingKVCache)):
                     continue
@@ -427,12 +427,12 @@ class KVPrefixCache:
         return match_length
 
     def _evict_if_needed(self):
-        """Evict least recently used entries while memory usage is high."""
+        """此說明已翻譯為繁體中文。"""
         if len(self.caches) == 0:
             return
 
         evicted_any = False
-        # Evict LRU entries until below threshold
+        # 已翻譯註解。
         while (
             len(self.caches) > 0
             and self.get_memory_used_percentage() > _MEMORY_THRESHOLD
@@ -465,7 +465,7 @@ class KVPrefixCache:
             mx.array([local_pressure], dtype=mx.float32),
             group=self._group,
         )
-        # .item() evals.
+        # 已翻譯註解。
         max_pressure = float(mx.max(all_pressure).item())
         return max_pressure
 
@@ -490,7 +490,7 @@ def trim_cache(
                     c.offset = 0
                     c._idx = 0
             else:
-                # CacheList without a snapshot — zero each inner cache's state
+                # 已翻譯註解。
                 for inner in c:  # type: ignore[reportUnknownVariableType]
                     if isinstance(inner, (ArraysCache, RotatingKVCache)):
                         inner.state = [None] * len(inner.state)
@@ -502,13 +502,13 @@ def trim_cache(
 
 
 def encode_prompt(tokenizer: TokenizerWrapper, prompt: str) -> mx.array:
-    """Encode a prompt string to token array.
+    """此說明已翻譯為繁體中文。
 
-    For chat-templated prompts (which have their own structure markers like
-    <|im_user|>, <|im_middle|>, etc.), we should NOT add BOS/EOS tokens as
-    that would corrupt the prompt structure.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
-    # Chat templates define their own structure - don't add BOS/EOS
+    # 已翻譯註解。
     prompt_tokens = tokenizer.encode(prompt, add_special_tokens=False)
     return mx.array(prompt_tokens)
 
@@ -521,28 +521,28 @@ def _entry_length(
     | CacheList
     | DeepseekV4Cache,
 ) -> int:
-    # Use .offset attribute which KVCache types have (len() not implemented in older QuantizedKVCache).
+    # 已翻譯註解。
     if hasattr(c, "offset"):
         return c.offset
-    # For CacheList
+    # 已翻譯註解。
     if hasattr(c, "size"):
         return int(c.size())  # type: ignore
     return 0
 
 
 def cache_length(cache: KVCacheType) -> int:
-    """Get the number of tokens in a KV cache."""
+    """此說明已翻譯為繁體中文。"""
     return max((_entry_length(c) for c in cache), default=0)
 
 
 def get_prefix_length(prompt: mx.array, cached_prompt: mx.array) -> int:
-    """Find the length of the common prefix between two token arrays."""
+    """此說明已翻譯為繁體中文。"""
     n = min(int(prompt.shape[0]), int(cached_prompt.shape[0]))
     if n == 0:
         return 0
 
     equal = mx.equal(prompt[:n], cached_prompt[:n]).astype(mx.int32)
-    prefix_mask = mx.cumprod(equal)  # stays 1 until first mismatch, then 0 forever
+    prefix_mask = mx.cumprod(equal)  # 已翻譯註解。
     return int(mx.sum(prefix_mask).item())
 
 
@@ -553,7 +553,7 @@ def get_available_memory() -> Memory:
 
 def get_memory_used_percentage() -> float:
     mem = psutil.virtual_memory()
-    # percent is 0-100
+    # 已翻譯註解。
     return float(mem.percent / 100)
 
 

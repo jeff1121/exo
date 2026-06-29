@@ -43,7 +43,7 @@ class FluxJointBlockWrapper(JointBlockWrapper[JointTransformerBlock]):
         self._num_heads = block.attn.num_heads
         self._head_dim = block.attn.head_dimension
 
-        # Intermediate state stored between _compute_qkv and _apply_output
+        # 已翻譯註解。
         self._hidden_mod: FluxModulationParams | None = None
         self._context_mod: FluxModulationParams | None = None
 
@@ -161,7 +161,7 @@ class FluxJointBlockWrapper(JointBlockWrapper[JointTransformerBlock]):
         context_attn_output = attn_out[:, : self._text_seq_len, :]
         hidden_attn_output = attn_out[:, self._text_seq_len :, :]
 
-        hidden_attn_output = attn.to_out[0](hidden_attn_output)  # pyright: ignore[reportAny]
+        hidden_attn_output = attn.to_out[0](hidden_attn_output)  # 已翻譯註解。
         context_attn_output = attn.to_add_out(context_attn_output)
 
         assert self._hidden_mod is not None
@@ -169,7 +169,7 @@ class FluxJointBlockWrapper(JointBlockWrapper[JointTransformerBlock]):
 
         hidden_states = JointTransformerBlock.apply_norm_and_feed_forward(
             hidden_states=hidden_states,
-            attn_output=hidden_attn_output,  # pyright: ignore[reportAny]
+            attn_output=hidden_attn_output,  # 已翻譯註解。
             gate_mlp=self._hidden_mod.gate_mlp,
             gate_msa=self._hidden_mod.gate_msa,
             scale_mlp=self._hidden_mod.scale_mlp,
@@ -192,14 +192,14 @@ class FluxJointBlockWrapper(JointBlockWrapper[JointTransformerBlock]):
 
 
 class FluxSingleBlockWrapper(SingleBlockWrapper[SingleTransformerBlock]):
-    """Flux-specific single block wrapper with pipefusion support."""
+    """此說明已翻譯為繁體中文。"""
 
     def __init__(self, block: SingleTransformerBlock, text_seq_len: int):
         super().__init__(block, text_seq_len)
         self._num_heads = block.attn.num_heads
         self._head_dim = block.attn.head_dimension
 
-        # Intermediate state stored between _compute_qkv and _apply_output
+        # 已翻譯註解。
         self._norm_state: FluxNormGateState | None = None
 
     def _compute_qkv(

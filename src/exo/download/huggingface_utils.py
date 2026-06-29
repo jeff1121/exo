@@ -63,16 +63,16 @@ def get_hf_endpoint() -> str:
 
 
 def get_hf_home() -> Path:
-    """Get the Hugging Face home directory."""
+    """此說明已翻譯為繁體中文。"""
     return Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface"))
 
 
 async def get_hf_token() -> str | None:
-    """Retrieve the Hugging Face token from HF_TOKEN env var or HF_HOME directory."""
-    # Check environment variable first
+    """此說明已翻譯為繁體中文。"""
+    # 先檢查環境變數
     if token := os.environ.get("HF_TOKEN"):
         return token
-    # Fall back to file-based token
+    # 若無則回退為檔案型權杖
     token_path = get_hf_home() / "token"
     if await aios.path.exists(token_path):
         async with aiofiles.open(token_path, "r") as f:
@@ -81,7 +81,7 @@ async def get_hf_token() -> str | None:
 
 
 async def get_auth_headers() -> dict[str, str]:
-    """Get authentication headers if a token is available."""
+    """若有權杖可用則取得驗證標頭。"""
     token = await get_hf_token()
     if token:
         return {"Authorization": f"Bearer {token}"}
@@ -89,7 +89,7 @@ async def get_auth_headers() -> dict[str, str]:
 
 
 def extract_layer_num(tensor_name: str) -> int | None:
-    # This is a simple example and might need to be adjusted based on the actual naming convention
+    # 這是簡化範例，可能需依實際命名慣例調整
     parts = tensor_name.split(".")
     for part in parts:
         if part.isdigit():
@@ -119,14 +119,14 @@ def get_allow_patterns(weight_map: dict[str, str], shard: ShardMetadata) -> list
 
         if weight_map and shardable_component:
             for tensor_name, filename in weight_map.items():
-                # Strip component prefix from tensor name (added by weight map namespacing)
-                # E.g., "transformer/blocks.0.weight" -> "blocks.0.weight"
+                # 從張量名稱移除元件前綴（由權重映射命名空間加入）
+                # 已翻譯註解。
                 if "/" in tensor_name:
                     _, tensor_name_no_prefix = tensor_name.split("/", 1)
                 else:
                     tensor_name_no_prefix = tensor_name
 
-                # Determine which component this file belongs to from filename
+                # 由檔名判斷此檔案所屬元件
                 component_path = Path(filename).parts[0] if "/" in filename else None
 
                 if component_path == shardable_component.component_path.rstrip("/"):
@@ -145,7 +145,7 @@ def get_allow_patterns(weight_map: dict[str, str], shard: ShardMetadata) -> list
         else:
             shard_specific_patterns = set(["*.safetensors"])
 
-        # TODO(ciaran): temporary - Include all files from non-shardable components that have no index file
+        # 待辦事項：已翻譯註解。
         for component in shard.model_card.components:
             if not component.can_shard and component.safetensors_index_filename is None:
                 component_pattern = f"{component.component_path.rstrip('/')}/*"

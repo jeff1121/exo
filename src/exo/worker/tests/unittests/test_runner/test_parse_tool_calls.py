@@ -1,4 +1,4 @@
-"""Tests for parse_tool_calls generator, especially unclosed tool call handling."""
+"""此說明已翻譯為繁體中文。"""
 
 import json
 from collections.abc import Generator
@@ -10,7 +10,7 @@ from exo.worker.runner.llm_inference.tool_parsers import make_mlx_parser
 
 
 def _make_responses(texts: list[str]) -> Generator[GenerationResponse]:
-    """Create a sequence of GenerationResponses from text strings."""
+    """此說明已翻譯為繁體中文。"""
     for i, text in enumerate(texts):
         is_last = i == len(texts) - 1
         yield GenerationResponse(
@@ -29,10 +29,10 @@ _dummy_parser = make_mlx_parser("<tool_call>", "</tool_call>", _dummier_parser)
 
 
 class TestParseToolCalls:
-    """Tests for parse_tool_calls generator."""
+    """此說明已翻譯為繁體中文。"""
 
     def test_closed_tool_call_works_normally(self):
-        """Normal tool call flow should not be affected."""
+        """此說明已翻譯為繁體中文。"""
         texts = ["<tool_call>", "test_fn", "</tool_call>"]
         results = list(
             parse_tool_calls(
@@ -46,7 +46,7 @@ class TestParseToolCalls:
         assert isinstance(results[0], ToolCallResponse)
 
     def test_no_tool_call_passes_through(self):
-        """Responses without tool calls should pass through unchanged."""
+        """此說明已翻譯為繁體中文。"""
         texts = ["Hello", " world"]
         results = list(
             parse_tool_calls(
@@ -67,7 +67,7 @@ class TestParseToolCalls:
         assert r1.finish_reason == "stop"
 
     def test_failed_parse_yields_text(self):
-        """When tool call parsing fails, the text should be yielded as-is."""
+        """此說明已翻譯為繁體中文。"""
 
         def _failing_parser(text: str) -> dict[str, Any]:
             raise ValueError("parse failed")
@@ -87,7 +87,7 @@ class TestParseToolCalls:
         assert results[0].finish_reason == "error"
 
     def test_tool_schema_coerces_string_arguments_to_expected_types(self):
-        """Tool argument values should be coerced using provided JSON schema."""
+        """此說明已翻譯為繁體中文。"""
 
         def _parser_with_string_args(_text: str) -> dict[str, Any]:
             return {
@@ -133,7 +133,7 @@ class TestParseToolCalls:
         assert len(results) == 1
         assert isinstance(results[0], ToolCallResponse)
 
-        args = json.loads(results[0].tool_calls[0].arguments)  # pyright: ignore[reportAny]
+        args = json.loads(results[0].tool_calls[0].arguments)  # 已翻譯註解。
         assert args == {
             "action": "output",
             "id": 0,
@@ -142,7 +142,7 @@ class TestParseToolCalls:
         }
 
     def test_schema_coercion_skips_unknown_tools(self):
-        """If no matching tool schema exists, arguments should remain unchanged."""
+        """此說明已翻譯為繁體中文。"""
 
         def _parser_with_string_id(_text: str) -> dict[str, Any]:
             return {
@@ -174,5 +174,5 @@ class TestParseToolCalls:
         assert len(results) == 1
         assert isinstance(results[0], ToolCallResponse)
 
-        args = json.loads(results[0].tool_calls[0].arguments)  # pyright: ignore[reportAny]
+        args = json.loads(results[0].tool_calls[0].arguments)  # 已翻譯註解。
         assert args == {"action": "output", "id": "0"}

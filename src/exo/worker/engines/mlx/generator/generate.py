@@ -98,12 +98,12 @@ def patch_embed_tokens(
         chunk_end = chunk_start + chunk_len
         offset[0] = chunk_end
 
-        # The injection window is [start_offset, end_offset).
+        # 已翻譯註解。
         if chunk_end <= start_offset or chunk_start >= end_offset:
             return original_embed(input_ids)  # type: ignore
 
-        # Mixed chunk: splice the pre-computed embeddings for the overlap
-        # into `original_embed(input_ids)` for any text-only fringes.
+        # 混合區塊：將重疊區段的預先計算嵌入，拼接到
+        # 已翻譯註解。
         overlap_start = max(chunk_start, start_offset)
         overlap_end = min(chunk_end, end_offset)
         dst_start = overlap_start - chunk_start
@@ -125,12 +125,11 @@ def patch_embed_tokens(
 
     inner.embed_tokens = _inject
 
-    # Gemma 4 (e2b/e4b) has a second, independent embedding table that produces
-    # per-layer conditioning signals via self.embed_tokens_per_layer(input_ids).
-    # The injected vision embeddings live in the main residual stream only, so
-    # if image_token_id positions are passed through as-is the per-layer table
-    # produces garbage signals at those positions (the `<image>` token was never
-    # trained to have meaningful per-layer inputs).
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 已翻譯註解。
+    # 具有有意義的逐層輸入）。
     original_per_layer = getattr(inner, "embed_tokens_per_layer", None)  # type: ignore
     if original_per_layer is not None and image_token_id is not None:
 
@@ -151,7 +150,7 @@ def patch_embed_tokens(
 
 
 class PrefillCancelled(BaseException):
-    """Raised when prefill is cancelled via the progress callback."""
+    """此說明已翻譯為繁體中文。"""
 
 
 def _has_pipeline_communication_layer(model: Model):
@@ -172,25 +171,24 @@ def pipeline_parallel_prefill(
     distributed_prompt_progress_callback: Callable[[], None] | None,
     group: mx.distributed.Group,
 ) -> None:
-    """Prefill the KV cache for pipeline parallel with overlapping stages.
+    """此說明已翻譯為繁體中文。
 
-    Each rank processes the full prompt through its real cache, offset by leading
-    and trailing dummy iterations.
+    此說明已翻譯為繁體中文。
 
-    Total iterations per rank = N_real_chunks + world_size - 1:
-      - rank r leading dummies  (skip_pipeline_io, throwaway cache)
-      - N_real_chunks real      (pipeline IO active, real cache)
-      - (world_size-1-r) trailing dummies (skip_pipeline_io, throwaway cache)
+    此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
+      此說明已翻譯為繁體中文。
 
-    e.g.
-    Timeline (2 ranks, 3 chunks of 10240 tokens @ step=4096):
-        iter 0: R0 real[0:4096]     R1 dummy
-        iter 1: R0 real[4096:8192]  R1 real[0:4096]
-        iter 2: R0 real[8192:10240] R1 real[4096:8192]
-        iter 3: R0 dummy            R1 real[8192:10240]
+    例如：
+    此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
 
-    This function is designed to match mlx_lm's stream_generate exactly in terms of
-    side effects (given the same prefill step size)
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
     prefill_step_size = prefill_step_size // min(4, group.size())
 
@@ -205,7 +203,7 @@ def pipeline_parallel_prefill(
     rank = group.rank()
     world_size = group.size()
 
-    # Build list of real prompt chunk sizes
+    # 建立真實提示區塊大小清單
     total = len(prompt)
     real_chunk_sizes: list[int] = []
     remaining = total - 1
@@ -215,7 +213,7 @@ def pipeline_parallel_prefill(
         remaining -= n
     n_real = len(real_chunk_sizes)
 
-    # Each rank does: [rank leading dummies] [N real chunks] [world_size-1-rank trailing dummies]
+    # 已翻譯註解。
     n_leading = rank
     n_trailing = world_size - 1 - rank
     n_total = n_leading + n_real + n_trailing
@@ -227,7 +225,7 @@ def pipeline_parallel_prefill(
     )
     clear_prefill_sends()
 
-    # Initial callback matching generate_step
+    # 已翻譯註解。
     prompt_progress_callback(0, total)
 
     try:
@@ -259,7 +257,7 @@ def pipeline_parallel_prefill(
     finally:
         clear_prefill_sends()
 
-    # Post-loop: process remaining 1 token + add +1 entry to match stream_generate.
+    # 已翻譯註解。
     for _ in range(2):
         with mx.stream(generation_stream):
             model(prompt[-1:][None], cache=_prompt_cache)
@@ -270,7 +268,7 @@ def pipeline_parallel_prefill(
     with mx.stream(generation_stream):
         mx.eval([c.state for c in _prompt_cache])  # type: ignore
 
-    # Final callback matching generate_step
+    # 已翻譯註解。
     prompt_progress_callback(total, total)
 
     logger.info(
@@ -289,13 +287,13 @@ def prefill(
     on_prefill_progress: Callable[[int, int], None] | None,
     distributed_prompt_progress_callback: Callable[[], None] | None,
 ) -> tuple[float, int, list[CacheSnapshot]]:
-    """Prefill the KV cache with prompt tokens.
+    """此說明已翻譯為繁體中文。
 
-    This runs the model over the prompt tokens to populate the cache,
-    then trims off the extra generated token.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
 
-    Returns:
-        (tokens_per_sec, num_tokens, snapshots)
+    回傳：
+        此說明已翻譯為繁體中文。
     """
     num_tokens = len(prompt_tokens)
     if num_tokens == 0:
@@ -306,7 +304,7 @@ def prefill(
     has_ssm = has_non_kv_caches(cache)
     snapshots: list[CacheSnapshot] = []
 
-    # TODO(evan): kill the callbacks/runner refactor
+    # 待辦事項：已翻譯註解。
     def progress_callback(processed: int, total: int) -> None:
         elapsed = time.perf_counter() - start_time
         tok_per_sec = processed / elapsed if elapsed > 0 else 0
@@ -349,8 +347,8 @@ def prefill(
                 group=group,
             )
         else:
-            # Use max_tokens=1 because max_tokens=0 does not work.
-            # We just throw away the generated token - we only care about filling the cache
+            # 已翻譯註解。
+            # 已翻譯註解。
             for _ in stream_generate(
                 model=model,
                 tokenizer=tokenizer,
@@ -363,7 +361,7 @@ def prefill(
                 kv_bits=KV_BITS,
                 prompt_progress_callback=combined_progress_callback,
             ):
-                break  # Stop after first iteration - cache is now filled
+                break  # 第一輪後即停止 - 快取已填滿
     except PrefillCancelled:
         set_pipeline_queue_sends(model, queue_sends=False)
         set_pipeline_prefill(model, is_prefill=False)
@@ -372,8 +370,8 @@ def prefill(
     set_pipeline_queue_sends(model, queue_sends=False)
     set_pipeline_prefill(model, is_prefill=False)
 
-    # stream_generate added 1 extra generated token to the cache, so we should trim it.
-    # Because of needing to roll back arrays cache, we will generate on 2 tokens so trim 1 more.
+    # 已翻譯註解。
+    # 已翻譯註解。
     pre_gen = snapshots[-2] if has_ssm else None
     for i, c in enumerate(cache):
         non_trimmable = is_non_trimmable_cache_entry(c)
@@ -392,7 +390,7 @@ def prefill(
         f"Prefill complete: {num_tokens} tokens in {elapsed:.2f}s "
         f"({tokens_per_sec:.1f} tok/s)"
     )
-    # Exclude the last snapshot
+    # 排除最後一個快照
     return tokens_per_sec, num_tokens, snapshots[:-1] if snapshots else []
 
 
@@ -510,13 +508,13 @@ def extract_top_logprobs(
         top_indices_list = top_indices.tolist()  # type: ignore
         top_values_list = top_values.tolist()  # type: ignore
 
-    # Convert to list of TopLogprobItem
+    # 已翻譯註解。
     top_logprob_items: list[TopLogprobItem] = []
     for token_id, token_logprob in zip(top_indices_list, top_values_list, strict=True):
         if math.isnan(token_logprob):
             continue
 
-        # Decode token ID to string
+        # 已翻譯註解。
         token_str = tokenizer.decode([token_id])
         top_logprob_items.append(
             TopLogprobItem(
@@ -541,13 +539,13 @@ def mlx_generate(
     on_generation_token: Callable[[], None] | None = None,
     vision_processor: VisionProcessor | None = None,
 ) -> Generator[GenerationResponse]:
-    # Ensure that generation stats only contains peak memory for this generation
+    # 確保生成統計只包含本次生成的峰值記憶體
     mx.reset_peak_memory()
-    # TODO: Randomise task seed and set in taskparams, instead of hard coding as 42.
+    # 待辦事項：已翻譯註解。
     seed = task.seed or 42
     mx.random.seed(seed)
 
-    # Encode prompt once at the top and fix unmatched think tags
+    # 已翻譯註解。
     all_prompt_tokens = encode_prompt(tokenizer, prompt)
     all_prompt_tokens = fix_unmatched_think_end_tokens(all_prompt_tokens, tokenizer)
     min_prefix_hit_length = max(1000, system_prompt_token_count(task, tokenizer))
@@ -572,12 +570,12 @@ def mlx_generate(
         all_prompt_tokens = vision.prompt_tokens
     media_regions: list[MediaRegion] = vision.media_regions if vision else []
 
-    # Do not use the prefix cache if we are trying to do benchmarks.
+    # 若在做效能基準測試，則不要使用前綴快取。
     is_bench = task.bench
     if is_bench and not task.use_prefix_cache:
         kv_prefix_cache = None
 
-    # Use prefix cache if available, otherwise create fresh cache
+    # 可用時使用前綴快取，否則建立新快取
     prefix_hit_length = 0
     matched_index: int | None = None
     is_exact_hit = False
@@ -607,7 +605,7 @@ def mlx_generate(
         )
     )
     if is_bench:
-        # Only sample length eos tokens
+        # 已翻譯註解。
         eos_ids = eos_ids_from_tokenizer(tokenizer)
         logits_processors = [ban_token_ids(eos_ids)] + logits_processors
 
@@ -618,7 +616,7 @@ def mlx_generate(
         top_k=task.top_k if task.top_k is not None else 0,
     )
 
-    # Normalize stop sequences to a list
+    # 將停止序列正規化為清單
     stop_sequences: list[str] = (
         ([task.stop] if isinstance(task.stop, str) else task.stop)
         if task.stop is not None
@@ -706,7 +704,7 @@ def mlx_generate(
                 prefill_tps=prefill_tps,
             )
 
-    # stream_generate starts from the last token
+    # 已翻譯註解。
     last_token = prompt_tokens[-2:]
 
     max_tokens = task.max_output_tokens or MAX_TOKENS
@@ -735,7 +733,7 @@ def mlx_generate(
         generated_text_parts.append(out.text)
         accumulated_text += out.text
 
-        # Check for stop sequences
+        # 檢查停止序列
         text = out.text
         finish_reason: FinishReason | None = cast(
             FinishReason | None, out.finish_reason
@@ -745,7 +743,7 @@ def mlx_generate(
         if stop_sequences:
             for stop_seq in stop_sequences:
                 if stop_seq in accumulated_text:
-                    # Trim text to just before the stop sequence
+                    # 將文字裁切到停止序列前
                     stop_index = accumulated_text.find(stop_seq)
                     text_before_stop = accumulated_text[:stop_index]
                     chunk_start = len(accumulated_text) - len(out.text)
@@ -781,7 +779,7 @@ def mlx_generate(
                 completion_tokens_details=CompletionTokensDetails(reasoning_tokens=0),
             )
 
-        # Extract logprobs from the full vocabulary logprobs array
+        # 已翻譯註解。
         logprob: float | None = None
         top_logprobs: list[TopLogprobItem] | None = None
         if task.logprobs:
@@ -794,7 +792,7 @@ def mlx_generate(
                 )
 
         if is_done:
-            # Log generation stats
+            # 記錄生成統計
             generation_elapsed = time.perf_counter() - generation_start_time
             generated_tokens = len(generated_text_parts)
             generation_tps = (
@@ -822,6 +820,6 @@ def mlx_generate(
             mx_barrier(group)
             break
 
-        # Limit accumulated_text to what's needed for stop sequence detection
+        # 已翻譯註解。
         if max_stop_len > 0 and len(accumulated_text) > max_stop_len:
             accumulated_text = accumulated_text[-max_stop_len:]

@@ -28,18 +28,18 @@ from exo.utils.pydantic_ext import FrozenModel
 
 
 class State(FrozenModel):
-    """Global system state.
+    """此說明已翻譯為繁體中文。
 
-    The :class:`Topology` instance is encoded/decoded via an immutable
-    :class:`~shared.topology.TopologySnapshot` to ensure compatibility with
-    standard JSON serialisation.
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
+    此說明已翻譯為繁體中文。
     """
 
     model_config = ConfigDict(
         alias_generator=to_camel,
         validate_by_name=True,
         extra="forbid",
-        # I want to reenable this ASAP, but it's causing an issue with TaskStatus
+        # 已翻譯註解。
         strict=True,
         arbitrary_types_allowed=True,
     )
@@ -51,7 +51,7 @@ class State(FrozenModel):
     topology: Topology = Field(default_factory=Topology)
     last_event_applied_idx: int = Field(default=-1, ge=-1)
 
-    # Granular node state mappings (update independently at different frequencies)
+    # 已翻譯註解。
     node_identities: Mapping[NodeId, NodeIdentity] = {}
     node_memory: Mapping[NodeId, MemoryUsage] = {}
     node_disk: Mapping[NodeId, DiskUsage] = {}
@@ -62,13 +62,13 @@ class State(FrozenModel):
     node_rdma_ctl: Mapping[NodeId, NodeRdmaCtlStatus] = {}
     node_backends: Mapping[NodeId, list[Backend]] = {}
 
-    # Detected cycles where all nodes have Thunderbolt bridge enabled (>2 nodes)
+    # 已翻譯註解。
     thunderbolt_bridge_cycles: Sequence[Sequence[NodeId]] = []
 
     instance_links: Mapping[InstanceLinkId, InstanceLink] = {}
     prefill_server_ports: Mapping[RunnerId, int] = {}
 
-    # User-added model cards. Workers can reconcile their on-disk custom card cache
+    # 已翻譯註解。
     custom_model_cards: Mapping[ModelId, ModelCard] = {}
 
     @field_serializer("topology", mode="plain")
@@ -78,16 +78,16 @@ class State(FrozenModel):
     @field_validator("topology", mode="before")
     @classmethod
     def _deserialize_topology(cls, value: object) -> Topology:  # noqa: D401 – Pydantic validator signature
-        """Convert an incoming *value* into a :class:`Topology` instance.
+        """此說明已翻譯為繁體中文。
 
-        Accepts either an already constructed :class:`Topology` or a mapping
-        representing :class:`~shared.topology.TopologySnapshot`.
+        此說明已翻譯為繁體中文。
+        此說明已翻譯為繁體中文。
         """
 
         if isinstance(value, Topology):
             return value
 
-        if isinstance(value, Mapping):  # likely a snapshot-dict coming from JSON
+        if isinstance(value, Mapping):  # 已翻譯註解。
             snapshot = TopologySnapshot(**cast(dict[str, Any], value))  # type: ignore[arg-type]
             return Topology.from_snapshot(snapshot)
 

@@ -64,19 +64,19 @@ def run_distributed_test(
             p.start()
             processes.append(p)
 
-        for p in processes:  # pyright: ignore[reportAny]
-            p.join(timeout=process_timeout)  # pyright: ignore[reportAny]
+        for p in processes:  # 已翻譯註解。
+            p.join(timeout=process_timeout)  # 已翻譯註解。
 
-        timed_out = any(p.is_alive() for p in processes)  # pyright: ignore[reportAny]
+        timed_out = any(p.is_alive() for p in processes)  # 已翻譯註解。
 
-        for p in processes:  # pyright: ignore[reportAny]
-            if p.is_alive():  # pyright: ignore[reportAny]
-                p.terminate()  # pyright: ignore[reportAny]
-                p.join(timeout=5)  # pyright: ignore[reportAny]
+        for p in processes:  # 已翻譯註解。
+            if p.is_alive():  # 已翻譯註解。
+                p.terminate()  # 已翻譯註解。
+                p.join(timeout=5)  # 已翻譯註解。
 
         results: dict[int, tuple[bool, str]] = {}
-        while not result_queue.empty():  # pyright: ignore[reportAny]
-            rank, success, value = result_queue.get()  # pyright: ignore[reportAny]
+        while not result_queue.empty():  # 已翻譯註解。
+            rank, success, value = result_queue.get()  # 已翻譯註解。
             results[rank] = (success, value)
 
         return DistributedTestResult(

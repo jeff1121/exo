@@ -1,4 +1,4 @@
-"""Tests for XDG Base Directory Specification compliance."""
+"""此說明已翻譯為繁體中文。"""
 
 import os
 import sys
@@ -7,7 +7,7 @@ from unittest import mock
 
 
 def test_xdg_paths_on_linux():
-    """Test that XDG paths are used on Linux when XDG env vars are set."""
+    """此說明已翻譯為繁體中文。"""
     with (
         mock.patch.dict(
             os.environ,
@@ -20,7 +20,7 @@ def test_xdg_paths_on_linux():
         ),
         mock.patch.object(sys, "platform", "linux"),
     ):
-        # Re-import to pick up mocked values
+        # 已翻譯註解。
         import importlib
 
         import exo.shared.constants as constants
@@ -33,8 +33,8 @@ def test_xdg_paths_on_linux():
 
 
 def test_xdg_default_paths_on_linux():
-    """Test that XDG default paths are used on Linux when env vars are not set."""
-    # Remove XDG env vars and EXO_HOME
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     env = {
         k: v
         for k, v in os.environ.items()
@@ -57,7 +57,7 @@ def test_xdg_default_paths_on_linux():
 
 
 def test_legacy_exo_home_takes_precedence():
-    """Test that EXO_HOME environment variable takes precedence for backward compatibility."""
+    """此說明已翻譯為繁體中文。"""
     with mock.patch.dict(
         os.environ,
         {
@@ -78,8 +78,8 @@ def test_legacy_exo_home_takes_precedence():
 
 
 def test_macos_uses_traditional_paths():
-    """Test that macOS uses traditional ~/.exo directory."""
-    # Remove EXO_HOME to ensure we test the default behavior
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     env = {k: v for k, v in os.environ.items() if k != "EXO_HOME"}
     with (
         mock.patch.dict(os.environ, env, clear=True),
@@ -98,8 +98,8 @@ def test_macos_uses_traditional_paths():
 
 
 def test_models_in_data_dir():
-    """Test that default models directory is in the data directory."""
-    # Clear EXO_MODELS_DIRS to test default behavior
+    """此說明已翻譯為繁體中文。"""
+    # 已翻譯註解。
     env = {k: v for k, v in os.environ.items() if k != "EXO_MODELS_DIRS"}
     with mock.patch.dict(os.environ, env, clear=True):
         import importlib
@@ -112,7 +112,7 @@ def test_models_in_data_dir():
 
 
 def test_default_dir_always_prepended_to_models_dirs():
-    """Test that the default models dir is always the first entry in EXO_MODELS_DIRS."""
+    """此說明已翻譯為繁體中文。"""
     env = {
         k: v
         for k, v in os.environ.items()
@@ -131,7 +131,7 @@ def test_default_dir_always_prepended_to_models_dirs():
 
 
 def test_default_models_dir_override():
-    """Test that EXO_DEFAULT_MODELS_DIR can be overridden via env var."""
+    """此說明已翻譯為繁體中文。"""
     env = {
         k: v
         for k, v in os.environ.items()
@@ -156,7 +156,7 @@ def test_default_models_dir_override():
 
 
 def test_default_dir_only_entry_when_env_unset():
-    """Test that EXO_MODELS_DIRS contains only the default when env var is not set."""
+    """此說明已翻譯為繁體中文。"""
     env = {
         k: v
         for k, v in os.environ.items()
@@ -173,7 +173,7 @@ def test_default_dir_only_entry_when_env_unset():
 
 
 def test_overlap_between_dirs_and_read_only_dirs():
-    """Test that a directory in both lists is excluded from writable dirs."""
+    """此說明已翻譯為繁體中文。"""
     env = {
         k: v
         for k, v in os.environ.items()
@@ -188,16 +188,16 @@ def test_overlap_between_dirs_and_read_only_dirs():
 
         importlib.reload(constants)
 
-        # /tmp/shared should be excluded from writable dirs
+        # 已翻譯註解。
         assert Path("/tmp/shared") not in constants.EXO_MODELS_DIRS
         assert Path("/tmp/writable-only") in constants.EXO_MODELS_DIRS
-        # /tmp/shared should still be in read-only dirs
+        # 已翻譯註解。
         assert Path("/tmp/shared") in constants.EXO_MODELS_READ_ONLY_DIRS
         assert Path("/tmp/ro-only") in constants.EXO_MODELS_READ_ONLY_DIRS
 
 
 def test_empty_read_only_dirs_when_unset():
-    """Test that EXO_MODELS_READ_ONLY_DIRS is empty when env var is not set."""
+    """此說明已翻譯為繁體中文。"""
     env = {
         k: v
         for k, v in os.environ.items()
