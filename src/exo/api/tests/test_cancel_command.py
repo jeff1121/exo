@@ -10,7 +10,7 @@ from exo.shared.types.common import CommandId
 
 
 def _make_api() -> Any:
-    """Create a minimal API instance with cancel route and error handler."""
+    """建立含取消路由與錯誤處理器的最小 API 實例。"""
 
     app = FastAPI()
     api = object.__new__(API)
@@ -24,7 +24,7 @@ def _make_api() -> Any:
 
 
 def test_cancel_nonexistent_command_returns_404() -> None:
-    """Cancel for an unknown command_id returns 404 in OpenAI error format."""
+    """未知 command_id 的取消請求會以 OpenAI 錯誤格式回傳 404。"""
     api = _make_api()
     client = TestClient(api.app)
 
@@ -38,7 +38,7 @@ def test_cancel_nonexistent_command_returns_404() -> None:
 
 
 def test_cancel_active_text_generation() -> None:
-    """Cancel an active text generation command: returns 200, sender.close() called."""
+    """取消進行中的文字生成命令：回傳 200，並呼叫 sender.close()。"""
     api = _make_api()
     client = TestClient(api.app)
 
@@ -58,7 +58,7 @@ def test_cancel_active_text_generation() -> None:
 
 
 def test_cancel_active_image_generation() -> None:
-    """Cancel an active image generation command: returns 200, sender.close() called."""
+    """取消進行中的影像生成命令：回傳 200，並呼叫 sender.close()。"""
     api = _make_api()
     client = TestClient(api.app)
 

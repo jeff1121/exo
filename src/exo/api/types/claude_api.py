@@ -1,4 +1,4 @@
-"""Claude Messages API types for request/response conversion."""
+"""用於請求/回應轉換的 Claude Messages API 型別。"""
 
 from typing import Any, Literal
 
@@ -6,33 +6,33 @@ from pydantic import BaseModel, Field
 
 from exo.shared.types.common import ModelId
 
-# Tool definition types
+# 工具定義型別
 ClaudeToolInputSchema = dict[str, Any]
 
 
 class ClaudeToolDefinition(BaseModel, frozen=True):
-    """Tool definition in Claude Messages API request."""
+    """Claude Messages API 請求中的工具定義。"""
 
     name: str
     description: str | None = None
     input_schema: ClaudeToolInputSchema
 
 
-# Type aliases
+# 型別別名
 ClaudeRole = Literal["user", "assistant"]
 ClaudeStopReason = Literal["end_turn", "max_tokens", "stop_sequence", "tool_use"]
 
 
-# Content block types
+# 內容區塊型別
 class ClaudeTextBlock(BaseModel, frozen=True):
-    """Text content block in Claude Messages API."""
+    """Claude Messages API 的文字內容區塊。"""
 
     type: Literal["text"] = "text"
     text: str
 
 
 class ClaudeImageSource(BaseModel, frozen=True):
-    """Image source for Claude image blocks."""
+    """Claude 圖像區塊的圖片來源。"""
 
     type: Literal["base64", "url"]
     media_type: str | None = None
@@ -41,14 +41,14 @@ class ClaudeImageSource(BaseModel, frozen=True):
 
 
 class ClaudeImageBlock(BaseModel, frozen=True):
-    """Image content block in Claude Messages API."""
+    """Claude Messages API 的圖片內容區塊。"""
 
     type: Literal["image"] = "image"
     source: ClaudeImageSource
 
 
 class ClaudeThinkingBlock(BaseModel, frozen=True):
-    """Thinking content block in Claude Messages API."""
+    """Claude Messages API 的思考內容區塊。"""
 
     type: Literal["thinking"] = "thinking"
     thinking: str
@@ -56,7 +56,7 @@ class ClaudeThinkingBlock(BaseModel, frozen=True):
 
 
 class ClaudeToolUseBlock(BaseModel, frozen=True):
-    """Tool use content block in Claude Messages API."""
+    """Claude Messages API 的工具使用內容區塊。"""
 
     type: Literal["tool_use"] = "tool_use"
     id: str
@@ -65,7 +65,7 @@ class ClaudeToolUseBlock(BaseModel, frozen=True):
 
 
 class ClaudeToolResultBlock(BaseModel, frozen=True):
-    """Tool result content block in Claude Messages API request."""
+    """Claude Messages API 請求中的工具結果內容區塊。"""
 
     type: Literal["tool_result"] = "tool_result"
     tool_use_id: str
@@ -78,7 +78,7 @@ ClaudeContentBlock = (
     ClaudeTextBlock | ClaudeImageBlock | ClaudeThinkingBlock | ClaudeToolUseBlock
 )
 
-# Input content blocks can also include tool_result (sent by user after tool_use)
+# 輸入內容區塊也可包含 tool_result（由使用者在 tool_use 後送出）
 ClaudeInputContentBlock = (
     ClaudeTextBlock
     | ClaudeImageBlock
@@ -88,9 +88,9 @@ ClaudeInputContentBlock = (
 )
 
 
-# Request types
+# 請求型別
 class ClaudeMessage(BaseModel, frozen=True):
-    """Message in Claude Messages API request."""
+    """Claude Messages API 請求中的訊息。"""
 
     role: ClaudeRole
     content: str | list[ClaudeInputContentBlock]
@@ -102,7 +102,7 @@ class ClaudeThinkingConfig(BaseModel, frozen=True):
 
 
 class ClaudeMessagesRequest(BaseModel):
-    """Request body for Claude Messages API."""
+    """Claude Messages API 的請求主體。"""
 
     model: ModelId
     max_tokens: int
@@ -118,16 +118,16 @@ class ClaudeMessagesRequest(BaseModel):
     thinking: ClaudeThinkingConfig | None = None
 
 
-# Response types
+# 回應型別
 class ClaudeUsage(BaseModel, frozen=True):
-    """Token usage in Claude Messages API response."""
+    """Claude Messages API 回應中的 token 使用量。"""
 
     input_tokens: int
     output_tokens: int
 
 
 class ClaudeMessagesResponse(BaseModel, frozen=True):
-    """Response body for Claude Messages API."""
+    """Claude Messages API 的回應主體。"""
 
     id: str
     type: Literal["message"] = "message"
@@ -139,9 +139,9 @@ class ClaudeMessagesResponse(BaseModel, frozen=True):
     usage: ClaudeUsage
 
 
-# Streaming event types
+# 串流事件型別
 class ClaudeMessageStart(BaseModel, frozen=True):
-    """Partial message in message_start event."""
+    """message_start 事件中的部分訊息。"""
 
     id: str
     type: Literal["message"] = "message"
@@ -154,14 +154,14 @@ class ClaudeMessageStart(BaseModel, frozen=True):
 
 
 class ClaudeMessageStartEvent(BaseModel, frozen=True):
-    """Event sent at start of message stream."""
+    """在訊息串流開始時送出的事件。"""
 
     type: Literal["message_start"] = "message_start"
     message: ClaudeMessageStart
 
 
 class ClaudeContentBlockStartEvent(BaseModel, frozen=True):
-    """Event sent at start of a content block."""
+    """在內容區塊開始時送出的事件。"""
 
     type: Literal["content_block_start"] = "content_block_start"
     index: int
@@ -169,28 +169,28 @@ class ClaudeContentBlockStartEvent(BaseModel, frozen=True):
 
 
 class ClaudeTextDelta(BaseModel, frozen=True):
-    """Delta for text content block."""
+    """文字內容區塊的增量。"""
 
     type: Literal["text_delta"] = "text_delta"
     text: str
 
 
 class ClaudeThinkingDelta(BaseModel, frozen=True):
-    """Delta for thinking content block."""
+    """思考內容區塊的增量。"""
 
     type: Literal["thinking_delta"] = "thinking_delta"
     thinking: str
 
 
 class ClaudeInputJsonDelta(BaseModel, frozen=True):
-    """Delta for tool use input JSON content block."""
+    """工具使用輸入 JSON 內容區塊的增量。"""
 
     type: Literal["input_json_delta"] = "input_json_delta"
     partial_json: str
 
 
 class ClaudeContentBlockDeltaEvent(BaseModel, frozen=True):
-    """Event sent for content block delta."""
+    """送出內容區塊增量時的事件。"""
 
     type: Literal["content_block_delta"] = "content_block_delta"
     index: int
@@ -198,27 +198,27 @@ class ClaudeContentBlockDeltaEvent(BaseModel, frozen=True):
 
 
 class ClaudeContentBlockStopEvent(BaseModel, frozen=True):
-    """Event sent at end of a content block."""
+    """在內容區塊結束時送出的事件。"""
 
     type: Literal["content_block_stop"] = "content_block_stop"
     index: int
 
 
 class ClaudeMessageDeltaUsage(BaseModel, frozen=True):
-    """Usage in message_delta event."""
+    """message_delta 事件中的使用量。"""
 
     output_tokens: int
 
 
 class ClaudeMessageDelta(BaseModel, frozen=True):
-    """Delta in message_delta event."""
+    """message_delta 事件中的增量。"""
 
     stop_reason: ClaudeStopReason | None = None
     stop_sequence: str | None = None
 
 
 class ClaudeMessageDeltaEvent(BaseModel, frozen=True):
-    """Event sent with final message delta."""
+    """附帶最終訊息增量送出的事件。"""
 
     type: Literal["message_delta"] = "message_delta"
     delta: ClaudeMessageDelta
@@ -226,7 +226,7 @@ class ClaudeMessageDeltaEvent(BaseModel, frozen=True):
 
 
 class ClaudeMessageStopEvent(BaseModel, frozen=True):
-    """Event sent at end of message stream."""
+    """在訊息串流結束時送出的事件。"""
 
     type: Literal["message_stop"] = "message_stop"
 

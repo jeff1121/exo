@@ -1,5 +1,5 @@
 # pyright: reportUnusedFunction=false, reportAny=false
-"""Tests that InstanceDeleted events close active generation streams."""
+"""測試 InstanceDeleted 事件會關閉進行中的生成串流。"""
 
 from unittest.mock import MagicMock
 
@@ -17,7 +17,7 @@ from exo.shared.types.worker.instances import InstanceId
 
 
 def _make_api_with_state(state: State) -> API:
-    """Create a minimal API instance with pre-set state."""
+    """建立預先設定狀態的最小 API 實例。"""
     api = object.__new__(API)
     api.state = state
     api._text_generation_queues = {}  # pyright: ignore[reportPrivateUsage]
@@ -39,7 +39,7 @@ def _make_text_gen_task(
 
 
 def test_close_streams_for_deleted_instance() -> None:
-    """Deleting an instance closes the text generation sender for commands on that instance."""
+    """刪除實例時，會關閉該實例命令對應的文字生成 sender。"""
     instance_id = InstanceId("inst-1")
     command_id = CommandId("cmd-1")
     task = _make_text_gen_task(instance_id, command_id)
@@ -57,7 +57,7 @@ def test_close_streams_for_deleted_instance() -> None:
 
 
 def test_close_streams_ignores_unrelated_instances() -> None:
-    """Deleting an instance does NOT close streams for commands on other instances."""
+    """刪除實例時，不會關閉其他實例命令的串流。"""
     target_id = InstanceId("inst-delete")
     other_id = InstanceId("inst-keep")
     other_cmd = CommandId("cmd-keep")
@@ -76,7 +76,7 @@ def test_close_streams_ignores_unrelated_instances() -> None:
 
 
 def test_close_streams_for_deleted_instance_image_generation() -> None:
-    """Deleting an instance closes the image generation sender for commands on that instance."""
+    """刪除實例時，會關閉該實例命令對應的影像生成 sender。"""
     instance_id = InstanceId("inst-img")
     command_id = CommandId("cmd-img")
     task = ImageGeneration(

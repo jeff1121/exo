@@ -1,7 +1,7 @@
-"""Tests for OpenAI Responses API wire types.
+"""OpenAI Responses API 線路型別測試。
 
-ResponsesRequest is the API wire type for the Responses endpoint.
-The responses adapter converts it to TextGenerationTaskParams for the pipeline.
+ResponsesRequest 是 Responses 端點的 API 線路型別。
+responses 轉接器會將其轉為流程使用的 TextGenerationTaskParams。
 """
 
 import json
@@ -31,7 +31,7 @@ _TEST_MODEL = ModelId("test-model")
 
 
 class TestResponsesRequestValidation:
-    """Tests for OpenAI Responses API request validation."""
+    """OpenAI Responses API 請求驗證測試。"""
 
     def test_request_requires_model(self):
         with pytest.raises(pydantic.ValidationError):
@@ -65,7 +65,7 @@ class TestResponsesRequestValidation:
 
 
 class TestResponseUsage:
-    """Tests for ResponseUsage with input_tokens_details and output_tokens_details."""
+    """ResponseUsage（含 input_tokens_details 與 output_tokens_details）測試。"""
 
     def test_usage_defaults_to_zero_details(self):
         usage = ResponseUsage(
@@ -126,7 +126,7 @@ class TestResponseUsage:
 def _make_usage(
     prompt_tokens: int, completion_tokens: int, reasoning_tokens: int = 0
 ) -> Usage:
-    """Create a Usage object for testing."""
+    """建立測試用 Usage 物件。"""
     return Usage(
         prompt_tokens=prompt_tokens,
         completion_tokens=completion_tokens,
@@ -146,7 +146,7 @@ async def _token_chunks(
 
 
 class TestCollectResponsesResponseReasoningTokens:
-    """Tests for reasoning_tokens in collect_responses_response."""
+    """collect_responses_response 中 reasoning_tokens 的測試。"""
 
     async def test_non_streaming_includes_reasoning_tokens(self):
         usage = _make_usage(10, 25, reasoning_tokens=8)
@@ -203,7 +203,7 @@ class TestCollectResponsesResponseReasoningTokens:
 
 
 class TestGenerateResponsesStreamReasoningTokens:
-    """Tests for reasoning_tokens in generate_responses_stream."""
+    """generate_responses_stream 中 reasoning_tokens 的測試。"""
 
     async def test_streaming_includes_reasoning_tokens(self):
         usage = _make_usage(10, 25, reasoning_tokens=8)
@@ -230,9 +230,9 @@ class TestGenerateResponsesStreamReasoningTokens:
         ):
             events.append(event)
 
-        # The last event should be response.completed
+        # 最後一個事件應為 response.completed
         last_event = events[-1]
-        # Parse the SSE data
+        # 解析 SSE 資料
         data_line = [
             line for line in last_event.strip().split("\n") if line.startswith("data: ")
         ][0]

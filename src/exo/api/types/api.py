@@ -34,7 +34,7 @@ class ModelListModel(BaseModel):
     object: str = "model"
     created: int = Field(default_factory=lambda: int(time.time()))
     owned_by: str = "exo"
-    # openwebui fields
+    # openwebui 欄位
     hugging_face_id: str = Field(default="")
     name: str = Field(default="")
     description: str = Field(default="")
@@ -186,8 +186,8 @@ class NodePowerStats(BaseModel, frozen=True):
     node_id: NodeId
     samples: int
     avg_sys_power: float
-    # Per-phase breakdown. Populated only when the caller marks a phase
-    # boundary (e.g. prefill -> generation); None otherwise.
+    # 分階段拆解。僅在呼叫端標記階段
+    # 邊界（例如 prefill -> generation）時填入；否則為 None。
     prefill_avg_sys_power: float | None = None
     generation_avg_sys_power: float | None = None
     prefill_energy_joules: float | None = None
@@ -199,10 +199,10 @@ class PowerUsage(BaseModel, frozen=True):
     nodes: list[NodePowerStats]
     total_avg_sys_power_watts: float
     total_energy_joules: float
-    # Split between the prefill (prompt-processing) phase and the
-    # generation/decode phase. Populated only when the caller marks a phase
-    # boundary; None otherwise. The two phase energies should sum to
-    # approximately `total_energy_joules` (modulo interpolation rounding).
+    # 在 prefill（提示詞處理）階段與
+    # generation/decode 階段之間拆分。僅在呼叫端標記階段
+    # 邊界時填入；否則為 None。兩階段能耗應加總約等於
+    # `total_energy_joules`（允許插值取整誤差）。
     prefill_seconds: float | None = None
     generation_seconds: float | None = None
     prefill_energy_joules: float | None = None
@@ -282,7 +282,7 @@ class PlacementPreview(BaseModel):
     sharding: Sharding
     instance_meta: InstanceMeta
     instance: Instance | None = None
-    # Keys are NodeId strings, values are additional bytes that would be used on that node
+    # 鍵為 NodeId 字串，值為該節點將額外使用的位元組數
     memory_delta_by_node: dict[str, int] | None = None
     error: str | None = None
 
@@ -345,7 +345,7 @@ ImageSize = Literal[
 
 
 def normalize_image_size(v: object) -> ImageSize:
-    """Shared validator for ImageSize fields: maps None → "auto" and rejects invalid values."""
+    """ImageSize 欄位共用驗證器：將 None 對映為 "auto"，並拒絕無效值。"""
     if v is None:
         return "auto"
     if v not in get_args(ImageSize):
@@ -377,7 +377,7 @@ class ImageGenerationTaskParams(BaseModel):
     style: str | None = "vivid"
     user: str | None = None
     advanced_params: AdvancedImageParams | None = None
-    # Internal flag for benchmark mode - set by API, preserved through serialization
+    # 供 benchmark 模式使用的內部旗標 - 由 API 設定，並在序列化時保留
     bench: bool = False
 
     @field_validator("size", mode="before")
@@ -391,9 +391,9 @@ class BenchImageGenerationTaskParams(ImageGenerationTaskParams):
 
 
 class ImageEditsTaskParams(BaseModel):
-    """Internal task params for image-editing requests."""
+    """影像編輯請求的內部任務參數。"""
 
-    image_data: str = ""  # Base64-encoded image (empty when using chunked transfer)
+    image_data: str = ""  # Base64 編碼影像（使用分塊傳輸時為空）
     total_input_chunks: int = 0
     prompt: str
     model: str

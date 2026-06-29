@@ -8,16 +8,16 @@ from exo.api.main import API
 
 
 def test_http_exception_handler_formats_openai_style() -> None:
-    """Test that HTTPException is converted to OpenAI-style error format."""
+    """測試 HTTPException 會被轉為 OpenAI 風格的錯誤格式。"""
 
     app = FastAPI()
 
-    # Setup exception handler
+    # 設定例外處理器
     api = object.__new__(API)
     api.app = app
     api._setup_exception_handlers()  # pyright: ignore[reportPrivateUsage]
 
-    # Add test routes that raise HTTPException
+    # 新增會拋出 HTTPException 的測試路由
     @app.get("/test-error")
     async def _test_error() -> None:
         raise HTTPException(status_code=500, detail="Test error message")
@@ -28,7 +28,7 @@ def test_http_exception_handler_formats_openai_style() -> None:
 
     client = TestClient(app)
 
-    # Test 500 error
+    # 測試 500 錯誤
     response = client.get("/test-error")
     assert response.status_code == 500
     data: dict[str, Any] = response.json()
@@ -37,7 +37,7 @@ def test_http_exception_handler_formats_openai_style() -> None:
     assert data["error"]["type"] == "Internal Server Error"
     assert data["error"]["code"] == 500
 
-    # Test 404 error
+    # 測試 404 錯誤
     response = client.get("/test-not-found")
     assert response.status_code == 404
     data = response.json()

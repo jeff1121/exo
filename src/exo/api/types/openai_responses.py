@@ -1,8 +1,8 @@
-"""OpenAI Responses API wire types.
+"""OpenAI Responses API 線路型別。
 
-These types model the OpenAI Responses API request/response format.
-ResponsesRequest is the API-level wire type; for the canonical internal
-task params type used by the inference pipeline, see
+這些型別描述 OpenAI Responses API 的請求/回應格式。
+ResponsesRequest 是 API 層級的線路型別；若要看推論流程使用的標準內部
+任務參數型別，請參考
 ``exo.shared.types.text_generation.TextGenerationTaskParams``.
 """
 
@@ -14,14 +14,14 @@ from pydantic import BaseModel, Field
 from exo.shared.types.common import ModelId
 from exo.shared.types.text_generation import ReasoningEffort
 
-# Type aliases
+# 型別別名
 ResponseStatus = Literal["completed", "failed", "in_progress", "incomplete"]
 ResponseRole = Literal["user", "assistant", "system", "developer"]
 
 
-# Request input content part types
+# 請求輸入內容分段型別
 class ResponseInputTextPart(BaseModel, frozen=True):
-    """Text content part in a Responses API input message."""
+    """Responses API 輸入訊息中的文字內容分段。"""
 
     type: Literal["input_text"] = "input_text"
     text: str
@@ -34,7 +34,7 @@ class ResponseInputImagePart(BaseModel, frozen=True):
 
 
 class ResponseOutputTextPart(BaseModel, frozen=True):
-    """Output text content part (used when replaying assistant messages in input)."""
+    """輸出文字內容分段（用於在輸入中重播 assistant 訊息）。"""
 
     type: Literal["output_text"] = "output_text"
     text: str
@@ -45,9 +45,9 @@ ResponseContentPart = (
 )
 
 
-# Request input item types
+# 請求輸入項目型別
 class ResponseInputMessage(BaseModel, frozen=True):
-    """Input message for Responses API."""
+    """Responses API 的輸入訊息。"""
 
     role: ResponseRole
     content: str | list[ResponseContentPart]
@@ -55,7 +55,7 @@ class ResponseInputMessage(BaseModel, frozen=True):
 
 
 class FunctionCallInputItem(BaseModel, frozen=True):
-    """Function call item replayed in input (from a previous assistant response)."""
+    """在輸入中重播的函式呼叫項目（來自先前 assistant 回應）。"""
 
     type: Literal["function_call"] = "function_call"
     id: str | None = None
@@ -66,7 +66,7 @@ class FunctionCallInputItem(BaseModel, frozen=True):
 
 
 class FunctionCallOutputInputItem(BaseModel, frozen=True):
-    """Function call output item in input (user providing tool results)."""
+    """輸入中的函式呼叫輸出項目（使用者提供工具結果）。"""
 
     type: Literal["function_call_output"] = "function_call_output"
     call_id: str
@@ -301,21 +301,21 @@ ResponseInputItem = (
 
 
 class Reasoning(BaseModel, frozen=True):
-    """Reasoning configuration for OpenAI Responses API."""
+    """OpenAI Responses API 的推理設定。"""
 
     effort: ReasoningEffort | None = None
     summary: Literal["auto", "concise", "detailed"] | None = None
 
 
 class ResponsesRequest(BaseModel, frozen=True):
-    """Request body for OpenAI Responses API.
+    """OpenAI Responses API 的請求主體。
 
-    This is the API wire type for the Responses endpoint. The canonical
-    internal task params type is ``TextGenerationTaskParams``; see the
-    ``responses_request_to_text_generation`` adapter for conversion.
+    這是 Responses 端點的 API 線路型別。標準
+    內部任務參數型別為 ``TextGenerationTaskParams``；請參考
+    ``responses_request_to_text_generation`` 轉接器進行轉換。
     """
 
-    # --- OpenAI Responses API standard fields ---
+    # --- OpenAI Responses API 標準欄位 ---
     model: ModelId
     input: str | list[ResponseInputItem]
     instructions: str | None = None
@@ -327,7 +327,7 @@ class ResponsesRequest(BaseModel, frozen=True):
     metadata: dict[str, str] | None = None
     reasoning: Reasoning | None = None
 
-    # --- exo extensions (not in OpenAI Responses API spec) ---
+    # --- exo 擴充（不在 OpenAI Responses API 規範中）---
     enable_thinking: bool | None = Field(
         default=None,
         description="[exo extension] Boolean thinking toggle. Not part of the OpenAI Responses API.",
@@ -350,7 +350,7 @@ class ResponsesRequest(BaseModel, frozen=True):
         json_schema_extra={"x-exo-extension": True},
     )
 
-    # --- Internal fields (preserved during serialization, hidden from OpenAPI schema) ---
+    # --- 內部欄位（序列化時保留，並從 OpenAPI schema 隱藏）---
     chat_template_messages: list[dict[str, Any]] | None = Field(
         default=None,
         description="Internal: pre-formatted messages for tokenizer chat template. Not part of the OpenAI Responses API.",
@@ -358,9 +358,9 @@ class ResponsesRequest(BaseModel, frozen=True):
     )
 
 
-# Response types
+# 回應型別
 class ResponseOutputText(BaseModel, frozen=True):
-    """Text content in response output."""
+    """回應輸出中的文字內容。"""
 
     type: Literal["output_text"] = "output_text"
     text: str
@@ -368,7 +368,7 @@ class ResponseOutputText(BaseModel, frozen=True):
 
 
 class ResponseMessageItem(BaseModel, frozen=True):
-    """Message item in response output array."""
+    """回應輸出陣列中的訊息項目。"""
 
     type: Literal["message"] = "message"
     id: str
@@ -378,7 +378,7 @@ class ResponseMessageItem(BaseModel, frozen=True):
 
 
 class ResponseFunctionCallItem(BaseModel, frozen=True):
-    """Function call item in response output array."""
+    """回應輸出陣列中的函式呼叫項目。"""
 
     type: Literal["function_call"] = "function_call"
     id: str
@@ -389,14 +389,14 @@ class ResponseFunctionCallItem(BaseModel, frozen=True):
 
 
 class ResponseReasoningSummaryText(BaseModel, frozen=True):
-    """Summary text part in a reasoning output item."""
+    """推理輸出項目中的摘要文字分段。"""
 
     type: Literal["summary_text"] = "summary_text"
     text: str
 
 
 class ResponseReasoningItem(BaseModel, frozen=True):
-    """Reasoning output item in response output array."""
+    """回應輸出陣列中的推理輸出項目。"""
 
     type: Literal["reasoning"] = "reasoning"
     id: str
@@ -408,19 +408,19 @@ ResponseItem = ResponseMessageItem | ResponseFunctionCallItem | ResponseReasonin
 
 
 class InputTokensDetails(BaseModel, frozen=True):
-    """Breakdown of input token counts in Responses API response."""
+    """Responses API 回應中的輸入 token 計數拆解。"""
 
     cached_tokens: int = 0
 
 
 class OutputTokensDetails(BaseModel, frozen=True):
-    """Breakdown of output token counts in Responses API response."""
+    """Responses API 回應中的輸出 token 計數拆解。"""
 
     reasoning_tokens: int = 0
 
 
 class ResponseUsage(BaseModel, frozen=True):
-    """Token usage in Responses API response."""
+    """Responses API 回應中的 token 使用量。"""
 
     input_tokens: int
     input_tokens_details: InputTokensDetails
@@ -430,7 +430,7 @@ class ResponseUsage(BaseModel, frozen=True):
 
 
 class ResponsesResponse(BaseModel, frozen=True):
-    """Response body for OpenAI Responses API."""
+    """OpenAI Responses API 的回應主體。"""
 
     id: str
     object: Literal["response"] = "response"
@@ -442,9 +442,9 @@ class ResponsesResponse(BaseModel, frozen=True):
     usage: ResponseUsage | None = None
 
 
-# Streaming event types
+# 串流事件型別
 class ResponseCreatedEvent(BaseModel, frozen=True):
-    """Event sent when response is created."""
+    """回應建立時送出的事件。"""
 
     type: Literal["response.created"] = "response.created"
     sequence_number: int
@@ -452,7 +452,7 @@ class ResponseCreatedEvent(BaseModel, frozen=True):
 
 
 class ResponseInProgressEvent(BaseModel, frozen=True):
-    """Event sent when response starts processing."""
+    """回應開始處理時送出的事件。"""
 
     type: Literal["response.in_progress"] = "response.in_progress"
     sequence_number: int
@@ -460,7 +460,7 @@ class ResponseInProgressEvent(BaseModel, frozen=True):
 
 
 class ResponseOutputItemAddedEvent(BaseModel, frozen=True):
-    """Event sent when an output item is added."""
+    """新增輸出項目時送出的事件。"""
 
     type: Literal["response.output_item.added"] = "response.output_item.added"
     sequence_number: int
@@ -469,7 +469,7 @@ class ResponseOutputItemAddedEvent(BaseModel, frozen=True):
 
 
 class ResponseContentPartAddedEvent(BaseModel, frozen=True):
-    """Event sent when a content part is added."""
+    """新增內容分段時送出的事件。"""
 
     type: Literal["response.content_part.added"] = "response.content_part.added"
     sequence_number: int
@@ -480,7 +480,7 @@ class ResponseContentPartAddedEvent(BaseModel, frozen=True):
 
 
 class ResponseTextDeltaEvent(BaseModel, frozen=True):
-    """Event sent for text delta during streaming."""
+    """串流期間送出文字增量時的事件。"""
 
     type: Literal["response.output_text.delta"] = "response.output_text.delta"
     sequence_number: int
@@ -491,7 +491,7 @@ class ResponseTextDeltaEvent(BaseModel, frozen=True):
 
 
 class ResponseTextDoneEvent(BaseModel, frozen=True):
-    """Event sent when text content is done."""
+    """文字內容完成時送出的事件。"""
 
     type: Literal["response.output_text.done"] = "response.output_text.done"
     sequence_number: int
@@ -502,7 +502,7 @@ class ResponseTextDoneEvent(BaseModel, frozen=True):
 
 
 class ResponseContentPartDoneEvent(BaseModel, frozen=True):
-    """Event sent when a content part is done."""
+    """內容分段完成時送出的事件。"""
 
     type: Literal["response.content_part.done"] = "response.content_part.done"
     sequence_number: int
@@ -513,7 +513,7 @@ class ResponseContentPartDoneEvent(BaseModel, frozen=True):
 
 
 class ResponseOutputItemDoneEvent(BaseModel, frozen=True):
-    """Event sent when an output item is done."""
+    """輸出項目完成時送出的事件。"""
 
     type: Literal["response.output_item.done"] = "response.output_item.done"
     sequence_number: int
@@ -522,7 +522,7 @@ class ResponseOutputItemDoneEvent(BaseModel, frozen=True):
 
 
 class ResponseFunctionCallArgumentsDeltaEvent(BaseModel, frozen=True):
-    """Event sent for function call arguments delta during streaming."""
+    """串流期間送出函式呼叫參數增量時的事件。"""
 
     type: Literal["response.function_call_arguments.delta"] = (
         "response.function_call_arguments.delta"
@@ -534,7 +534,7 @@ class ResponseFunctionCallArgumentsDeltaEvent(BaseModel, frozen=True):
 
 
 class ResponseFunctionCallArgumentsDoneEvent(BaseModel, frozen=True):
-    """Event sent when function call arguments are complete."""
+    """函式呼叫參數完成時送出的事件。"""
 
     type: Literal["response.function_call_arguments.done"] = (
         "response.function_call_arguments.done"
@@ -547,7 +547,7 @@ class ResponseFunctionCallArgumentsDoneEvent(BaseModel, frozen=True):
 
 
 class ResponseReasoningSummaryPartAddedEvent(BaseModel, frozen=True):
-    """Event sent when a reasoning summary part is added."""
+    """新增推理摘要分段時送出的事件。"""
 
     type: Literal["response.reasoning_summary_part.added"] = (
         "response.reasoning_summary_part.added"
@@ -560,7 +560,7 @@ class ResponseReasoningSummaryPartAddedEvent(BaseModel, frozen=True):
 
 
 class ResponseReasoningSummaryTextDeltaEvent(BaseModel, frozen=True):
-    """Event sent for reasoning summary text delta during streaming."""
+    """串流期間送出推理摘要文字增量時的事件。"""
 
     type: Literal["response.reasoning_summary_text.delta"] = (
         "response.reasoning_summary_text.delta"
@@ -573,7 +573,7 @@ class ResponseReasoningSummaryTextDeltaEvent(BaseModel, frozen=True):
 
 
 class ResponseReasoningSummaryTextDoneEvent(BaseModel, frozen=True):
-    """Event sent when reasoning summary text is done."""
+    """推理摘要文字完成時送出的事件。"""
 
     type: Literal["response.reasoning_summary_text.done"] = (
         "response.reasoning_summary_text.done"
@@ -586,7 +586,7 @@ class ResponseReasoningSummaryTextDoneEvent(BaseModel, frozen=True):
 
 
 class ResponseReasoningSummaryPartDoneEvent(BaseModel, frozen=True):
-    """Event sent when a reasoning summary part is done."""
+    """推理摘要分段完成時送出的事件。"""
 
     type: Literal["response.reasoning_summary_part.done"] = (
         "response.reasoning_summary_part.done"
@@ -599,7 +599,7 @@ class ResponseReasoningSummaryPartDoneEvent(BaseModel, frozen=True):
 
 
 class ResponseCompletedEvent(BaseModel, frozen=True):
-    """Event sent when response is completed."""
+    """回應完成時送出的事件。"""
 
     type: Literal["response.completed"] = "response.completed"
     sequence_number: int
