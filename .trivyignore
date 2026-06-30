@@ -1,0 +1,4 @@
+# CVE-2026-32829 is reported from lz4_flex in zenoh-transport, but this
+# repository disables zenoh's transport_compression feature in Cargo.toml, so
+# the affected compression/decompression codepaths are not compiled.
+CVE-2026-32829
