@@ -1,6 +1,6 @@
 import json
 from collections.abc import Generator
-from typing import Any
+from typing import Any, cast
 
 from exo.api.types import CompletionTokensDetails, PromptTokensDetails, Usage
 from exo.shared.types.worker.runner_response import (
@@ -667,7 +667,9 @@ class TestThinkingModelsPrefixBuffering:
 
         tool_results = [r for r in results if isinstance(r, ToolCallResponse)]
         assert len(tool_results) == 1
-        raw = json.loads(tool_results[0].tool_calls[0].arguments)["raw"]  # 已翻譯註解。
+        raw = cast(
+            dict[str, str], json.loads(tool_results[0].tool_calls[0].arguments)
+        )["raw"]  # 已翻譯註解。
         assert "<function=glob>" in raw
         assert "<parameter=pattern>" in raw
         assert "</parameter>" in raw

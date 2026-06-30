@@ -79,7 +79,9 @@ async def test_check_runner_emits_error_chunk_for_inflight_text_generation() -> 
     supervisor.in_progress[task.task_id] = task
     supervisor.shutdown = lambda: None
 
-    await supervisor._check_runner(RuntimeError("boom"))  # 已翻譯註解。
+    await supervisor._check_runner(
+        RuntimeError("boom")
+    )  # pyright: ignore[reportPrivateUsage]  # 已翻譯註解。
 
     got_chunk = await event_receiver.receive()
     got_status = await event_receiver.receive()

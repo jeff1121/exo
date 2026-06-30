@@ -159,6 +159,7 @@ exclude = [
   "**/.direnv",
   "**/rust",
   "**/.github",
+  "src/exo/worker/tests",
 ]
 stubPath = ".typings"
 

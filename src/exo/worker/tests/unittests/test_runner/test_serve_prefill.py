@@ -4,7 +4,7 @@
 import io
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import cast
 
 import mlx.core as mx
 import pytest
@@ -21,6 +21,7 @@ from exo.worker.disaggregated.protocol import (
 from exo.worker.disaggregated.server import PrefillRequest
 from exo.worker.engines.mlx.cache import KVPrefixCache
 from exo.worker.engines.mlx.disaggregated.adapter import write_cache_to_wire
+from exo.worker.engines.mlx.types import Model
 
 N_HEADS = 2
 HEAD_DIM = 4
@@ -93,8 +94,8 @@ def _decode(payload: bytes) -> tuple[Header, list[KVChunk], int]:
 
 def _serve(request: PrefillRequest, kv_prefix_cache: KVPrefixCache | None) -> bytes:
     cache = mlx_serve_mod.run_prefill_for_request(
-        model=cast(Any, _FakeModel()),  # 已翻譯註解。
-        tokenizer=cast(Any, _FakeTokenizer()),  # 已翻譯註解。
+        model=cast(Model, _FakeModel()),  # 已翻譯註解。
+        tokenizer=cast(mlx_serve_mod.TokenizerWrapper, _FakeTokenizer()),  # 已翻譯註解。
         group=None,
         kv_prefix_cache=kv_prefix_cache,
         request=request,
