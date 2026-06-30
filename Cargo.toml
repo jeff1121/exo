@@ -22,10 +22,10 @@ opt-level = 3
 networking = { path = "rust/networking" }
 
 # pyo3
-pyo3 = "0.28.3"
-pyo3-async-runtimes = "0.28.0"
-pyo3-log = "0.13.3"
-pyo3-stub-gen = "0.22.3"
+pyo3 = "0.29.0"
+pyo3-async-runtimes = "0.29.0"
+pyo3-log = "0.13.4"
+pyo3-stub-gen = "0.23.0"
 
 # util
 extend = "1.2"
@@ -48,7 +48,20 @@ log = "0.4"
 env_logger = "0.11.10"
 
 # networking
-zenoh = "=1.9.0"
+zenoh = { version = "=1.9.0", default-features = false, features = [
+  # Keep zenoh transport_compression disabled until zenoh can move off
+  # lz4_flex 0.10.x.
+  "auth_pubkey",
+  "auth_usrpwd",
+  "transport_multilink",
+  "transport_quic",
+  "transport_quic_datagram",
+  "transport_tcp",
+  "transport_tls",
+  "transport_udp",
+  "transport_unixsock-stream",
+  "transport_ws",
+] }
 zenoh-plugin-storage-manager = { version = "=1.9.0", default-features = false }
 zenoh-plugin-trait = "=1.9.0"
 netwatcher = "0.6.0"

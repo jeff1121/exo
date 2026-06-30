@@ -553,9 +553,9 @@ dependencies = [
 
 [[package]]
 name = "chrono"
-version = "0.4.44"
+version = "0.4.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c673075a2e0e5f4a1dde27ce9dee1ea4558c7ffe648f576438a20ca1d2acc4b0"
+checksum = "1aa79e62e7697b8e29b513a68abacf485adcd1fe8284a4316c5ae868e6633327"
 dependencies = [
  "iana-time-zone",
  "js-sys",
@@ -1902,9 +1902,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.30"
+version = "0.4.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "616ec5685824bcc94416c6d4a7a446eea774a31efd7062c8480ba6fd06d7a6e5"
+checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
 
 [[package]]
 name = "lru-slab"
@@ -2236,9 +2236,9 @@ dependencies = [
 
 [[package]]
 name = "numpy"
-version = "0.28.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "778da78c64ddc928ebf5ad9df5edf0789410ff3bdbf3619aed51cd789a6af1e2"
+checksum = "6a5b15d63a5ff39e378daed0e1340d3a5964703ea9712eb09a0dc66fade996f4"
 dependencies = [
  "libc",
  "ndarray",
@@ -2678,9 +2678,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3"
-version = "0.28.3"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91fd8e38a3b50ed1167fb981cd6fd60147e091784c427b8f7183a7ee32c31c12"
+checksum = "cd274650b21d4bfc26a0a47587962c1edb425f69287324355cd040c3ea66071c"
 dependencies = [
  "libc",
  "once_cell",
@@ -2692,9 +2692,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-async-runtimes"
-version = "0.28.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e7364a95bf00e8377bbf9b0f09d7ff9715a29d8fcf93b47d1a967363b973178"
+checksum = "b3ef68daa7316a3fac65e5e18b2203f010346de1c1c53456811a2624673ab046"
 dependencies = [
  "clap",
  "futures-channel",
@@ -2709,9 +2709,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-async-runtimes-macros"
-version = "0.28.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c23399970eea9c31d0ac84cee4a9d8dd05f89b1da2f4dd5bb44b32a3f66db4f8"
+checksum = "faf75ff3922e6830adcaa30f3a359ce861326f6161f16a13d97adb40ba6a744a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2720,18 +2720,18 @@ dependencies = [
 
 [[package]]
 name = "pyo3-build-config"
-version = "0.28.3"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e368e7ddfdeb98c9bca7f8383be1648fd84ab466bf2bc015e94008db6d35611e"
+checksum = "c5e2a7d2f0d013342f295c048ad19237add5154a55b1c5a254c0ec93d4109078"
 dependencies = [
  "target-lexicon",
 ]
 
 [[package]]
 name = "pyo3-ffi"
-version = "0.28.3"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f29e10af80b1f7ccaf7f69eace800a03ecd13e883acfacc1e5d0988605f651e"
+checksum = "ca85c467da1bbc8d866eea5deff9cf29ea5f7785054a17da36e65bda9c05845b"
 dependencies = [
  "libc",
  "pyo3-build-config",
@@ -2739,9 +2739,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-log"
-version = "0.13.3"
+version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26c2ec80932c5c3b2d4fbc578c9b56b2d4502098587edb8bef5b6bfcad43682e"
+checksum = "f64083bd3a16a353d9d62335808e8e13d0552d2a2b83fdb084496192dcfa9fcd"
 dependencies = [
  "arc-swap",
  "log",
@@ -2750,9 +2750,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros"
-version = "0.28.3"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df6e520eff47c45997d2fc7dd8214b25dd1310918bbb2642156ef66a67f29813"
+checksum = "9ac53762fd065daa3194dd09337a38bd793a188100fd1a9304c4ab312d901771"
 dependencies = [
  "proc-macro2",
  "pyo3-macros-backend",
@@ -2762,22 +2762,21 @@ dependencies = [
 
 [[package]]
 name = "pyo3-macros-backend"
-version = "0.28.3"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4cdc218d835738f81c2338f822078af45b4afdf8b2e33cbb5916f108b813acb"
+checksum = "4ca3a1557399783172dc5bf39cfca835157732532cba56b71d2292161e53b362"
 dependencies = [
  "heck",
  "proc-macro2",
- "pyo3-build-config",
  "quote",
  "syn 2.0.117",
 ]
 
 [[package]]
 name = "pyo3-stub-gen"
-version = "0.22.3"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1242a6080f45edcfaf3be3b9968914dd47a408c5590aea22770b978f7c36ffa7"
+checksum = "a267ea4da9a831f534def7f1d8e14f581d5640d3e5af6527072724f216f4dbbf"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2801,9 +2800,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-stub-gen-derive"
-version = "0.22.3"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd9a73abe6f57890e657c265b86805637138f83203e1a56bc156078abf215e36"
+checksum = "6573423a5e8cc43ec7565eccccbc2dd35e1fc9032d9ca404afab875429eb8cf0"
 dependencies = [
  "heck",
  "indexmap 2.14.0",
@@ -5107,7 +5106,7 @@ dependencies = [
 [[package]]
 name = "zenoh"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "ahash",
  "arc-swap",
@@ -5157,7 +5156,7 @@ dependencies = [
 [[package]]
 name = "zenoh-buffers"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "zenoh-collections",
 ]
@@ -5165,7 +5164,7 @@ dependencies = [
 [[package]]
 name = "zenoh-codec"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "tracing",
  "uhlc",
@@ -5176,7 +5175,7 @@ dependencies = [
 [[package]]
 name = "zenoh-collections"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "ahash",
 ]
@@ -5184,7 +5183,7 @@ dependencies = [
 [[package]]
 name = "zenoh-config"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "json5",
  "nonempty-collections",
@@ -5209,7 +5208,7 @@ dependencies = [
 [[package]]
 name = "zenoh-core"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "lazy_static",
  "tokio",
@@ -5220,7 +5219,7 @@ dependencies = [
 [[package]]
 name = "zenoh-crypto"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "aes",
  "hmac",
@@ -5233,7 +5232,7 @@ dependencies = [
 [[package]]
 name = "zenoh-keyexpr"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "getrandom 0.2.17",
  "hashbrown 0.16.1",
@@ -5248,7 +5247,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "zenoh-config",
  "zenoh-link-commons",
@@ -5266,7 +5265,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-commons"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "base64",
@@ -5302,7 +5301,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-quic"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "rustls-webpki",
@@ -5318,7 +5317,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-quic_datagram"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "rustls-webpki",
@@ -5334,7 +5333,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-tcp"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "socket2 0.5.10",
@@ -5351,7 +5350,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-tls"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "base64",
@@ -5380,7 +5379,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-udp"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "libc",
@@ -5402,7 +5401,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-unixsock_stream"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "nix 0.29.0",
@@ -5420,7 +5419,7 @@ dependencies = [
 [[package]]
 name = "zenoh-link-ws"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "futures-util",
@@ -5440,7 +5439,7 @@ dependencies = [
 [[package]]
 name = "zenoh-macros"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5479,7 +5478,7 @@ dependencies = [
 [[package]]
 name = "zenoh-plugin-trait"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "git-version",
  "libloading",
@@ -5496,7 +5495,7 @@ dependencies = [
 [[package]]
 name = "zenoh-protocol"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "const_format",
  "rand 0.8.6",
@@ -5511,7 +5510,7 @@ dependencies = [
 [[package]]
 name = "zenoh-result"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "anyhow",
 ]
@@ -5519,7 +5518,7 @@ dependencies = [
 [[package]]
 name = "zenoh-runtime"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "lazy_static",
  "ron",
@@ -5533,7 +5532,7 @@ dependencies = [
 [[package]]
 name = "zenoh-sync"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "arc-swap",
  "event-listener",
@@ -5547,7 +5546,7 @@ dependencies = [
 [[package]]
 name = "zenoh-task"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "futures",
  "tokio",
@@ -5560,7 +5559,7 @@ dependencies = [
 [[package]]
 name = "zenoh-transport"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "crossbeam-utils",
@@ -5594,7 +5593,7 @@ dependencies = [
 [[package]]
 name = "zenoh-util"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "const_format",
@@ -5620,7 +5619,7 @@ dependencies = [
 [[package]]
 name = "zenoh_backend_traits"
 version = "1.9.0"
-source = "git+https://github.com/evanev7/zenoh.git?branch=exo#aa219b84e55dfbbf55ebd827b492626a470b8ac8"
+source = "git+https://github.com/evanev7/zenoh.git?branch=exo#2fed58ef264a8415b29452cc37054b2e04c10396"
 dependencies = [
  "async-trait",
  "const_format",
