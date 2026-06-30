@@ -281,13 +281,13 @@ def _run(tasks: Iterable[Task], send_after_ready: list[Task] | None = None):
         task_receiver.join = nothin
         builder = MlxBuilder(
             bound_instance.bound_shard.model_card.model_id,
-            event_sender,  # 已翻譯註解。
+            event_sender,  # pyright: ignore[reportArgumentType]  # 已翻譯註解。
             cancel_receiver,
         )
         runner = Runner(
             bound_instance,
             builder,
-            event_sender,  # 已翻譯註解。
+            event_sender,  # pyright: ignore[reportArgumentType]  # 已翻譯註解。
             task_receiver,
         )
         runner.main()
