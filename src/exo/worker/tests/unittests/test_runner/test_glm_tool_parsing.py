@@ -1,6 +1,7 @@
 """此說明已翻譯為繁體中文。"""
 
 import regex as re
+from typing import cast
 
 # 已翻譯註解。
 _func_name_regex = re.compile(r"^(.*?)<arg_key>", re.DOTALL)
@@ -12,7 +13,7 @@ _func_arg_regex = re.compile(
 
 def _parse_args(text: str) -> list[tuple[str, str]]:
     """此說明已翻譯為繁體中文。"""
-    pairs = _func_arg_regex.findall(text)
+    pairs = cast(list[tuple[str, str]], _func_arg_regex.findall(text))
     return [(k.strip(), v.strip()) for k, v in pairs]  # 已翻譯註解。
 
 

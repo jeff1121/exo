@@ -627,7 +627,9 @@ class TestE2EFullRoundTrip:
         assert "get_weather tool" in "".join(r.text for r in thinking_1)
         assert len(tool_1) == 1
         assert tool_1[0].tool_calls[0].name == "get_weather"
-        tc_args = json.loads(tool_1[0].tool_calls[0].arguments)  # 已翻譯註解。
+        tc_args = cast(
+            dict[str, str], json.loads(tool_1[0].tool_calls[0].arguments)
+        )  # 已翻譯註解。
         assert tc_args == {"city": "Hangzhou"}
 
         # 已翻譯註解。
@@ -857,7 +859,9 @@ class TestE2EFullRoundTrip:
 
         assert len(tool_results) == 1
         assert tool_results[0].tool_calls[0].name == "get_weather"
-        args = json.loads(tool_results[0].tool_calls[0].arguments)  # 已翻譯註解。
+        args = cast(
+            dict[str, str], json.loads(tool_results[0].tool_calls[0].arguments)
+        )  # 已翻譯註解。
         assert args == {"city": "Beijing"}
 
     def test_chained_tool_calls_loop(self):

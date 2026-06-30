@@ -2,7 +2,7 @@
 
 import json
 from collections.abc import Generator
-from typing import Any
+from typing import Any, cast
 
 from exo.shared.types.worker.runner_response import GenerationResponse, ToolCallResponse
 from exo.worker.runner.llm_inference.model_output_parsers import parse_tool_calls
@@ -133,7 +133,7 @@ class TestParseToolCalls:
         assert len(results) == 1
         assert isinstance(results[0], ToolCallResponse)
 
-        args = json.loads(results[0].tool_calls[0].arguments)  # 已翻譯註解。
+        args = cast(dict[str, object], json.loads(results[0].tool_calls[0].arguments))
         assert args == {
             "action": "output",
             "id": 0,
@@ -174,5 +174,5 @@ class TestParseToolCalls:
         assert len(results) == 1
         assert isinstance(results[0], ToolCallResponse)
 
-        args = json.loads(results[0].tool_calls[0].arguments)  # 已翻譯註解。
+        args = cast(dict[str, object], json.loads(results[0].tool_calls[0].arguments))
         assert args == {"action": "output", "id": "0"}
