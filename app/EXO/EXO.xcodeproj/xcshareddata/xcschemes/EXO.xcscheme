@@ -77,12 +77,12 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "EXO_BUG_AWS_ACCESS_KEY_ID"
-            value = "AKIAYEKP5EMXTOBYDGHX"
+            value = "EXAMPLE_ACCESS_KEY_ID"
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "EXO_BUG_AWS_SECRET_ACCESS_KEY"
-            value = "Ep5gIlUZ1o8ssTLQwmyy34yPGfTPEYQ4evE8NdPE"
+            value = "EXAMPLE_SECRET_ACCESS_KEY"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
