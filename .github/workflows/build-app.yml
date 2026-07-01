@@ -19,6 +19,10 @@ on:
     branches:
       - "test-app"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-macos-app:
     runs-on: "macos-26"
